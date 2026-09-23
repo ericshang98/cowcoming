@@ -1,0 +1,71 @@
+[
+  {
+    "id": "fengge",
+    "archive": "峰哥-Blender-GLB.zip",
+    "sha256": "0b028be4f3e4f7437206fed1b46f0fa7abb1ac583a53c8111461e30000f85c30",
+    "bytes": 5599520,
+    "bones": 22,
+    "clips": [
+      "bow",
+      "idle",
+      "look",
+      "nod",
+      "reflect",
+      "tilt",
+      "wave"
+    ],
+    "verifiedFileHashes": 25
+  },
+  {
+    "id": "toothless",
+    "archive": "小黑龙-Blender-GLB.zip",
+    "sha256": "0bb9e883a5bfc70b4cf5da36ed7ed2c1652993a86373bf7b1da44a23aa6420f8",
+    "bytes": 4033240,
+    "bones": 25,
+    "clips": [
+      "bow",
+      "idle",
+      "look",
+      "nod",
+      "reflect",
+      "tilt",
+      "wave",
+      "wing_flap"
+    ],
+    "verifiedFileHashes": 22
+  },
+  {
+    "id": "nailong",
+    "archive": "nailong-web-rig.zip",
+    "sha256": "a5e1867385cf29d40c3a976cf16b8e6d8b3f23f59bd6f31f8e79017fe5ab7ac5",
+    "bytes": 1822964,
+    "bones": 21,
+    "clips": [
+      "bow",
+      "idle",
+      "look",
+      "nod",
+      "reflect",
+      "tilt",
+      "wave"
+    ],
+    "verifiedFileHashes": 5
+  },
+  {
+    "id": "spiderman",
+    "archive": "spiderman-web-rig.zip",
+    "sha256": "c54a5c4c01c4d53c4262facfac825a6c65fb7d2835384da978f71b75e3c4015a",
+    "bytes": 5466788,
+    "bones": 22,
+    "clips": [
+      "bow",
+      "idle",
+      "look",
+      "nod",
+      "reflect",
+      "tilt",
+      "wave"
+    ],
+    "verifiedFileHashes": 4
+  }
+]

@@ -1,4 +1,4 @@
-import { Localized } from "../i18n/Language";
+import { Localized, useLanguage } from "../i18n/Language";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
@@ -61,22 +61,25 @@ export function BrandFooter({ trajectory = false }) {
 }
 export function Home() {
   const { mobile, navigate, muted, setMuted, paused, setPaused,
-    voiceState, interactionNotice, collection } = useApp();
+    voiceState, interactionNotice, collection, activeIp, wave } = useApp();
+  const { language } = useLanguage();
+  const isNiulai = activeIp.id === 'niulai';
   const feedback = voiceState.error || interactionNotice ||
     (voiceState.status === "loading" ? "One moment—getting ready to speak…"
-      : voiceState.status === "playing" ? voiceState.track?.textEn : "");
+      : voiceState.status === "playing" ? (language === 'zh' ? voiceState.track?.text || voiceState.track?.textEn : voiceState.track?.textEn) : "");
   return (
     <Localized><section className="home-page" data-pwc-critical="home">
       <h1 className="hero-wordmark">COW COMING</h1>
       <div className="home-tools">
         <Controls />
-        <div className="idea-promotion">
+        {isNiulai ? <><div className="idea-promotion">
           <button onClick={() => navigate("blog")}>WORLD ↗</button>
           <span>收集星光 · 解锁第一声妈妈</span>
         </div>
         <button className="latest-drop" onClick={() => navigate("blog")}>
           <span>星光</span> {collection.collected.length}/27 · {collection.unlocked ? "已学会叫妈妈" : "继续收集"} →
         </button>
+        </> : <div className="idea-promotion"><button onClick={wave}>{activeIp.actionLabel[language === 'en' ? 1 : 0]}</button><span>{language === 'en' ? 'Click the character for a short reply' : '左键点人物，听一句短回应'}</span></div>}
       </div>
       <div className="greeting home-product">
         <span className="eyebrow">POWERED BY JEV</span>
@@ -92,7 +95,7 @@ export function Home() {
         {muted && feedback && <button className="interaction-resume" onClick={() => setMuted(false)}>Sound off · Unmute</button>}
         {paused && feedback && <button className="interaction-resume" onClick={() => setPaused(false)}>Animation paused · Resume</button>}
       </div>
-      <NiulaiVoice />
+      {isNiulai && <NiulaiVoice />}
       {mobile && <TiltPrompt />}
     </section></Localized>
   );
