@@ -3,8 +3,10 @@ import { ArrowUpRight, Camera, Check, Clock3, Cpu, MessageSquare, Pause, Play, R
 import { useLanguage } from '../i18n/Language';
 import { observationExamples } from './observation-examples.mjs';
 import './observation-panel.css';
+import ConnectionBar from '../live/ConnectionBar';
+import LiveObservationPanel from '../live/LiveObservationPanel';
 
-export default function ObservationPanel() {
+export default function ObservationPanel({ live }) {
   const { language } = useLanguage();
   const t = (zh, en) => language === 'zh' ? zh : en;
   const copy = values => values[language === 'zh' ? 0 : 1];
@@ -54,8 +56,10 @@ export default function ObservationPanel() {
     tabs.current[next]?.focus();
   }
 
+  if (live?.snapshot) return <LiveObservationPanel live={live} />;
   return <aside className={`work-list evolution-technology observation-panel ${demo ? 'is-example' : ''}`} aria-label={t('感知、对话与决策', 'Perception, conversation and decisions')}>
     <div className="observer-heading"><span>TECHNOLOGY</span><span className="observer-source"><i className={demo ? 'example' : ''} />{demo ? t('示例模式', 'EXAMPLE MODE') : t('等待连接', 'NOT CONNECTED')}</span></div>
+    {live && <ConnectionBar live={live} />}
     <div className="observer-tabs" role="tablist" aria-label={t('切换观察内容', 'Observation view')}>
       {[['vision', 'Vision / Action', Camera], ['language', 'Large Language Model', MessageSquare]].map(([id, label, Icon], index) => <button key={id} ref={el => { tabs.current[index] = el; }} id={`observer-tab-${id}`} role="tab" aria-selected={tab === id} aria-controls={`observer-${id}`} tabIndex={tab === id ? 0 : -1} onClick={() => setTab(id)} onKeyDown={event => onTabKey(event, index)}><Icon size={14} /><span>{label}</span></button>)}
     </div>

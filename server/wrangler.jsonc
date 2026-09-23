@@ -1,0 +1,10 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "cowcoming-live",
+  "main": "worker.mjs",
+  "compatibility_date": "2025-11-25",
+  "durable_objects": { "bindings": [{ "name": "ROOMS", "class_name": "DeviceRoom" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DeviceRoom"] }],
+  "vars": { "ALLOWED_ORIGINS": "https://cowcoming.world,https://niulai.nexting.design,https://niulai-preview-20260922.pages.dev" },
+  "observability": { "enabled": false }
+}

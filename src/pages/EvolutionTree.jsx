@@ -13,9 +13,10 @@ const connections = {
 };
 const stages = ['ORIGIN', 'SHARED FORM', 'BRANCH', 'NEXT FORM'];
 
-export default function EvolutionTree({ selected, onSelect, onClose }) {
+export default function EvolutionTree({ revealed, selected, onSelect, onClose }) {
   const dialogRef = useRef(null);
   const path = ancestry(selected.id);
+  const known = id => isFormRevealed(id, revealed);
   useEffect(() => {
     const dialog = dialogRef.current;
     const opener = document.activeElement;
@@ -48,9 +49,9 @@ export default function EvolutionTree({ selected, onSelect, onClose }) {
       <div className="atlas-scroll">
         <div className="atlas-tree" role="group" aria-label="小牛 to 普通牛来. Future forms are undiscovered.">
           <svg className="atlas-connections" viewBox="0 0 800 632" preserveAspectRatio="none" aria-hidden="true">
-            {evolutionEdges.map(edge => <path key={edge.to} d={connections[edge.to]} className={!isFormRevealed(edge.to) ? 'undiscovered' : path.includes(edge.to) ? 'on-path' : ''} />)}
+            {evolutionEdges.map(edge => <path key={edge.to} d={connections[edge.to]} className={!known(edge.to) ? 'undiscovered' : path.includes(edge.to) ? 'on-path' : ''} />)}
           </svg>
-          {Object.values(forms).map(form => !isFormRevealed(form.id) ? (
+          {Object.values(forms).map(form => !known(form.id) ? (
             <div key={form.id} className="atlas-node glass atlas-undiscovered" aria-hidden="true"
               style={{ gridRow: form.depth + 1, gridColumn: form.branch === 'celestial' ? '1' : '2' }}>
               <span className="atlas-model-slot"><Box size={29} strokeWidth={1} /></span>
@@ -73,7 +74,7 @@ export default function EvolutionTree({ selected, onSelect, onClose }) {
               <span className="atlas-model-label">{form.model ? 'Model available' : 'Model pending'}</span>
             </button>
           ))}
-          {Object.values(forms).filter(form => form.depth >= 2).every(form => !isFormRevealed(form.id)) && <div className="atlas-mist">
+          {Object.values(forms).filter(form => form.depth >= 2).every(form => !known(form.id)) && <div className="atlas-mist">
             <div><LockKeyhole size={22} strokeWidth={1.2} /><h2>Still undiscovered</h2><p>Your story is still unfolding.</p></div>
           </div>}
         </div>

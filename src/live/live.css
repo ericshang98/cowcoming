@@ -1,0 +1,417 @@
+.live-connection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border: 1px solid #c1dade;
+  border-radius: 11px;
+  background: #ecf6f7b8;
+  min-width: 0;
+}
+.live-connection button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #087c88;
+  font: 9px/1.5 var(--mono);
+  flex-shrink: 0;
+}
+.live-room-name {
+  margin-left: auto;
+  font-size: 10px;
+  color: #6d858b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.live-error {
+  position: relative;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #9e5033;
+  background: #fff3e7dc;
+  border: 1px solid #e4ccad;
+  padding: 9px 24px 9px 10px;
+  border-radius: 8px;
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+.live-error > button {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+}
+.live-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(560px, calc(100vw - 24px));
+  max-height: 88dvh;
+  overflow: auto;
+  padding: 25px;
+  border: 1px solid #c8dfe4;
+  border-radius: 20px;
+  background: #f0f6f9;
+  color: #294b54;
+  box-shadow: 0 20px 100px #17384633;
+}
+.live-dialog::backdrop {
+  background: #14394355;
+  backdrop-filter: blur(8px);
+}
+.live-dialog header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.live-dialog header h2 {
+  font-size: 23px;
+  letter-spacing: -0.04em;
+  font-weight: 500;
+  margin: 0;
+}
+.live-dialog header button {
+  padding: 6px;
+}
+.live-dialog p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #637f89;
+}
+.live-dialog small {
+  font-size: 10px;
+  line-height: 1.7;
+  color: #708a93;
+  display: block;
+  margin-top: 15px;
+}
+.live-dialog label:not(.live-checkbox) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 11px;
+  margin-top: 17px;
+}
+.live-dialog input:not([type="checkbox"]),
+.live-dialog textarea,
+.live-dialog select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #bed5dc;
+  border-radius: 9px;
+  padding: 11px;
+  font: 12px/1.6 var(--mono);
+  color: #285764;
+  background: #ffffffbd;
+}
+.live-dialog textarea {
+  resize: vertical;
+}
+.live-checkbox {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+  margin-top: 14px;
+}
+.live-dialog input[type="checkbox"] {
+  accent-color: #188d96;
+}
+.live-dialog footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+.live-dialog footer button,
+.live-debug-actions button {
+  padding: 10px 15px;
+  border-radius: 9px;
+  font-size: 11px;
+  border: 1px solid #bdd7dc;
+}
+.live-primary {
+  background: #187d87;
+  color: white;
+}
+.live-dialog button:disabled,
+.live-observation button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.live-dialog :focus-visible {
+  outline: 2px solid #118a95;
+  outline-offset: 3px;
+}
+.live-dialog fieldset {
+  margin: 18px 0;
+  border: 1px solid #d0e0e4;
+  border-radius: 10px;
+  padding: 10px 13px;
+}
+.live-dialog legend {
+  font-size: 11px;
+  padding: 0 5px;
+}
+.live-action-options {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.live-action-options label {
+  margin: 0;
+}
+.live-dialog details {
+  margin-top: 18px;
+}
+.live-dialog summary {
+  font-size: 11px;
+  cursor: pointer;
+  color: #147b86;
+}
+.live-dialog pre {
+  font: 10px/1.7 var(--mono);
+  max-height: 240px;
+  overflow: auto;
+  background: #dfedf1;
+  padding: 12px;
+  border-radius: 9px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.live-debug-actions {
+  padding-top: 15px;
+  margin-top: 20px;
+  border-top: 1px solid #d1e2e6;
+}
+.live-debug-actions h3 {
+  font-size: 13px;
+  font-weight: 500;
+}
+.live-debug-actions > div {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.live-stop {
+  color: #a25a3c;
+}
+.live-lab-button {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  color: #147885;
+  font: 8px var(--mono);
+}
+.live-component-status {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  font: 7px/1.5 var(--mono);
+  color: #6b8992;
+  padding: 9px 2px;
+}
+.live-camera {
+  position: relative;
+  margin: 0 10px;
+  background: #18282c;
+  border-radius: 9px;
+  overflow: hidden;
+  min-height: 135px;
+}
+.live-camera video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.live-camera:not(.is-live) video {
+  opacity: 0.18;
+}
+.live-camera-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  color: #98b4bc;
+  text-align: center;
+  padding: 10px;
+}
+.live-camera-empty strong {
+  font-size: 12px;
+  font-weight: 400;
+}
+.live-camera-empty span {
+  font-size: 9px;
+}
+.live-video-badge {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: #082c24b3;
+  color: #a1f6cb;
+  font: 7px var(--mono);
+}
+.live-cv-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.live-cv-box {
+  position: absolute;
+  border: 1.5px solid #7bf5bf;
+  box-shadow: 0 0 0 1px #153b2655;
+}
+.live-cv-box span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 3px 5px;
+  background: #126549dd;
+  color: white;
+  font: 8px var(--mono);
+  white-space: nowrap;
+}
+.live-camera-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 13px;
+}
+.live-camera-controls > span {
+  font-size: 8px;
+  line-height: 1.5;
+  color: #69858e;
+}
+.live-camera-controls button {
+  font-size: 10px;
+  white-space: nowrap;
+  color: #147d88;
+}
+.live-vision {
+  flex: none !important;
+}
+.live-messages {
+  max-height: 280px;
+  min-height: 170px;
+}
+.live-messages p {
+  white-space: pre-wrap;
+}
+.live-empty {
+  color: #77919a;
+  font-size: 11px;
+}
+.live-input {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 6px;
+  border: 1px solid #c8dce2;
+  border-radius: 10px;
+  background: #f8fcfcc9;
+  flex-shrink: 0;
+}
+.live-input input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 8px;
+  font-size: 11px;
+  outline: none;
+  color: #305a65;
+}
+.live-input:focus-within {
+  outline: 2px solid #158591;
+}
+.live-input button {
+  padding: 5px 9px;
+  color: #087e8a;
+  font-size: 10px;
+}
+.live-command-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 9px;
+  line-height: 1.7;
+  color: #6c8790;
+  margin: 8px 2px;
+  flex-shrink: 0;
+}
+.live-command-status button {
+  padding: 5px 8px;
+  border: 1px solid #d9c5b6;
+  border-radius: 6px;
+  font-size: 9px;
+}
+.live-profile-note {
+  font-size: 10px;
+  line-height: 1.8;
+  color: #537a84;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border: 1px solid #c8dee2;
+  border-radius: 9px;
+}
+.live-profile-note strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+}
+.live-profile-note button {
+  color: #087e8a;
+  margin-top: 7px;
+  font-size: 10px;
+}
+@media (max-width: 768px) {
+  .live-dialog {
+    padding: 20px;
+  }
+  .live-connection {
+    padding: 12px;
+  }
+  .live-connection button {
+    font-size: 10px;
+  }
+  .live-messages {
+    max-height: 340px;
+  }
+  .live-camera {
+    min-height: 160px;
+  }
+  .live-component-status {
+    font-size: 8px;
+  }
+  .live-input input {
+    font-size: 16px;
+  }
+  .live-camera-controls button {
+    min-height: 36px;
+  }
+}
+
+.live-kit-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 22px;
+  font-size: 11px;
+  color: #117e8a;
+}
+.live-kit-links a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
