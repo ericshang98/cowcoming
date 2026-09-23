@@ -37,10 +37,13 @@ const fs = require("node:fs");
     );
     await page.keyboard.up("w");
     check("real movement collects the first star");
-    const before = await page.locator(".world-progress footer").innerText();
     await page
       .getByRole("button", { name: "打开星光地图", exact: true })
       .click();
+    // Opening the map freezes movement; let the throttled HUD publish the
+    // final distance before checking that selecting a target cannot move it.
+    await page.waitForTimeout(600);
+    const before = await page.locator(".world-progress footer").innerText();
     await page
       .getByRole("button", { name: "星光 2，设为目标", exact: true })
       .click();

@@ -81,10 +81,12 @@ const base = process.env.QA_BASE_URL || 'http://127.0.0.1:42910/';
     await page.waitForSelector('.binding-page');
     assert.equal(await page.locator('.evolution-node').count(), 0);
     assert.equal(await page.evaluate(() => window.__replica.controller.rig.characterId), 'niulai');
+    assert.ok(await page.locator('.navigation button[aria-controls=ip-switcher]').isDisabled());
+    await page.locator('.navigation button').filter({hasText:/首页|HOME/}).click();
     await open(); await page.locator('[data-ip=toothless]').click(); await waitIp('toothless');
     assert.equal((await state()).mode, 'home');
     assert.deepEqual(await page.evaluate(() => window.__replica.controller.evolution.context()), evolution);
-    checks.push('switching preserves evolution session; selection from Work enters Home');
+    checks.push('switching preserves evolution session; Work disables the selector; returning Home enables it');
 
     await page.locator('.navigation .language-toggle').click(); await open();
     assert.equal(await page.locator('#ip-switcher-title').textContent(),'Who’s here today?');

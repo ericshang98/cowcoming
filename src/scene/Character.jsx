@@ -26,7 +26,8 @@ const gestures = {
 function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, visible, onReady, entrance, onTap }) {
   const gltf = useGLTF(human ? HUMAN : modelAsset),
     { camera, gl } = useThree(),
-    root = useRef();
+    root = useRef(),
+    initialScale = useRef(entrance ? 0.7 : placement.scale);
   const model = useMemo(() => {
     const m = clone(gltf.scene);
     m.traverse((o) => {
@@ -329,7 +330,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     controller.headPitch = st.pitch;
   });
   return (
-    <group ref={root} scale={0.7}>
+    <group ref={root} scale={initialScale.current}>
       <group scale={metrics.s} position={metrics.pos}>
         <primitive object={model} onClick={event => {
           event.stopPropagation();
@@ -341,7 +342,10 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
   );
 }
 class SceneBoundary extends React.Component {
-  state = { error: null };
+  state = { error: null, asset: this.props.asset };
+  static getDerivedStateFromProps(props, state) {
+    return props.asset !== state.asset ? { error: null, asset: props.asset } : null;
+  }
   static getDerivedStateFromError(error) {
     return { error };
   }
@@ -360,6 +364,7 @@ class SceneBoundary extends React.Component {
   }
 }
 export default function Character({
+  rigKey = "default",
   controller,
   mode,
   mobile,
@@ -498,7 +503,7 @@ export default function Character({
           transform: `translateX(-50%) scale(${placement.scale})`,
         }}
       />
-      <SceneBoundary key={modelAsset} onError={(e) => {
+      <SceneBoundary asset={modelAsset} onError={(e) => {
         controller.error = e.message;
         onError?.(e);
       }}>
@@ -520,7 +525,7 @@ export default function Character({
               environmentIntensity={0.3}
             />
             <Rig
-              key={modelAsset}
+              key={`${modelAsset}:${rigKey}`}
               modelAsset={modelAsset}
               characterId={characterId}
               human={false}
@@ -530,6 +535,7 @@ export default function Character({
               visible
               entrance={!boot}
               onReady={() => {
+                controller.error = null;
                 controller.ready = true;
                 onReady();
               }}
