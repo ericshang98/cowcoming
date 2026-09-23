@@ -55,3 +55,20 @@ class Runtime(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class Contract(unittest.IsolatedAsyncioTestCase):
+    async def test_unconfigured_hardware_never_claims_motion_or_stop(self):
+        from hardware_adapter import Adapter
+        adapter = Adapter()
+        self.assertEqual((await adapter.status())['supportedActions'], [])
+        self.assertEqual((await adapter.status())['hardware'], 'offline')
+        self.assertFalse((await adapter.stop())['confirmed'])
+        self.assertEqual((await adapter.execute('NOD'))['status'], 'unknown')
+
+    async def test_capability_intersection_and_semantics(self):
+        from action_contract import validate_profile, executable_actions
+        p={'actionContractVersion':2,'formId':'calf','allowedActions':['NOD','TILT_LEFT','WAIT'],'animationMap':{'NOD':['nod-soft'],'TILT_LEFT':['tilt-left'],'WAIT':['idle']}}
+        self.assertEqual(executable_actions(p,{'actionContractVersion':2,'hardware':'ready','supportedActions':['NOD']}),['NOD','WAIT'])
+        self.assertEqual(executable_actions(p,{'actionContractVersion':2,'hardware':'offline','supportedActions':['NOD']}),['WAIT'])
+        p['animationMap']['NOD']=['nod-double']
+        with self.assertRaises(ValueError): validate_profile(p)

@@ -13,7 +13,7 @@ export const evolutionAssets = {
         "label": "确认点头",
         "formId": "calf",
         "logicalId": "nod_confirm",
-        "baseActionId": "nod",
+        "baseActionId": "NOD",
         "baseActionLabel": "点头",
         "durationSeconds": 2.2,
         "description": "先关注，干脆点一下，再自然回正。",
@@ -38,7 +38,9 @@ export const evolutionAssets = {
           3
         ],
         "hardwareCommands": false,
-        "actionId": "NOD"
+        "actionId": "NOD",
+        "authoringPrimitive": "nod",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "calf_head_shake",
@@ -46,7 +48,7 @@ export const evolutionAssets = {
         "label": "摇头",
         "formId": "calf",
         "logicalId": "head_shake",
-        "baseActionId": "head_shake",
+        "baseActionId": "SHAKE",
         "baseActionLabel": "摇头",
         "durationSeconds": 3,
         "description": "左右连续摇头，最后一下收小，自然回正。",
@@ -69,7 +71,9 @@ export const evolutionAssets = {
           5
         ],
         "hardwareCommands": false,
-        "actionId": "SHAKE"
+        "actionId": "SHAKE",
+        "authoringPrimitive": "head_shake",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "calf_nod_proud",
@@ -77,7 +81,7 @@ export const evolutionAssets = {
         "label": "得意双点头",
         "formId": "calf",
         "logicalId": "nod_proud",
-        "baseActionId": "nod",
+        "baseActionId": "NOD_DOUBLE",
         "baseActionLabel": "点头",
         "durationSeconds": 2.9,
         "description": "轻轻挺胸，两次点头；第二下收小，留一点得意劲。",
@@ -106,7 +110,9 @@ export const evolutionAssets = {
           3
         ],
         "hardwareCommands": false,
-        "actionId": "NOD_DOUBLE"
+        "actionId": "NOD_DOUBLE",
+        "authoringPrimitive": "nod",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "calf_tilt_curious_left",
@@ -114,7 +120,7 @@ export const evolutionAssets = {
         "label": "左侧好奇歪头",
         "formId": "calf",
         "logicalId": "tilt_curious_left",
-        "baseActionId": "head_tilt_left",
+        "baseActionId": "TILT_LEFT",
         "baseActionLabel": "左歪头",
         "durationSeconds": 3.1,
         "description": "先停半拍，向自己的左侧歪头，略微探身，等你解释。",
@@ -139,7 +145,9 @@ export const evolutionAssets = {
           4
         ],
         "hardwareCommands": false,
-        "actionId": "TILT_LEFT"
+        "actionId": "TILT_LEFT",
+        "authoringPrimitive": "head_tilt_left",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "calf_tilt_curious_right",
@@ -147,7 +155,7 @@ export const evolutionAssets = {
         "label": "右侧好奇歪头",
         "formId": "calf",
         "logicalId": "tilt_curious_right",
-        "baseActionId": "head_tilt_right",
+        "baseActionId": "TILT_RIGHT",
         "baseActionLabel": "右歪头",
         "durationSeconds": 3.1,
         "description": "先停半拍，向自己的右侧歪头，略微探身，等你解释。",
@@ -172,7 +180,9 @@ export const evolutionAssets = {
           4
         ],
         "hardwareCommands": false,
-        "actionId": "TILT_RIGHT"
+        "actionId": "TILT_RIGHT",
+        "authoringPrimitive": "head_tilt_right",
+        "interruptionRecoverySeconds": 0
       }
     ]
   },
@@ -189,7 +199,7 @@ export const evolutionAssets = {
         "label": "确认点头",
         "formId": "normal",
         "logicalId": "nod_confirm",
-        "baseActionId": "nod",
+        "baseActionId": "NOD",
         "baseActionLabel": "点头",
         "durationSeconds": 2.2,
         "description": "先关注，干脆点一下，再自然回正。",
@@ -214,7 +224,9 @@ export const evolutionAssets = {
           3
         ],
         "hardwareCommands": false,
-        "actionId": "NOD"
+        "actionId": "NOD",
+        "authoringPrimitive": "nod",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "normal_head_shake",
@@ -222,7 +234,7 @@ export const evolutionAssets = {
         "label": "摇头",
         "formId": "normal",
         "logicalId": "head_shake",
-        "baseActionId": "head_shake",
+        "baseActionId": "SHAKE",
         "baseActionLabel": "摇头",
         "durationSeconds": 3,
         "description": "左右连续摇头，最后一下收小，自然回正。",
@@ -245,7 +257,9 @@ export const evolutionAssets = {
           5
         ],
         "hardwareCommands": false,
-        "actionId": "SHAKE"
+        "actionId": "SHAKE",
+        "authoringPrimitive": "head_shake",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "normal_nod_proud",
@@ -253,7 +267,7 @@ export const evolutionAssets = {
         "label": "得意双点头",
         "formId": "normal",
         "logicalId": "nod_proud",
-        "baseActionId": "nod",
+        "baseActionId": "NOD_DOUBLE",
         "baseActionLabel": "点头",
         "durationSeconds": 2.9,
         "description": "轻轻挺胸，两次点头；第二下收小，留一点得意劲。",
@@ -282,7 +296,9 @@ export const evolutionAssets = {
           3
         ],
         "hardwareCommands": false,
-        "actionId": "NOD_DOUBLE"
+        "actionId": "NOD_DOUBLE",
+        "authoringPrimitive": "nod",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "normal_tilt_curious_left",
@@ -290,7 +306,7 @@ export const evolutionAssets = {
         "label": "左侧好奇歪头",
         "formId": "normal",
         "logicalId": "tilt_curious_left",
-        "baseActionId": "head_tilt_left",
+        "baseActionId": "TILT_LEFT",
         "baseActionLabel": "左歪头",
         "durationSeconds": 3.1,
         "description": "先停半拍，向自己的左侧歪头，略微探身，等你解释。",
@@ -315,7 +331,9 @@ export const evolutionAssets = {
           4
         ],
         "hardwareCommands": false,
-        "actionId": "TILT_LEFT"
+        "actionId": "TILT_LEFT",
+        "authoringPrimitive": "head_tilt_left",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "normal_tilt_curious_right",
@@ -323,7 +341,7 @@ export const evolutionAssets = {
         "label": "右侧好奇歪头",
         "formId": "normal",
         "logicalId": "tilt_curious_right",
-        "baseActionId": "head_tilt_right",
+        "baseActionId": "TILT_RIGHT",
         "baseActionLabel": "右歪头",
         "durationSeconds": 3.1,
         "description": "先停半拍，向自己的右侧歪头，略微探身，等你解释。",
@@ -348,7 +366,9 @@ export const evolutionAssets = {
           4
         ],
         "hardwareCommands": false,
-        "actionId": "TILT_RIGHT"
+        "actionId": "TILT_RIGHT",
+        "authoringPrimitive": "head_tilt_right",
+        "interruptionRecoverySeconds": 0
       }
     ]
   },
@@ -365,7 +385,7 @@ export const evolutionAssets = {
         "label": "确认点头",
         "formId": "tough",
         "logicalId": "nod_confirm",
-        "baseActionId": "nod",
+        "baseActionId": "NOD",
         "baseActionLabel": "点头",
         "durationSeconds": 2.2,
         "description": "先关注，干脆点一下，再自然回正。",
@@ -390,7 +410,9 @@ export const evolutionAssets = {
           3
         ],
         "hardwareCommands": false,
-        "actionId": "NOD"
+        "actionId": "NOD",
+        "authoringPrimitive": "nod",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "tough_head_shake",
@@ -398,7 +420,7 @@ export const evolutionAssets = {
         "label": "摇头",
         "formId": "tough",
         "logicalId": "head_shake",
-        "baseActionId": "head_shake",
+        "baseActionId": "SHAKE",
         "baseActionLabel": "摇头",
         "durationSeconds": 3,
         "description": "左右连续摇头，最后一下收小，自然回正。",
@@ -421,7 +443,9 @@ export const evolutionAssets = {
           5
         ],
         "hardwareCommands": false,
-        "actionId": "SHAKE"
+        "actionId": "SHAKE",
+        "authoringPrimitive": "head_shake",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "tough_nod_proud",
@@ -429,7 +453,7 @@ export const evolutionAssets = {
         "label": "得意双点头",
         "formId": "tough",
         "logicalId": "nod_proud",
-        "baseActionId": "nod",
+        "baseActionId": "NOD_DOUBLE",
         "baseActionLabel": "点头",
         "durationSeconds": 2.9,
         "description": "轻轻挺胸，两次点头；第二下收小，留一点得意劲。",
@@ -458,7 +482,9 @@ export const evolutionAssets = {
           3
         ],
         "hardwareCommands": false,
-        "actionId": "NOD_DOUBLE"
+        "actionId": "NOD_DOUBLE",
+        "authoringPrimitive": "nod",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "tough_tilt_curious_left",
@@ -466,7 +492,7 @@ export const evolutionAssets = {
         "label": "左侧好奇歪头",
         "formId": "tough",
         "logicalId": "tilt_curious_left",
-        "baseActionId": "head_tilt_left",
+        "baseActionId": "TILT_LEFT",
         "baseActionLabel": "左歪头",
         "durationSeconds": 3.1,
         "description": "先停半拍，向自己的左侧歪头，略微探身，等你解释。",
@@ -491,7 +517,9 @@ export const evolutionAssets = {
           4
         ],
         "hardwareCommands": false,
-        "actionId": "TILT_LEFT"
+        "actionId": "TILT_LEFT",
+        "authoringPrimitive": "head_tilt_left",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "tough_tilt_curious_right",
@@ -499,7 +527,7 @@ export const evolutionAssets = {
         "label": "右侧好奇歪头",
         "formId": "tough",
         "logicalId": "tilt_curious_right",
-        "baseActionId": "head_tilt_right",
+        "baseActionId": "TILT_RIGHT",
         "baseActionLabel": "右歪头",
         "durationSeconds": 3.1,
         "description": "先停半拍，向自己的右侧歪头，略微探身，等你解释。",
@@ -524,7 +552,9 @@ export const evolutionAssets = {
           4
         ],
         "hardwareCommands": false,
-        "actionId": "TILT_RIGHT"
+        "actionId": "TILT_RIGHT",
+        "authoringPrimitive": "head_tilt_right",
+        "interruptionRecoverySeconds": 0
       }
     ]
   },
@@ -541,7 +571,7 @@ export const evolutionAssets = {
         "label": "确认点头",
         "formId": "celestial",
         "logicalId": "nod_confirm",
-        "baseActionId": "nod",
+        "baseActionId": "NOD",
         "baseActionLabel": "点头",
         "durationSeconds": 2.2,
         "description": "先关注，干脆点一下，再自然回正。",
@@ -566,7 +596,9 @@ export const evolutionAssets = {
           3
         ],
         "hardwareCommands": false,
-        "actionId": "NOD"
+        "actionId": "NOD",
+        "authoringPrimitive": "nod",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "celestial_head_shake",
@@ -574,7 +606,7 @@ export const evolutionAssets = {
         "label": "摇头",
         "formId": "celestial",
         "logicalId": "head_shake",
-        "baseActionId": "head_shake",
+        "baseActionId": "SHAKE",
         "baseActionLabel": "摇头",
         "durationSeconds": 3,
         "description": "左右连续摇头，最后一下收小，自然回正。",
@@ -597,7 +629,9 @@ export const evolutionAssets = {
           5
         ],
         "hardwareCommands": false,
-        "actionId": "SHAKE"
+        "actionId": "SHAKE",
+        "authoringPrimitive": "head_shake",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "celestial_nod_proud",
@@ -605,7 +639,7 @@ export const evolutionAssets = {
         "label": "得意双点头",
         "formId": "celestial",
         "logicalId": "nod_proud",
-        "baseActionId": "nod",
+        "baseActionId": "NOD_DOUBLE",
         "baseActionLabel": "点头",
         "durationSeconds": 2.9,
         "description": "轻轻挺胸，两次点头；第二下收小，留一点得意劲。",
@@ -634,7 +668,9 @@ export const evolutionAssets = {
           3
         ],
         "hardwareCommands": false,
-        "actionId": "NOD_DOUBLE"
+        "actionId": "NOD_DOUBLE",
+        "authoringPrimitive": "nod",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "celestial_tilt_curious_left",
@@ -642,7 +678,7 @@ export const evolutionAssets = {
         "label": "左侧好奇歪头",
         "formId": "celestial",
         "logicalId": "tilt_curious_left",
-        "baseActionId": "head_tilt_left",
+        "baseActionId": "TILT_LEFT",
         "baseActionLabel": "左歪头",
         "durationSeconds": 3.1,
         "description": "先停半拍，向自己的左侧歪头，略微探身，等你解释。",
@@ -667,7 +703,9 @@ export const evolutionAssets = {
           4
         ],
         "hardwareCommands": false,
-        "actionId": "TILT_LEFT"
+        "actionId": "TILT_LEFT",
+        "authoringPrimitive": "head_tilt_left",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "celestial_tilt_curious_right",
@@ -675,7 +713,7 @@ export const evolutionAssets = {
         "label": "右侧好奇歪头",
         "formId": "celestial",
         "logicalId": "tilt_curious_right",
-        "baseActionId": "head_tilt_right",
+        "baseActionId": "TILT_RIGHT",
         "baseActionLabel": "右歪头",
         "durationSeconds": 3.1,
         "description": "先停半拍，向自己的右侧歪头，略微探身，等你解释。",
@@ -700,7 +738,9 @@ export const evolutionAssets = {
           4
         ],
         "hardwareCommands": false,
-        "actionId": "TILT_RIGHT"
+        "actionId": "TILT_RIGHT",
+        "authoringPrimitive": "head_tilt_right",
+        "interruptionRecoverySeconds": 0
       }
     ]
   },
@@ -717,7 +757,7 @@ export const evolutionAssets = {
         "label": "确认点头",
         "formId": "dark",
         "logicalId": "nod_confirm",
-        "baseActionId": "nod",
+        "baseActionId": "NOD",
         "baseActionLabel": "点头",
         "durationSeconds": 2.2,
         "description": "先关注，干脆点一下，再自然回正。",
@@ -742,7 +782,9 @@ export const evolutionAssets = {
           3
         ],
         "hardwareCommands": false,
-        "actionId": "NOD"
+        "actionId": "NOD",
+        "authoringPrimitive": "nod",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "dark_head_shake",
@@ -750,7 +792,7 @@ export const evolutionAssets = {
         "label": "摇头",
         "formId": "dark",
         "logicalId": "head_shake",
-        "baseActionId": "head_shake",
+        "baseActionId": "SHAKE",
         "baseActionLabel": "摇头",
         "durationSeconds": 3,
         "description": "左右连续摇头，最后一下收小，自然回正。",
@@ -773,7 +815,9 @@ export const evolutionAssets = {
           5
         ],
         "hardwareCommands": false,
-        "actionId": "SHAKE"
+        "actionId": "SHAKE",
+        "authoringPrimitive": "head_shake",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "dark_nod_proud",
@@ -781,7 +825,7 @@ export const evolutionAssets = {
         "label": "得意双点头",
         "formId": "dark",
         "logicalId": "nod_proud",
-        "baseActionId": "nod",
+        "baseActionId": "NOD_DOUBLE",
         "baseActionLabel": "点头",
         "durationSeconds": 2.9,
         "description": "轻轻挺胸，两次点头；第二下收小，留一点得意劲。",
@@ -810,7 +854,9 @@ export const evolutionAssets = {
           3
         ],
         "hardwareCommands": false,
-        "actionId": "NOD_DOUBLE"
+        "actionId": "NOD_DOUBLE",
+        "authoringPrimitive": "nod",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "dark_tilt_curious_left",
@@ -818,7 +864,7 @@ export const evolutionAssets = {
         "label": "左侧好奇歪头",
         "formId": "dark",
         "logicalId": "tilt_curious_left",
-        "baseActionId": "head_tilt_left",
+        "baseActionId": "TILT_LEFT",
         "baseActionLabel": "左歪头",
         "durationSeconds": 3.1,
         "description": "先停半拍，向自己的左侧歪头，略微探身，等你解释。",
@@ -843,7 +889,9 @@ export const evolutionAssets = {
           4
         ],
         "hardwareCommands": false,
-        "actionId": "TILT_LEFT"
+        "actionId": "TILT_LEFT",
+        "authoringPrimitive": "head_tilt_left",
+        "interruptionRecoverySeconds": 0
       },
       {
         "id": "dark_tilt_curious_right",
@@ -851,7 +899,7 @@ export const evolutionAssets = {
         "label": "右侧好奇歪头",
         "formId": "dark",
         "logicalId": "tilt_curious_right",
-        "baseActionId": "head_tilt_right",
+        "baseActionId": "TILT_RIGHT",
         "baseActionLabel": "右歪头",
         "durationSeconds": 3.1,
         "description": "先停半拍，向自己的右侧歪头，略微探身，等你解释。",
@@ -876,7 +924,9 @@ export const evolutionAssets = {
           4
         ],
         "hardwareCommands": false,
-        "actionId": "TILT_RIGHT"
+        "actionId": "TILT_RIGHT",
+        "authoringPrimitive": "head_tilt_right",
+        "interruptionRecoverySeconds": 0
       }
     ]
   }

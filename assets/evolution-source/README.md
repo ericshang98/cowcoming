@@ -10,6 +10,8 @@ NIULAI_FORM=calf NIULAI_SOURCE="$PWD/assets/evolution-source/calf/source.glb" NI
 NIULAI_OUTPUT="$PWD/tmp/evolution/calf" /Applications/Blender.app/Contents/MacOS/Blender -b --python-exit-code 1 --python assets/evolution-source/scripts/verify_actions.py
 ```
 
+五形态输出到 `tmp/evolution/{form}` 后，运行 `node scripts/prepare-evolution-assets.mjs` 更新网页资源与 manifest。
+
 verify_legacy.py 需同样提供 NIULAI_SOURCE 和 NIULAI_OUTPUT，对比原有动画。新动作 120 Hz 采样，回到中立姿态，脚底不漂移。网站播放器单独等待动画结束和恢复过渡；硬件回执独立。
 
 ## 模型权属

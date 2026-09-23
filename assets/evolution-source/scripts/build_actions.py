@@ -8,6 +8,7 @@ import hashlib
 import json
 import math
 import os
+import shutil
 from pathlib import Path
 from mathutils import Quaternion, Vector
 
@@ -215,7 +216,7 @@ bpy.ops.file.pack_all()
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT / f'{STEM}.blend'))
 
 manifest = {
-    'schemaVersion': 1, 'packageId': STEM, 'version': '2.0.0',
+    'schemaVersion': 1, 'packageId': STEM, 'version': '3.0.0', 'actionContractVersion': 2,
     'formId': FORM, 'formLabel': LABELS[FORM], 'model': f'{STEM}.glb',
     'boneCount': len(arm.data.bones), 'sourceFile': 'source/niulai-mouth-source.glb' if FORM=='normal' else 'source/niulai-source.glb',
     'morphNames': ['MouthOpen','MouthRound','MouthWide'] if FORM in ('normal','calf','tough') else [],
@@ -224,21 +225,23 @@ manifest = {
     'execution': 'software-animation-only', 'hardwareProfile': None,
     'preservedClips': sorted(a.name for a in original_actions),
     'idleClip': 'idle', 'neutralPose': 'standing',
-    'selection': {'mode': 'uniform-without-immediate-repeat', 'deduplicateBy': 'sessionId+eventId', 'emptyCandidate': 'idle-with-unavailable-status'},
+    'selection': {'mode': 'single-verified-clip-per-semantic-action', 'deduplicateBy': 'sessionId+eventId', 'emptyCandidate': 'idle-with-unavailable-status'},
     'variants': [],
 }
 for d in DEFS:
     manifest['variants'].append({
         'id': d['id'], 'clip': d['id'], 'label': d['label'], 'formId': FORM, 'logicalId': d['logicalId'],
-        'baseActionId': d['base'], 'baseActionLabel': d['group'],
+        'baseActionId': {'nod_confirm':'NOD','head_shake':'SHAKE','nod_proud':'NOD_DOUBLE','tilt_curious_left':'TILT_LEFT','tilt_curious_right':'TILT_RIGHT'}[d['logicalId']], 'authoringPrimitive': d['base'], 'baseActionLabel': d['group'],
         'durationSeconds': d['duration'], 'description': d['description'],
         'requiredBones': list(d['channels']), 'occupiedBones': list(d['channels']),
         'entryPose': 'standing', 'exitPose': 'standing',
-        'interruptible': True, 'recoverySeconds': .35,
+        'interruptible': True, 'recoverySeconds': .35, 'interruptionRecoverySeconds': 0,
         'semanticTags': {'nod_confirm':['confirmation'], 'nod_proud':['proud-confirmation'], 'tilt_curious_left':['curiosity'], 'tilt_curious_right':['curiosity'], 'head_shake':['disagreement']}[d['logicalId']],
         'historicalScreenshotJointReference': {'nod':[3],'head_tilt_left':[4],'head_tilt_right':[4],'head_shake':[5]}[d['base']],
         'hardwareCommands': False,
     })
+target_source = OUT/manifest['sourceFile']
+if SOURCE.resolve() != target_source.resolve(): shutil.copyfile(SOURCE, target_source)
 (OUT/'actions.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n')
 (OUT/'source/authoring-curves.json').write_text(json.dumps(DEFS, ensure_ascii=False, indent=2)+'\n')
 print('NIULAI_ACTIONS_BUILT', json.dumps({'clips':len(bpy.data.actions),'new':len(DEFS),'meshes':len(meshes),'bytes':(OUT/f'{STEM}.glb').stat().st_size}),flush=True)

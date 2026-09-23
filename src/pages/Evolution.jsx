@@ -55,7 +55,7 @@ export default function Evolution({ controller, live, preview, onSelectRoute, on
           <p>{form.description}</p>
           <small>{modelStatus === 'error' ? 'Model unavailable. Return to 小牛.' : modelStatus === 'loading' ? 'Loading form…' : placeholder ? 'Model pending. Showing a reference 牛来.' : 'Showing this form’s model.'}</small>
         </div>
-        <MotionPreview controller={controller} formId={form.id} ready={modelStatus==='ready'&&!placeholder} connected={live?.online} />
+        <MotionPreview controller={controller} formId={form.id} ready={modelStatus==='ready'&&!placeholder} />
       </aside>
 
       <ObservationPanel live={live} />

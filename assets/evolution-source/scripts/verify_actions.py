@@ -68,7 +68,7 @@ for d in defs:
     if d['base']=='head_tilt_right':assert min(roll)<-14
     if d['base']=='head_shake':assert max(yaw)>18 and min(yaw)<-18 and abs(yaw[-1])<.01
     checks.append(dict(clip=d['id'],frames=round(duration*120)+1,durationSeconds=duration,maxVertexDisplacement=max_move,maxFootDisplacement=max_foot,endpointMaxError=endpoint,pitchRange=[min(pitch),max(pitch)],rollRange=[min(roll),max(roll)],yawRange=[min(yaw),max(yaw)]))
-# Ensure the three nods have genuinely distinct motion and the proud version has two down strokes.
+# Ensure the proud double nod has two distinct down strokes.
 activate(f"{manifest['formId']}_nod_proud")
 peaks=[]
 for time in [.96,1.28,1.69]:
