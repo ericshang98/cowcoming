@@ -38,7 +38,7 @@ export function Controls({ music = true, onExpand, onReset }) {
     setVoiceOpen,
     voiceOpen,
     activeIp,
-    mode,
+    canSwitchIp,
   } = useApp();
   return (
     <Localized><div className="scene-controls">
@@ -69,7 +69,7 @@ export function Controls({ music = true, onExpand, onReset }) {
       >
         {onReset ? <RotateCcw size={15} /> : paused ? <Play size={15} /> : <Pause size={15} />}
       </button>
-      {music && !(mode === 'home' && activeIp.id !== 'niulai') && (
+      {music && !(canSwitchIp && activeIp.id !== 'niulai') && (
         <button
           aria-label="牛来的声音"
           title="牛来的声音"
@@ -92,26 +92,27 @@ export function Header() {
     openIp,
     ipOpen,
     activeIp,
+    canSwitchIp,
     muted,
     setMuted,
     tracking,
     collection,
   } = useApp();
   const { language } = useLanguage();
-  const name = mode === 'home' ? (language === 'en' ? activeIp.nameEn : activeIp.name) : '牛来';
-  const switchLabel = language === 'en' ? (mode === 'home' ? 'Switch IP' : 'Switch IP (HOME only)') : (mode === 'home' ? '切换 IP' : '切换 IP（仅首页可用）');
+  const name = canSwitchIp ? (language === 'en' ? activeIp.nameEn : activeIp.name) : '牛来';
+  const switchLabel = language === 'en' ? (canSwitchIp ? 'Switch IP' : 'Switch IP (Home, About and Support only)') : (canSwitchIp ? '切换 IP' : '切换 IP（首页、关于和支持我们可用）');
   return (
     <Localized><>
       <header className="identity">
-        <button onClick={() => navigate("home")} aria-label={mode === "about" ? "Cowcoming" : name}>
-          {mode === "about" ? "Cowcoming" : name}
+        <button onClick={() => navigate("home")} aria-label="Cowcoming">
+          Cowcoming
         </button>
         <div className="identity-desktop">
-          {mode === "about" ? "基于 JEV 决策模型的可进化 AI 宠物" : mode === 'home' ? `${name} IP · Powered by Cowcoming` : "牛来 IP · Powered by Cowcoming"}
+          {mode === "about" ? "基于 JEV 决策模型的可进化 AI 宠物" : canSwitchIp ? `${name} IP · Powered by Cowcoming` : "牛来 IP · Powered by Cowcoming"}
         </div>
         <div className="identity-mobile">
           <i />
-          {mode === "about" ? "可进化 AI 宠物" : mode === "work" ? "Explore how 牛来 evolves" : mode === 'home' && activeIp.id !== 'niulai' ? (language === 'en' ? `Tap ${activeIp.nameEn} for a reply` : `点点${activeIp.name}，听听回应`) : "点点牛来，听它说话"}
+          {mode === "about" ? "可进化 AI 宠物" : mode === "work" ? "Explore how 牛来 evolves" : canSwitchIp && activeIp.id !== 'niulai' ? (language === 'en' ? `Tap ${activeIp.nameEn} for a reply` : `点点${activeIp.name}，听听回应`) : "点点牛来，听它说话"}
         </div>
       </header>
       <div className="mobile-actions">
@@ -121,7 +122,7 @@ export function Header() {
         >
           {muted ? <VolumeX /> : <Volume2 />}
         </button>
-        <button disabled={mode !== "home"} aria-label={switchLabel} title={switchLabel} aria-haspopup="dialog" aria-expanded={ipOpen} aria-controls="ip-switcher" onClick={openIp}>
+        <button disabled={!canSwitchIp} aria-label={switchLabel} title={switchLabel} aria-haspopup="dialog" aria-expanded={ipOpen} aria-controls="ip-switcher" onClick={openIp}>
           <UsersRound />
         </button>
         <button
@@ -143,7 +144,7 @@ export function Header() {
         </button>
         <button
           className="desktop-nav-icon"
-          disabled={mode !== "home"}
+          disabled={!canSwitchIp}
           aria-label={switchLabel}
           title={switchLabel}
           aria-haspopup="dialog" aria-expanded={ipOpen} aria-controls="ip-switcher"

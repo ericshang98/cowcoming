@@ -1,4 +1,4 @@
-import { Localized } from "../i18n/Language";
+import { Localized, useLanguage } from "../i18n/Language";
 import { useEffect, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { useApp } from "../context";
@@ -7,13 +7,18 @@ import { PageLead } from "./Portfolio";
 import "./about.css";
 
 export default function About() {
-  const { navigate, controller, mobile, tracking, setTracking, paused, setPaused, worldBlocked } = useApp();
+  const { navigate, controller, mobile, tracking, setTracking, paused, setPaused, worldBlocked, activeIp, tap, wave } = useApp();
+  const { language } = useLanguage();
+  const otherIp = activeIp.id !== 'niulai';
+  const name = language === 'en' ? activeIp.nameEn : activeIp.name;
+  const t = (zh, en) => language === 'en' ? en : zh;
   const [status, setStatus] = useState("loading");
   const [greeted, setGreeted] = useState(false);
   useEffect(() => () => controller.queue.clear(), [controller]);
+  useEffect(() => { setStatus('loading'); setGreeted(false); }, [activeIp.id]);
   const greet = () => {
     if (paused || worldBlocked || status !== "ready") return;
-    controller.gesture("wave");
+    if (otherIp) wave(); else controller.gesture("wave");
     setGreeted(true);
   };
   return (
@@ -33,12 +38,14 @@ export default function About() {
               overlay={worldBlocked}
               onReady={() => setStatus("ready")}
               onError={() => setStatus("error")}
-              onTap={greet}
+              modelAsset={activeIp.model}
+              characterId={activeIp.id}
+              onTap={otherIp ? tap : greet}
             />
-            {status === "loading" && <p className="cowcoming-model-loading" role="status">牛来正在准备…</p>}
+            {status === "loading" && <p className="cowcoming-model-loading" role="status">{t(`${name}正在准备…`, `Getting ${name} ready…`)}</p>}
           </div>
-          <div className="cowcoming-model-controls" aria-label="牛来互动">
-            <button onClick={greet} disabled={status !== "ready" || paused || worldBlocked}>挥挥手</button>
+          <div className="cowcoming-model-controls" aria-label={t(`${name}互动`, `${name} interactions`)}>
+            <button onClick={greet} disabled={status !== "ready" || paused || worldBlocked}>{otherIp ? activeIp.actionLabel[language === 'en' ? 1 : 0] : '挥挥手'}</button>
             {!mobile && <button aria-pressed={tracking} onClick={() => setTracking(!tracking)}>
               光标跟随 · {tracking ? "开" : "关"}
             </button>}
@@ -48,7 +55,8 @@ export default function About() {
           </div>
           <p className="cowcoming-model-hint" aria-live="polite">
             {status === "error" ? "模型暂时未能加载，可重试或继续阅读项目介绍。"
-              : paused ? "动画已暂停，继续后可以和牛来打招呼。"
+              : paused ? t(`动画已暂停，继续后可以和${name}打招呼。`, 'Animation paused. Resume to interact.')
+              : otherIp ? t(`点击${name}听短回应 · 按 L 互动 · 左右拖动转身`, `Tap ${name} for a reply · Press L to interact · Drag to turn`)
               : greeted ? "牛来向你挥挥手。左右拖动，看看它的样子。"
               : "点击牛来打招呼 · 左右拖动转身"}
           </p>
@@ -70,7 +78,7 @@ export default function About() {
           <button className="cowcoming-about-action" onClick={() => navigate("home")}>
             体验 Cowcoming <ArrowUpRight size={16} />
           </button>
-          <p className="cowcoming-about-note">从屏幕中的牛来，认识 Cowcoming。</p>
+          <p className="cowcoming-about-note">{t('从屏幕中的角色，认识 Cowcoming。', 'Meet Cowcoming through its characters.')}</p>
         </article>
       </div>
     </section></Localized>
