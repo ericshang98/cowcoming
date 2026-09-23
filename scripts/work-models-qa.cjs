@@ -41,7 +41,7 @@ fs.mkdirSync(output,{recursive:true});
   await page.locator('[data-ip=nailong]').click();await asset('/characters/nailong/');
   await page.getByRole('button',{name:'进化',exact:true}).click();await asset('evolution/dark-');
   assert.ok(await page.locator('.navigation button[aria-controls=ip-switcher]').isDisabled());
-  await page.getByRole('button',{name:'重置为小牛',exact:true}).click();await asset('niulai-mouth');
+  await page.getByRole('button',{name:'重置为小牛',exact:true}).click();await asset('evolution/calf-');
   await page.getByRole('button',{name:'首页',exact:true}).click();await asset('/characters/nailong/');
   check('HOME choice and WORK form persist independently; WORK reset only resets evolution');
   await page.locator('.navigation').getByRole('button',{name:'Switch to English'}).click();
