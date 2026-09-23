@@ -28,6 +28,10 @@ try {
     resolve("docs/live-device.md"),
     join(output, "device-protocol.md"),
   );
+  for (const file of ["hardware-handoff.md", "evolution-runtime.md"]) {
+    await copyFile(resolve("docs", file), join(kit, file));
+    await copyFile(resolve("docs", file), join(output, file));
+  }
   execFileSync("tar", [
     "-czf",
     join(output, "cowcoming-device.tar.gz"),
