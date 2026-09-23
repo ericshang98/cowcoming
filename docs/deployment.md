@@ -6,7 +6,15 @@
 
 本次补修仅改变 Worker 异常关闭后的离线通知；网页保留当前主分支的动画完整播放规则，无需用旧联调构建覆盖生产页面。使用项目方提供的账户 API Token，经 `CLOUDFLARE_API_TOKEN` 和 `CLOUDFLARE_ACCOUNT_ID` 传给 Wrangler；这是 API 认证，不是网页登录。Token 不进入仓库、网页构建或 GitHub Secret，保留已有 `ADMIN_KEY` 和 Durable Object 房间。
 
-发布前检查：Node 24 的 98 项测试、生产构建、独立 Worker 集成回归通过。发布后应核对 Cloudflare 当前版本、Worker 下载代码和健康接口，并确认主域名构建版本保持预期。原设备房间与真实硬件验收另行记录，不用临时房间或合成测试代替。
+发布前检查：Node 24 的 98 项测试、生产构建、独立 Worker 集成回归通过。[PR #28](https://github.com/ericshang98/cowcoming/pull/28) 两次 GitHub verify 均通过并已合入，合并提交 `4d3461c4feac1fc5e251e3df6af5247c8bc8950d`。
+
+额外浏览器检查使用独立临时 Worker、模拟设备和真实 Chrome：强制结束模拟设备进程后，网页在 4.9 秒内从“电脑已连接”转为“已绑定，等待电脑上线”，无页面运行异常。最初依赖旧选择器／页面内轮询的检查超时，改为读取实际页面文字后通过；没有把测试脚本超时计为通过，也没有启动真实硬件。
+
+**Worker 已发布并核验。** 上传的源码提交为 `085f090f8a10206fe78b0dc6ca4ff30f63da2b7b`，生产版本 `100e2399-f620-4b81-8520-64aa34bc5660`，部署 ID `14958574-bb35-4ad2-95f6-e018f4f48e9d`，100% 流量。下载线上代码已确认先执行 `closed()`，再用合法关闭码尽力回复；原 Durable Object 命名空间、`ADMIN_KEY` 与既有 workers.dev 路由保留。Node HTTPS 实测健康 200、畸形连接密钥 400、未允许来源 403、主站 Origin 的 CORS 正常。页面代码未改变，主域名仍为 `1a66bcc`，没有用旧构建覆盖。
+
+Wrangler 上传后因 Token 缺少账户 `/workers/subdomain` 查询权限返回错误；其 Worker 上传和 100% 部署实际已成功。结论来自单独读取部署记录、现有脚本子域名状态、下载代码和线上请求，不能仅凭该命令退出码判断回滚或重复上传。未扩大 Token 权限、未改 DNS。
+
+**原房间已显式升级。** 用户提供的 Browser Key 与 Device Key 属于同一房间，两者生产鉴权均通过。该房间此前仍存旧动作列表；已使用 Browser Key 按 expectedRevision 将 profile 从 v3 升至 v4，`actionContractVersion=2`，五动作加 WAIT，原形态与密钥保留。核验时 `deviceOnline=false`、`appliedRevision=null`；本地连接器仍需连回生产并声明实际能力、确认 v4。没有用模拟设备冒充原设备上线，没有重启本地服务或执行机械臂。
 
 ## 唯一入口
 
