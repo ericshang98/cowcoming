@@ -1,3 +1,4 @@
+import formDefaults from "../../shared/form-profiles.json";
 import { useEffect, useState } from "react";
 import { useLanguage } from "../i18n/Language";
 import { LiveDialog } from "./ConnectionBar";
@@ -16,7 +17,7 @@ export default function DeviceDebug({ live, onClose }) {
   }));
   const [error, setError] = useState("");
   const [sentRevision, setSentRevision] = useState(null);
-  useEffect(() => { setDraft({...profile, animationMap:JSON.stringify(profile.animationMap,null,2)}); setSentRevision(null); }, [profile.actionContractVersion]);
+  useEffect(() => { setDraft({...profile, animationMap:JSON.stringify(profile.animationMap,null,2)}); setSentRevision(null); }, [profile.revision]);
   function save(e) {
     e.preventDefault();
     setError("");
@@ -26,6 +27,7 @@ export default function DeviceDebug({ live, onClose }) {
         expectedRevision: draft.revision,
         formId: draft.formId,
         prompt: draft.prompt,
+        languagePrompt: draft.languagePrompt,
         allowedActions: draft.allowedActions,
         animationMap: map,
       });
@@ -61,7 +63,7 @@ export default function DeviceDebug({ live, onClose }) {
                       revision: draft.revision,
                       animationMap: JSON.stringify(saved.animationMap, null, 2),
                     }
-                  : { ...draft, formId: e.target.value },
+                  : { ...draft, ...formDefaults[e.target.value], formId: e.target.value },
               );
             }}
           >
@@ -81,6 +83,11 @@ export default function DeviceDebug({ live, onClose }) {
             required
             onChange={(e) => setDraft({ ...draft, prompt: e.target.value })}
           />
+        </label>
+        <label>
+          {t("给独立语言模型的人格提示词", "Personality prompt for the language model")}
+          <textarea rows={5} value={draft.languagePrompt || ""} maxLength={8000}
+            onChange={e=>setDraft({...draft, languagePrompt:e.target.value})}/>
         </label>
         <fieldset>
           <legend>{t("允许选择的动作", "Allowed actions")}</legend>

@@ -93,7 +93,7 @@ export default function App() {
     sound = useRef(null),
     viewRef = useRef();
   const live = useLiveDevice(controller, mode === "work");
-  const evolutionSession = useEvolutionSession({ enabled: live.online, roomId: live.snapshot?.roomId, form: live.snapshot?.profile.formId });
+  const evolutionSession = useEvolutionSession({ enabled: live.online, roomId: live.snapshot?.roomId, form: live.snapshot?.profile.formId, localGatewayKey: live.localGatewayKey });
   const deviceFormReady = useEvolutionDeviceSync(evolutionSession, live);
   const [evolutionRoute, setEvolutionRoute] = useState('celestial');
   useEffect(() => {

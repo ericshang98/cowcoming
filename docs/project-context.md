@@ -172,3 +172,7 @@ Eric 最新要求覆盖此前 HOME 限定：HOME、About、支持我们共用已
 验证入口为 `scripts/shared-ip-qa.cjs` 与现有 About/五 IP 浏览器回归；覆盖真实 GLB、原地切换、直接刷新、声音中止、桌面/英文手机布局和固定品牌。
 
 本次 81 项 Node 测试、生产构建通过；现有五 IP 11 组、About 11 组浏览器回归及正式构建的跨页面同步检查通过，零 pageerror。桌面和 390px 手机已检查；手机支持页直接刷新可加载小黑龙并播放 L 动作。
+
+## 2026-09-24 本机同步接线
+
+本轮新增非阻塞 EventPublisher、设备主动 interaction.start、六形态 JEV/LLM 默认提示词及旧房间迁移；动画收到多条决策后排队播完，断线不重播。benben 现有 Controller 已提供 `--cowcoming` 入口，复用已验证硬件与本地快照。完整边界、能力映射、运行与验收见 [交接](benben-handoff.md)。这替代前文“仍需朋友自行实现硬件 adapter”的历史状态，不能被理解为已经现场运行了真实机械臂。

@@ -1,5 +1,7 @@
 # 本机画面优先
 
+**使用 benben 的队友：**直接按仓库 `docs/cowcoming-handoff.md` 运行 `python -m niu_reactions.server --cowcoming`。下面的通用 ExampleAdapter 仍是模拟示例，不是 benben 的实机入口。
+
 已有视觉程序时，使用 `python3 local_preview.py` 读取它的 `/snapshot`，在网页“编辑视觉窗口”填本地接口和生成的本地访问密钥。只读桥不会打开相机或驱动机械臂，无需 aiortc/OpenCV 依赖。电脑摄像头也可以直接由浏览器采集；设置界面能编辑设备规格与呈现。详见 [本地窗口说明](../../docs/local-camera.md)（下载包内为 `local-camera.md`）。
 
 原 `--camera` / WebRTC 示例仍可在网页明确选择兼容模式后使用。

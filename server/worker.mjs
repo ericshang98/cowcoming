@@ -3,6 +3,7 @@ import {
   initialRoom,
   updateProfile,
   applyDeviceEvent,
+  upgradeRoomPersonality,
   makeCommand,
   validateSignal,
   parseKey,
@@ -139,6 +140,14 @@ export class DeviceRoom extends DurableObject {
         ? JSON.parse(row.payload)
         : await ctx.storage.get("state");
       this.auth = await ctx.storage.get("auth");
+      const upgraded = upgradeRoomPersonality(this.state);
+      if (upgraded !== this.state) {
+        this.state = upgraded;
+        await this.persist();
+        const device = this.device();
+        if (device) this.send(device, {type: "profile", profile: this.state.profile});
+        this.broadcast();
+      }
     });
   }
   peers(role) {
@@ -371,6 +380,9 @@ export class DeviceRoom extends DurableObject {
           this.state = next;
           await this.persist();
           this.broadcast();
+          if (m.type === "interaction.start")
+            for (const viewer of this.peers("browser"))
+              this.send(viewer, { type: "live.interaction", interaction: this.state.events.find(e => e.eventId === m.eventId) });
           if (m.type === "decision")
             for (const viewer of this.peers("browser"))
               this.send(viewer, {
