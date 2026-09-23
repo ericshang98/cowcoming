@@ -98,6 +98,7 @@ try {
   assert.equal(first.profile.revision, 1);
   browser.send({ type: "command", command: "action", actionId: "NOD" });
   await browser.wait((m) => m.type === "error" && /profile/.test(m.error));
+  device.send({type:"device.status",eventId:"caps",actionContractVersion:2,supportedActions:["NOD","SHAKE","NOD_DOUBLE","TILT_LEFT","TILT_RIGHT","WAIT"],hardware:"ready",jev:"ready",simulation:true});
   device.send({ type: "profile.applied", eventId: "applied-1", revision: 1 });
   await browser.wait((m) => m.type === "snapshot" && m.appliedRevision === 1);
   browser.send({

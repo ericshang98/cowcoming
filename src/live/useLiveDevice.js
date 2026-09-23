@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { completedEvolutionTurn } from "./evolution-turn.mjs";
-import { parseKey, chooseAnimation } from "../../shared/live-protocol.mjs";
+import { ACTION_CONTRACT_VERSION } from "../../shared/action-catalog.mjs";
+import { parseKey } from "../../shared/live-protocol.mjs";
 
 export function normalizeRelay(value) {
   const u = new URL(value);
@@ -32,12 +33,15 @@ export default function useLiveDevice(controller, active) {
   const credentials = useRef(null),
     snapshotRef = useRef(null),
     signalListeners = useRef(new Set()),
-    conversationCommands = useRef(new Map());
+    conversationCommands = useRef(new Map()),
+    softwareResults = useRef(new Map()), decisions = useRef(new Set());
   const current = useRef({ controller, active });
   current.current = { controller, active };
   const stop = useCallback(() => {
     generation.current++;
     conversationCommands.current.clear();
+    softwareResults.current.clear();
+    current.current.controller.responsePlayer?.stop();
     clearTimeout(retry.current);
     clearInterval(heartbeat.current);
     socket.current?.close();
@@ -151,11 +155,15 @@ export default function useLiveDevice(controller, active) {
             }
             if (m.type === "welcome") setClientId(m.clientId);
             if (m.type === "snapshot") {
+              if(snapshotRef.current && (snapshotRef.current.profile.revision!==m.profile.revision || !m.deviceOnline)){
+                current.current.controller.responsePlayer?.stop();
+                conversationCommands.current.clear();softwareResults.current.clear();setLastAnimation(null);
+              }
               snapshotRef.current = m;
               setSnapshot(m);
               for (const [commandId, context] of conversationCommands.current) {
-                const completion = completedEvolutionTurn(m, commandId, context);
-                if (completion.terminal) conversationCommands.current.delete(commandId);
+                const completion = completedEvolutionTurn(m, commandId, context, softwareResults.current.get(commandId));
+                if (completion.terminal) { conversationCommands.current.delete(commandId); softwareResults.current.delete(commandId); }
                 if (completion.turn) current.current.controller.evolution?.recordTurn(completion.turn);
               }
             }
@@ -167,18 +175,31 @@ export default function useLiveDevice(controller, active) {
             if (m.type === "live.decision" && current.current.active) {
               const profile = snapshotRef.current?.profile;
               if (profile?.revision === m.decision.profileRevision && (!current.current.controller.evolution || current.current.controller.evolution.deviceFormReady?.(profile.revision, profile.formId))) {
-                const clip = chooseAnimation(
-                  m.decision.actionId,
-                  profile.animationMap,
-                );
-                if (clip) {
-                  current.current.controller.gesture(clip);
-                  setLastAnimation({
-                    clip,
-                    actionId: m.decision.actionId,
-                    decisionId: m.decision.decisionId,
-                  });
-                }
+                const decision=m.decision;
+                if(profile.actionContractVersion!==ACTION_CONTRACT_VERSION || decisions.current.has(decision.decisionId))return;
+                decisions.current.add(decision.decisionId);
+                if(decisions.current.size>1000)decisions.current.delete(decisions.current.values().next().value);
+                const ctx=current.current.controller.evolution?.context();
+                const player=current.current.controller.responsePlayer;
+                const promise=player && current.current.controller.responseForm===profile.formId
+                  ?player.play({eventId:decision.decisionId,formId:profile.formId,actionId:decision.actionId})
+                  :Promise.resolve({status:'unavailable',reason:'model-not-loaded'});
+                setLastAnimation({actionId:decision.actionId,decisionId:decision.decisionId,status:'playing',clip:null});
+                promise.then(result=>{
+                  if(generation.current!==gen)return;
+                  const latest=current.current.controller.evolution?.context();
+                  if(ctx && (latest?.sessionId!==ctx.sessionId || latest?.generation!==ctx.generation))return;
+                  setLastAnimation({...result,actionId:decision.actionId,decisionId:decision.decisionId});
+                  if(decision.commandId && conversationCommands.current.has(decision.commandId)){
+                    softwareResults.current.set(decision.commandId,result);
+                    const context=conversationCommands.current.get(decision.commandId);
+                    if(context && snapshotRef.current){
+                      const completion=completedEvolutionTurn(snapshotRef.current,decision.commandId,context,result);
+                      if(completion.terminal){conversationCommands.current.delete(decision.commandId);softwareResults.current.delete(decision.commandId);}
+                      if(completion.turn)current.current.controller.evolution?.recordTurn(completion.turn);
+                    }
+                  }
+                });
               }
             }
           };
@@ -189,6 +210,8 @@ export default function useLiveDevice(controller, active) {
             if (generation.current !== gen) return;
             clearInterval(heartbeat.current);
             setClientId(null);
+            current.current.controller.responsePlayer?.stop();
+            conversationCommands.current.clear(); softwareResults.current.clear();
             current.current.controller.queue.clear();
             if (event.code === 4003) {
               setError("Keys were revoked. Enter a new browser key.");
@@ -227,15 +250,22 @@ export default function useLiveDevice(controller, active) {
     }
     return stop;
   }, [connect, stop]);
+  useEffect(()=>{if(!active){controller.responsePlayer?.stop();conversationCommands.current.clear();}},[active,controller]);
   const subscribeSignal = useCallback((fn) => {
     signalListeners.current.add(fn);
     return () => signalListeners.current.delete(fn);
   }, []);
   const command = useCallback(
     (data) => {
+      if(data.command==='stop'){
+        current.current.controller.responsePlayer?.stop();current.current.controller.queue.clear();conversationCommands.current.clear();
+      }
       setError("");
       const commandId = crypto.randomUUID();
       const profile = snapshotRef.current?.profile;
+      if(data.command!=='stop' && (!current.current.active || current.current.controller.responseForm!==profile?.formId)){
+        setError('Current form animation is not ready. Select a form with loaded assets.');return;
+      }
       const context = current.current.controller.evolution?.context();
       if (data.command === 'interact' && context?.formId === profile?.formId) {
         conversationCommands.current.set(commandId, { ...context, userText: data.input, profileRevision: profile.revision });

@@ -26,7 +26,7 @@ class FakeSocket:
 class Runtime(unittest.IsolatedAsyncioTestCase):
     async def test_example_emits_profile_bound_decision_action_and_stream(self):
         adapter = ExampleAdapter()
-        profile = {"revision": 3, "allowedActions": ["NOD"], "prompt": "test", "formId": "calf"}
+        profile = {"actionContractVersion": 2, "animationMap": {"NOD":["nod-soft"]}, "revision": 3, "allowedActions": ["NOD"], "prompt": "test", "formId": "calf"}
         await adapter.apply_profile(profile)
         client = DeviceClient('http://127.0.0.1:8794', 'cw1.device.test.' + 'a' * 64, adapter)
         client.ws = FakeSocket()
@@ -41,7 +41,7 @@ class Runtime(unittest.IsolatedAsyncioTestCase):
 
     async def test_model_cannot_return_an_unknown_action(self):
         class BadDecision(ExampleAdapter):
-            async def decide(self, user_input, requested_action=None):
+            async def decide(self, user_input, requested_action=None, *, allowed_actions=None):
                 return {"actionId": "EXEC", "summary": "reject"}
             async def execute(self, action_id):
                 raise AssertionError('must not execute')

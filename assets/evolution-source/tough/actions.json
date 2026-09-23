@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "packageId": "niulai-tough-actions",
+  "version": "2.0.0",
+  "formId": "tough",
+  "formLabel": "硬牛",
+  "model": "export/niulai-tough-actions.glb",
+  "boneCount": 17,
+  "sourceFile": "source/niulai-source.glb",
+  "morphNames": [
+    "MouthOpen",
+    "MouthRound",
+    "MouthWide"
+  ],
+  "sourceSha256": "844e461defbf3bacd2d6312ba940a87c96946f611ac50b67f3afed87a3ff3f3d",
+  "coordinateConvention": "glTF Y up, character front +Z; left means character left (+X)",
+  "execution": "software-animation-only",
+  "hardwareProfile": null,
+  "preservedClips": [
+    "bow",
+    "idle",
+    "walking",
+    "wave"
+  ],
+  "idleClip": "idle",
+  "neutralPose": "standing",
+  "selection": {
+    "mode": "uniform-without-immediate-repeat",
+    "deduplicateBy": "sessionId+eventId",
+    "emptyCandidate": "idle-with-unavailable-status"
+  },
+  "variants": [
+    {
+      "id": "tough_nod_confirm",
+      "clip": "tough_nod_confirm",
+      "label": "确认点头",
+      "formId": "tough",
+      "logicalId": "nod_confirm",
+      "baseActionId": "nod",
+      "baseActionLabel": "点头",
+      "durationSeconds": 2.2,
+      "description": "先关注，干脆点一下，再自然回正。",
+      "requiredBones": [
+        "Head",
+        "Neck",
+        "Spine"
+      ],
+      "occupiedBones": [
+        "Head",
+        "Neck",
+        "Spine"
+      ],
+      "entryPose": "standing",
+      "exitPose": "standing",
+      "interruptible": true,
+      "recoverySeconds": 0.35,
+      "semanticTags": [
+        "confirmation"
+      ],
+      "historicalScreenshotJointReference": [
+        3
+      ],
+      "hardwareCommands": false
+    },
+    {
+      "id": "tough_head_shake",
+      "clip": "tough_head_shake",
+      "label": "摇头",
+      "formId": "tough",
+      "logicalId": "head_shake",
+      "baseActionId": "head_shake",
+      "baseActionLabel": "摇头",
+      "durationSeconds": 3.0,
+      "description": "左右连续摇头，最后一下收小，自然回正。",
+      "requiredBones": [
+        "Head",
+        "Neck"
+      ],
+      "occupiedBones": [
+        "Head",
+        "Neck"
+      ],
+      "entryPose": "standing",
+      "exitPose": "standing",
+      "interruptible": true,
+      "recoverySeconds": 0.35,
+      "semanticTags": [
+        "disagreement"
+      ],
+      "historicalScreenshotJointReference": [
+        5
+      ],
+      "hardwareCommands": false
+    },
+    {
+      "id": "tough_nod_proud",
+      "clip": "tough_nod_proud",
+      "label": "得意双点头",
+      "formId": "tough",
+      "logicalId": "nod_proud",
+      "baseActionId": "nod",
+      "baseActionLabel": "点头",
+      "durationSeconds": 2.9,
+      "description": "轻轻挺胸，两次点头；第二下收小，留一点得意劲。",
+      "requiredBones": [
+        "Spine",
+        "Head",
+        "Neck",
+        "UpperArm_L",
+        "UpperArm_R"
+      ],
+      "occupiedBones": [
+        "Spine",
+        "Head",
+        "Neck",
+        "UpperArm_L",
+        "UpperArm_R"
+      ],
+      "entryPose": "standing",
+      "exitPose": "standing",
+      "interruptible": true,
+      "recoverySeconds": 0.35,
+      "semanticTags": [
+        "proud-confirmation"
+      ],
+      "historicalScreenshotJointReference": [
+        3
+      ],
+      "hardwareCommands": false
+    },
+    {
+      "id": "tough_tilt_curious_left",
+      "clip": "tough_tilt_curious_left",
+      "label": "左侧好奇歪头",
+      "formId": "tough",
+      "logicalId": "tilt_curious_left",
+      "baseActionId": "head_tilt_left",
+      "baseActionLabel": "左歪头",
+      "durationSeconds": 3.1,
+      "description": "先停半拍，向自己的左侧歪头，略微探身，等你解释。",
+      "requiredBones": [
+        "Head",
+        "Neck",
+        "Spine"
+      ],
+      "occupiedBones": [
+        "Head",
+        "Neck",
+        "Spine"
+      ],
+      "entryPose": "standing",
+      "exitPose": "standing",
+      "interruptible": true,
+      "recoverySeconds": 0.35,
+      "semanticTags": [
+        "curiosity"
+      ],
+      "historicalScreenshotJointReference": [
+        4
+      ],
+      "hardwareCommands": false
+    },
+    {
+      "id": "tough_tilt_curious_right",
+      "clip": "tough_tilt_curious_right",
+      "label": "右侧好奇歪头",
+      "formId": "tough",
+      "logicalId": "tilt_curious_right",
+      "baseActionId": "head_tilt_right",
+      "baseActionLabel": "右歪头",
+      "durationSeconds": 3.1,
+      "description": "先停半拍，向自己的右侧歪头，略微探身，等你解释。",
+      "requiredBones": [
+        "Head",
+        "Neck",
+        "Spine"
+      ],
+      "occupiedBones": [
+        "Head",
+        "Neck",
+        "Spine"
+      ],
+      "entryPose": "standing",
+      "exitPose": "standing",
+      "interruptible": true,
+      "recoverySeconds": 0.35,
+      "semanticTags": [
+        "curiosity"
+      ],
+      "historicalScreenshotJointReference": [
+        4
+      ],
+      "hardwareCommands": false
+    }
+  ]
+}

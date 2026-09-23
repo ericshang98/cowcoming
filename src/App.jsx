@@ -21,6 +21,7 @@ import Evolution from "./pages/Evolution";
 import useLiveDevice from "./live/useLiveDevice";
 import { useEvolutionDeviceSync } from "./live/useEvolutionDeviceSync";
 import { useEvolutionSession } from "./useEvolutionSession";
+import { NIULAI_ASSET } from "./scene/niulai.mjs";
 import { resolvePreview, forms } from "./evolution.mjs";
 import { Header, Ambient, Boot } from "./components/Chrome";
 import {
@@ -96,10 +97,11 @@ export default function App() {
   }, [controller, evolutionSession.context, evolutionSession.recordTurn, deviceFormReady]);
   const [previewModelState, setPreviewModelState] = useState({ model: null, status: 'loading' });
   const evolutionPreview = resolvePreview(forms[evolutionSession.state.form].branch || evolutionRoute, evolutionSession.state.form, Object.keys(forms));
-  const activeModel = mode === 'work' ? evolutionPreview.model : resolvePreview().model;
+  const activeModel = mode === 'work' ? evolutionPreview.model : NIULAI_ASSET;
   const evolutionPage = <Evolution
     live={live}
     preview={evolutionPreview}
+    controller={controller}
     modelStatus={previewModelState.model === evolutionPreview.model ? previewModelState.status : 'loading'}
     session={{ ...evolutionSession, reset: () => {
       if (live.online) live.command({ command: "stop" });

@@ -5,11 +5,12 @@ import { Controls } from '../components/Chrome';
 import { PageLead } from './Portfolio';
 import { evolutionRoutes, forms } from '../evolution.mjs';
 import EvolutionTree from './EvolutionTree';
+import MotionPreview from '../components/MotionPreview';
 import EvolutionSettings from '../components/EvolutionSettings';
 import { SlidersHorizontal } from 'lucide-react';
 import { evolutionStatus } from '../evolution-session.mjs';
 
-export default function Evolution({ live, preview, onSelectRoute, onSelectForm, modelStatus, session, browseRoute }) {
+export default function Evolution({ controller, live, preview, onSelectRoute, onSelectForm, modelStatus, session, browseRoute }) {
   const { form, placeholder } = preview;
   const route = evolutionRoutes.find(item => item.id === browseRoute) || preview.route;
   const [treeOpen, setTreeOpen] = useState(false);
@@ -49,7 +50,7 @@ export default function Evolution({ live, preview, onSelectRoute, onSelectForm, 
           <p>{form.description}</p>
           <small>{modelStatus === 'error' ? 'Model unavailable. Return to 小牛.' : modelStatus === 'loading' ? 'Loading form…' : placeholder ? 'Model pending. Showing a reference 牛来.' : 'Showing this form’s model.'}</small>
         </div>
-
+        <MotionPreview controller={controller} formId={form.id} ready={modelStatus==='ready'&&!placeholder} connected={live?.online} />
       </aside>
 
       <ObservationPanel live={live} />

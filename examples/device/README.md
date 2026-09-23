@@ -13,21 +13,21 @@ Default WebRTC is direct only: use the same computer or local network. There is 
 
 ## Your adapter
 
-Implement `adapter.py`'s async methods in your own `my_adapter.py`, then:
+Start from the non-executing `hardware_adapter.py` skeleton and implement its async methods in your own `my_adapter.py`, then:
 
 ```sh
 python run.py --adapter my_adapter:Adapter --camera 0
 ```
 
 - `simulation = False` for a real adapter.
-- `status()` → `{name, hardware, jev, language}`. Status values: ready/offline/error/unknown.
-- `apply_profile(profile)` receives `revision`, `formId`, `prompt`, `allowedActions`, `animationMap`. Return only after the JEV prompt/configuration is applied.
-- `decide(user_input, requested_action=None)` → `{actionId, summary}`. Call your JEV with the profile prompt and allowed action IDs. Never return arbitrary motor instructions.
+- `status()` → `{name, hardware, jev, language, actionContractVersion: 2, supportedActions}`. Status values: ready/offline/error/unknown.
+- `apply_profile(profile)` receives `revision`, `actionContractVersion`, `formId`, `prompt`, `allowedActions`, `animationMap`. Return only after the JEV prompt/configuration is applied.
+- `decide(user_input, requested_action=None, *, allowed_actions=None)` → `{actionId, summary}`. Call your JEV with the profile prompt and the provided allowed_actions capability intersection. Never return arbitrary motor instructions.
 - `execute(action_id)` → `{status, detail}`. Report completed only with actual completion evidence; use sent for a write without completion evidence, unknown for uncertain results.
 - `stop()` → `{confirmed: bool, detail: str}`. Stop the physical controller, not just this Python task.
 - `reply(user_input)` is an async generator yielding text from your local LLM process.
 
-Current protocol actions: NOD / LOOK / TILT / WAVE / WAIT. These are legacy IDs, not the newly confirmed five-action product contract. See [the developer handoff](https://github.com/ericshang98/cowcoming/blob/main/docs/hardware-handoff.md) (also included as `hardware-handoff.md` in the kit) before adapting actions. Do not send the proposed new IDs until the protocol is updated.
+Action contract **2**: NOD / SHAKE / NOD_DOUBLE / TILT_LEFT / TILT_RIGHT. WAIT means no movement. Left/right are device-own directions. Advertise only verified supportedActions and set hardware=ready only after actual readiness checks. Old rooms require explicit migration in Device lab. See `hardware-handoff.md`. HTTP/WebSocket transport remains v1. Never turn a simulation into a real adapter just by changing its flag.
 
 Manual form selection, reset and configurable conversation-based evolution evaluation are implemented. Automatic evolution requires a configured evaluation model and gateway; see `evolution-runtime.md` in the kit or [the repository contract](https://github.com/ericshang98/cowcoming/blob/main/docs/evolution-runtime.md). Profiles remain editable per form. An update stops the current interaction, applies the new prompt, and acknowledges its revision. Reconnection receives a fresh profile and does not replay old commands.
 

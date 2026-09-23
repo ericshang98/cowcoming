@@ -154,3 +154,4 @@
 .evolution-evaluation-status span { color: #6e8890; }
 .evolution-settings footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
 .evolution-settings :focus-visible, .evolution-settings-trigger:focus-visible { outline: 2px solid #168e9b; outline-offset: 3px; }
+.motion-preview{margin-top:14px;border-top:1px solid var(--line,#4443);padding-top:10px;font-size:12px}.motion-preview summary{cursor:pointer;font-weight:600}.motion-preview-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}.motion-preview button{border:1px solid #8885;border-radius:6px;background:transparent;color:inherit;font:inherit;padding:7px;cursor:pointer}.motion-preview button:disabled{opacity:.4;cursor:default}.motion-preview small{display:block;margin-top:6px;line-height:1.5}

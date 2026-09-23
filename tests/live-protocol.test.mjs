@@ -10,6 +10,9 @@ import {
   chooseAnimation,
 } from "../shared/live-protocol.mjs";
 
+function readyRoom() {
+ return applyDeviceEvent(initialRoom('demo','Desk'), {type:'device.status', eventId:'caps', actionContractVersion:2, supportedActions:['NOD','SHAKE','NOD_DOUBLE','TILT_LEFT','TILT_RIGHT','WAIT'], hardware:'ready', jev:'ready'});
+}
 test("keys are scoped by room and role; malformed input fails closed", () => {
   assert.deepEqual(parseKey(`cw1.browser.demo_01.${"a".repeat(64)}`), {
     role: "browser",
@@ -24,7 +27,7 @@ test("keys are scoped by room and role; malformed input fails closed", () => {
     assert.throws(() => parseKey(key));
 });
 test("manual profile edit increments revision without inventing evolution", () => {
-  const s = initialRoom("demo", "Desk");
+  const s = readyRoom();
   const next = updateProfile(s, {
     expectedRevision: 1,
     formId: "normal",
@@ -49,7 +52,7 @@ test("manual profile edit increments revision without inventing evolution", () =
   );
 });
 test("device acknowledgements cannot apply a stale or future prompt revision", () => {
-  const s = initialRoom("demo", "Desk");
+  const s = readyRoom();
   assert.throws(() =>
     applyDeviceEvent(s, { type: "profile.applied", eventId: "a", revision: 2 }),
   );
@@ -60,7 +63,7 @@ test("device acknowledgements cannot apply a stale or future prompt revision", (
   );
 });
 test("decision events are deduplicated and constrained by the applied profile", () => {
-  let s = initialRoom("demo", "Desk");
+  let s = readyRoom();
   const event = {
     type: "decision",
     eventId: "d1",
@@ -87,12 +90,12 @@ test("decision events are deduplicated and constrained by the applied profile", 
   );
   assert.equal(
     chooseAnimation("NOD", s.profile.animationMap, () => 0.99),
-    "nod-double",
+    "nod-soft",
   );
   assert.equal(chooseAnimation("UNKNOWN", s.profile.animationMap), null);
 });
 test("commands require a live device and applied prompt; stop is still available", () => {
-  const s = initialRoom("demo", "Desk");
+  const s = readyRoom();
   assert.throws(
     () => makeCommand(s, { command: "action", actionId: "NOD" }, false),
     /offline/,
@@ -111,7 +114,7 @@ test("commands require a live device and applied prompt; stop is still available
   );
 });
 test("language messages append once and reject late chunks after completion", () => {
-  let s = initialRoom("demo", "Desk");
+  let s = readyRoom();
   s = applyDeviceEvent(s, {
     type: "language.start",
     eventId: "s",
@@ -172,7 +175,7 @@ test("WebRTC signaling is bounded and does not accept video frames", () => {
   );
 });
 test("each form keeps its own editable prompt and action mapping", () => {
-  let s = initialRoom("demo", "Desk");
+  let s = readyRoom();
   s = updateProfile(s, { expectedRevision: 1, prompt: "Calf prompt" });
   s = updateProfile(s, {
     expectedRevision: 2,
@@ -185,7 +188,7 @@ test("each form keeps its own editable prompt and action mapping", () => {
   assert.equal(s.profile.prompt, "Normal prompt");
 });
 test("a completed action cannot move backwards and interrupted text stays interrupted", () => {
-  let s = initialRoom("demo", "Desk");
+  let s = readyRoom();
   s = applyDeviceEvent(s, {
     type: "profile.applied",
     eventId: "apply",
