@@ -1,0 +1,13 @@
+.home-page .home-product { width: min(430px, 36vw); }
+.home-product h2 { margin: 15px 0 0; font-size: clamp(27px, 2.25vw, 36px); line-height: 1.14; letter-spacing: -0.035em; font-weight: 500; }
+.home-product > .home-product-description { margin: 15px 0 20px; min-height: 0; max-width: 400px; font: 14px/1.65 Inter, system-ui, sans-serif; letter-spacing: 0; color: #627274; }
+.home-product-link { display: inline-flex; align-items: center; gap: 12px; padding: 6px 0; color: #008777; border-bottom: 1px solid #00877755; font-size: 13px; }
+.home-product-link:hover { color: #005f55; border-bottom-color: currentColor; }
+.home-product-feedback { margin-top: 14px; max-width: 400px; font-size: 12px; line-height: 1.5; color: #627274; }
+@media (max-width: 768px) {
+  .home-page .home-product { width: auto; bottom: 100px; }
+  .home-product h2 { font-size: 27px; margin-top: 12px; }
+  .home-product > .home-product-description { font-size: 12px; line-height: 1.55; margin: 12px 0 13px; max-width: 350px; }
+  .home-product-link { font-size: 12px; }
+  .home-product-feedback { font-size: 11px; margin-top: 10px; }
+}

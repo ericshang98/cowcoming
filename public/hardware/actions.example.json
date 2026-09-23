@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "actions": [
+    {
+      "id": "look",
+      "label": "看向你",
+      "motion": "look",
+      "durationMs": 1800
+    },
+    {
+      "id": "bow",
+      "label": "轻轻低头",
+      "motion": "bow",
+      "durationMs": 2200
+    },
+    {
+      "id": "nod",
+      "label": "点头回应",
+      "motion": "nod",
+      "durationMs": 2200
+    },
+    {
+      "id": "tilt",
+      "label": "好奇歪头",
+      "motion": "tilt",
+      "durationMs": 2500
+    },
+    {
+      "id": "reflect",
+      "label": "思考，再回应",
+      "motion": "reflect",
+      "durationMs": 3600
+    }
+  ]
+}

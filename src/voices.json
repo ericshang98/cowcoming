@@ -1,0 +1,65 @@
+[
+  {
+    "id": "okay",
+    "text": "好的呀",
+    "group": "日常互动",
+    "duration": 1.12,
+    "src": "/audio/niulai/okay.mp3",
+    "textEn": "Sure thing!",
+    "groupEn": "Everyday moments"
+  },
+  {
+    "id": "not-true",
+    "text": "才不是呢",
+    "group": "日常互动",
+    "duration": 1.54,
+    "src": "/audio/niulai/not-true.mp3",
+    "textEn": "No way!",
+    "groupEn": "Everyday moments"
+  },
+  {
+    "id": "jump-later",
+    "text": "我还是长大一点再跳吧",
+    "group": "成长反馈",
+    "duration": 2.77,
+    "src": "/audio/niulai/jump-later.mp3",
+    "textEn": "I think I’ll grow a little more before I jump.",
+    "groupEn": "Growing up"
+  },
+  {
+    "id": "growing",
+    "text": "长大是细微的积累，并不容易察觉",
+    "group": "成长反馈",
+    "duration": 4.75,
+    "src": "/audio/niulai/growing.mp3",
+    "textEn": "Growing happens in tiny steps you don’t always notice.",
+    "groupEn": "Growing up"
+  },
+  {
+    "id": "tomorrow",
+    "text": "今天就是昨天的将来",
+    "group": "牛来随想",
+    "duration": 2.66,
+    "src": "/audio/niulai/tomorrow.mp3",
+    "textEn": "Today is the future we imagined yesterday.",
+    "groupEn": "Little thoughts"
+  },
+  {
+    "id": "same-different",
+    "text": "是，是不一样，但其实也一样",
+    "group": "牛来随想",
+    "duration": 4.28,
+    "src": "/audio/niulai/same-different.mp3",
+    "textEn": "Yes, it’s different. But really, it’s the same.",
+    "groupEn": "Little thoughts"
+  },
+  {
+    "id": "mama",
+    "text": "妈～妈～～～",
+    "group": "隐藏彩蛋",
+    "duration": 1.88,
+    "src": "/audio/niulai/mama.mp3",
+    "textEn": "Ma… Mama!",
+    "groupEn": "A little surprise"
+  }
+]

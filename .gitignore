@@ -10,3 +10,11 @@ tmp/
 !.env.example
 *.log
 docs/product/*.tmp
+
+.dev.vars*
+*.keys.json
+__pycache__/
+.venv/
+!server/.dev.vars.example
+
+public/downloads/

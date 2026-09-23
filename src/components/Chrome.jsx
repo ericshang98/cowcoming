@@ -1,3 +1,4 @@
+import { Localized, LanguageToggle } from "../i18n/Language";
 import { useEffect, useRef, useState } from "react";
 import {
   MessageCircle,
@@ -9,22 +10,24 @@ import {
   Volume2,
   VolumeX,
   Pause,
+  RotateCcw,
   Play,
   Scan,
   Music2,
   X,
   Smartphone,
+  Maximize2,
 } from "lucide-react";
 import { useApp } from "../context";
 import ModelPicker from "./ModelPicker";
 export const routes = [
   ["home", "HOME", House],
   ["work", "WORK", FolderGit2],
-  ["blog", "IDEA52", Sparkles],
+  ["blog", "WORLD", Sparkles],
   ["about", "ABOUT", User],
-  ["contact", "CONTACT", Send],
+  ["contact", "VOTE US", Send],
 ];
-export function Controls({ music = true }) {
+export function Controls({ music = true, onExpand, onReset }) {
   const {
     tracking,
     setTracking,
@@ -32,18 +35,22 @@ export function Controls({ music = true }) {
     setMuted,
     paused,
     setPaused,
-    setMusicOpen,
+    setVoiceOpen,
+    voiceOpen,
   } = useApp();
   return (
-    <div className="scene-controls">
+    <Localized><div className="scene-controls">
       <button
         aria-label={
-          tracking ? "Turn off cursor tracking" : "Turn on cursor tracking"
+          onExpand ? "Open evolution tree" : tracking ? "Turn off cursor tracking" : "Turn on cursor tracking"
         }
-        aria-pressed={tracking}
-        onClick={() => setTracking(!tracking)}
+        title={onExpand ? "Explore your evolution" : undefined}
+        aria-haspopup={onExpand ? "dialog" : undefined}
+        aria-controls={onExpand ? "evolution-atlas" : undefined}
+        aria-pressed={onExpand ? undefined : tracking}
+        onClick={onExpand || (() => setTracking(!tracking))}
       >
-        <Scan size={15} />
+        {onExpand ? <Maximize2 size={15} /> : <Scan size={15} />}
       </button>
       <button
         aria-label={muted ? "Unmute sound" : "Mute sound"}
@@ -53,36 +60,50 @@ export function Controls({ music = true }) {
         {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
       </button>
       <button
-        aria-label={paused ? "Resume animations" : "Pause animations"}
-        aria-pressed={paused}
-        onClick={() => setPaused(!paused)}
+        aria-label={onReset ? "Reset to calf" : paused ? "Resume animations" : "Pause animations"}
+        title={onReset ? "Reset to calf" : undefined}
+        aria-pressed={onReset ? undefined : paused}
+        onClick={onReset || (() => setPaused(!paused))}
       >
-        {paused ? <Play size={15} /> : <Pause size={15} />}
+        {onReset ? <RotateCcw size={15} /> : paused ? <Play size={15} /> : <Pause size={15} />}
       </button>
       {music && (
         <button
-          aria-label="Show the last track played"
-          onClick={() => setMusicOpen((v) => !v)}
+          aria-label="牛来的声音"
+          title="牛来的声音"
+          aria-expanded={voiceOpen}
+          aria-controls="niulai-voice-panel"
+          onClick={() => setVoiceOpen((v) => !v)}
         >
           <Music2 size={15} />
         </button>
       )}
-    </div>
+    </div></Localized>
   );
 }
 export function Header() {
-  const { mode, mobile, navigate, openChat, muted, setMuted, snapshot, reaction } =
-    useApp();
+  const {
+    mode,
+    mobile,
+    navigate,
+    openChat,
+    muted,
+    setMuted,
+    tracking,
+    collection,
+  } = useApp();
   return (
-    <>
+    <Localized><>
       <header className="identity">
-        <button onClick={() => navigate("home")} aria-label="牛来">
-          牛来
+        <button onClick={() => navigate("home")} aria-label={mode === "about" ? "Cowcoming" : "牛来"}>
+          {mode === "about" ? "Cowcoming" : "牛来"}
         </button>
-        <div className="identity-desktop">一个 IP · 跑在一套尚未命名的系统上</div>
+        <div className="identity-desktop">
+          {mode === "about" ? "基于 JEV 决策模型的可进化 AI 宠物" : mode === "work" ? "牛来 IP · Powered by Cowcoming" : "牛来 IP · 由 Cowcoming 承载"}
+        </div>
         <div className="identity-mobile">
           <i />
-          形态 · {snapshot.name}
+          {mode === "about" ? "可进化 AI 宠物" : mode === "work" ? "Explore how 牛来 evolves" : "点点牛来，听它说话"}
         </div>
       </header>
       <div className="mobile-actions">
@@ -95,21 +116,23 @@ export function Header() {
         {mobile && <ModelPicker />}
         <button
           className="chat-dot"
-          aria-label="Ask Fuch"
+          aria-label="About JEV"
           onClick={() => openChat()}
         >
           <MessageCircle />
         </button>
+        <LanguageToggle />
       </div>
       <nav className="navigation glass" aria-label="Main navigation">
         <button
           className="desktop-nav-icon chat-dot"
-          aria-label="Ask Fuch"
+          aria-label="About JEV"
           onClick={() => openChat()}
         >
           <MessageCircle size={15} />
         </button>
         {!mobile && <ModelPicker />}
+        <LanguageToggle />
         {routes.map(([id, title, Icon]) => (
           <button
             key={id}
@@ -122,15 +145,15 @@ export function Header() {
           </button>
         ))}
       </nav>
-      {mode === "home" && (
+      {mode === "home" && !mobile && (
         <div className="snapshot-tag" aria-live="polite">
-          <b>形态 · {snapshot.name}</b>
+          <b>{tracking ? "鼠标跟随已开启" : "鼠标跟随已关闭"}</b>
           <span>
-            读到{reaction.read} → {reaction.judgment}
+            {collection.unlocked ? "左键叫妈妈 · L 挥挥手" : "WORLD 集齐星光，解锁叫妈妈 · L 挥手"}
           </span>
         </div>
       )}
-    </>
+    </></Localized>
   );
 }
 export function Boot({ ready, onDone }) {
@@ -187,7 +210,7 @@ export function Boot({ ready, onDone }) {
     }
   }, [phase, onDone]);
   return (
-    <div className={`boot-overlay ${phase}`} data-pwc-critical="boot">
+    <Localized><div className={`boot-overlay ${phase}`} data-pwc-critical="boot">
       <div className="boot-meter">
         <div className="boot-line">
           <span style={{ transform: `scaleX(${progress / 100})` }} />
@@ -218,7 +241,7 @@ export function Boot({ ready, onDone }) {
             <span className="loading-note">Preparing the 3D scene…</span>
           )}
       </div>
-    </div>
+    </div></Localized>
   );
 }
 export function Ambient() {
@@ -296,7 +319,7 @@ export function TiltPrompt() {
   }, [controller]);
   if (!visible) return null;
   return (
-    <div className="tilt-prompt">
+    <Localized><div className="tilt-prompt">
       <button
         onClick={async () => {
           try {
@@ -329,6 +352,6 @@ export function TiltPrompt() {
       >
         <X size={14} />
       </button>
-    </div>
+    </div></Localized>
   );
 }

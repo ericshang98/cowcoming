@@ -1,5 +1,13 @@
+import { Localized } from "../i18n/Language";
 import { useEffect, useRef, useState } from "react";
-export default function Window({ title, kind, onClose, onMinimize, children }) {
+export default function Window({
+  title,
+  kind,
+  onClose,
+  onMinimize,
+  children,
+  statusLabel = "LIVE",
+}) {
   const ref = useRef(),
     [full, setFull] = useState(false),
     [offset, setOffset] = useState({ x: 0, y: 0 }),
@@ -69,7 +77,7 @@ export default function Window({ title, kind, onClose, onMinimize, children }) {
     };
   }, []);
   return (
-    <div
+    <Localized><div
       className="window-backdrop"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -121,11 +129,11 @@ export default function Window({ title, kind, onClose, onMinimize, children }) {
           <span>{title}</span>
           <small>
             <i />
-            LIVE
+            {statusLabel}
           </small>
         </aside>
         <div className="window-body">{children}</div>
       </section>
-    </div>
+    </div></Localized>
   );
 }

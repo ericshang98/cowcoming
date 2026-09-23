@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Box, Check, LoaderCircle } from "lucide-react";
 import { useApp } from "../context";
+import { Localized } from "../i18n/Language";
 import { HOME_MODELS } from "../scene/home-models.mjs";
 
 export default function ModelPicker() {
@@ -33,7 +34,7 @@ export default function ModelPicker() {
     return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
   return (
-    <div
+    <Localized><div
       className="model-picker"
       title={!enabled ? "仅 HOME 可切换模型" : undefined}
       onBlur={(event) => {
@@ -132,6 +133,6 @@ export default function ModelPicker() {
           )}
         </div>
       )}
-    </div>
+    </div></Localized>
   );
 }

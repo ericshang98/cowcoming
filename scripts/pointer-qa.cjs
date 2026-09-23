@@ -7,7 +7,7 @@ const assert = require("node:assert/strict");
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   try {
-    await page.goto("http://127.0.0.1:4178/");
+    await page.goto(process.env.QA_BASE_URL || "http://127.0.0.1:4178/");
     await page.waitForFunction(() => window.__replica?.getState().bootDone);
     await page.waitForTimeout(4000);
     async function follows(width, height) {
@@ -103,10 +103,10 @@ const assert = require("node:assert/strict");
       .getByRole("navigation")
       .getByRole("button", { name: "ABOUT", exact: true })
       .click();
-    await page.getByLabel("Interactive 3D avatar").waitFor();
+    await page.getByLabel("Interactive 3D Niulai").waitFor();
     await page.waitForTimeout(3000);
     await follows(667, 720);
-    console.log("PASS human avatar follows in narrow layout");
+    console.log("PASS Niulai follows in narrow About layout");
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();

@@ -11,7 +11,7 @@ fs.mkdirSync(output, { recursive: true });
   });
   const errors = [],
     checks = [];
-  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("pageerror", (e) => errors.push(e.stack));
   const check = (name) => {
     checks.push(name);
     console.log("PASS", name);
@@ -63,12 +63,12 @@ fs.mkdirSync(output, { recursive: true });
     await choose("奶龙");
     await asset("nailong-web");
     assert.equal((await state()).homeModel, "nailong");
-    await page.getByText("奶龙暂不支持口型", { exact: true }).waitFor();
+    assert.equal(await page.evaluate(() => window.__replica.controller.rig.mouth.length), 0);
     await page.screenshot({ path: `${output}/nailong-home.png` });
     check(
-      "Retry switches HOME to Nailong and accurately marks missing mouth support",
+      "Retry switches HOME to Nailong and has no unsupported mouth controls",
     );
-    await page.getByRole("button", { name: "WORK", exact: true }).click();
+    await page.getByRole("button", { name: "进化", exact: true }).click();
     await asset("niulai-mouth");
     assert.ok(
       await page
@@ -80,42 +80,42 @@ fs.mkdirSync(output, { recursive: true });
       0,
     );
     await page.screenshot({ path: `${output}/work-unchanged.png` });
-    await page.getByRole("button", { name: "CONTACT", exact: true }).click();
+    await page.getByRole("button", { name: "支持我们", exact: true }).click();
     await asset("niulai-mouth");
     assert.ok(
       await page
         .getByRole("button", { name: "模型选择（仅 HOME 可用）" })
         .isDisabled(),
     );
-    await page.getByRole("button", { name: "ABOUT", exact: true }).click();
-    await asset("fuch-human-spin");
-    await page.getByRole("button", { name: "HOME", exact: true }).click();
+    await page.getByRole("button", { name: "关于", exact: true }).click();
+    await asset("niulai-mouth");
+    await page.getByRole("button", { name: "首页", exact: true }).click();
     await asset("nailong-web");
     check(
-      "WORK and CONTACT keep Niulai, ABOUT keeps its avatar, returning HOME restores Nailong",
+      "WORK and CONTACT keep Niulai, ABOUT keeps Niulai, returning HOME restores Nailong",
     );
     await choose("蜘蛛侠");
     await asset("spiderman-web");
     await page.screenshot({ path: `${output}/spiderman-home.png` });
     await choose("小黑龙");
     await asset("black-dragon-web");
-    await page.getByText("小黑龙暂不支持口型", { exact: true }).waitFor();
+    assert.equal(await page.evaluate(() => window.__replica.controller.rig.mouth.length), 0);
     await page.waitForTimeout(1200);
     await page.screenshot({ path: `${output}/black-dragon-home.png` });
-    await page.getByRole("button", { name: "WORK", exact: true }).click();
+    await page.getByRole("button", { name: "进化", exact: true }).click();
     await asset("niulai-mouth");
     assert.ok(
       await page
         .getByRole("button", { name: "模型选择（仅 HOME 可用）" })
         .isDisabled(),
     );
-    await page.getByRole("button", { name: "HOME", exact: true }).click();
+    await page.getByRole("button", { name: "首页", exact: true }).click();
     await asset("black-dragon-web");
     await choose("牛来");
     await asset("niulai-mouth");
-    await page.getByText("试口型", { exact: true }).waitFor();
+    assert.ok(await page.evaluate(() => window.__replica.controller.rig.mouth.length > 0));
     check(
-      "All four models switch; Black Dragon stays HOME-only; Niulai mouth controls return",
+      "All four models switch; Black Dragon stays HOME-only; Niulai mouth support returns",
     );
     // Fresh page cache: leave HOME while a custom file is still in flight.
     let release;
@@ -133,13 +133,13 @@ fs.mkdirSync(output, { recursive: true });
       .waitFor();
     assert.equal((await state()).homeModel, "niulai");
     await asset("niulai-mouth");
-    await page.getByRole("button", { name: "WORK", exact: true }).click();
+    await page.getByRole("button", { name: "进化", exact: true }).click();
     while (!release) await page.waitForTimeout(20);
     release();
     await page.waitForTimeout(500);
     assert.equal((await state()).homeModel, "niulai");
     assert.equal((await state()).pendingModel, null);
-    await page.getByRole("button", { name: "HOME", exact: true }).click();
+    await page.getByRole("button", { name: "首页", exact: true }).click();
     await asset("niulai-mouth");
     check(
       "Leaving HOME cancels an in-flight switch; late completion cannot change the model",

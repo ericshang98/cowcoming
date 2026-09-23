@@ -2,7 +2,7 @@
   "version": 1,
   "scope": "work",
   "kind": "route-model-asset-catalog",
-  "integrationStatus": "Assets ready; current production WORK source must consume this catalog",
+  "integrationStatus": "Bound to WORK evolution forms celestial and dark",
   "models": [
     {
       "id": "xianniu",
@@ -13,8 +13,17 @@
       "mouth": false,
       "walking": false,
       "bones": 20,
-      "animations": ["idle", "look", "bow", "nod", "tilt", "reflect", "wave"],
-      "sha256": "af2521e418ad066942c0767b7d5e4e557e2e285a9d3a3d0c7ddca9f896ab3d44"
+      "animations": [
+        "idle",
+        "look",
+        "bow",
+        "nod",
+        "tilt",
+        "reflect",
+        "wave"
+      ],
+      "sha256": "af2521e418ad066942c0767b7d5e4e557e2e285a9d3a3d0c7ddca9f896ab3d44",
+      "formId": "celestial"
     },
     {
       "id": "dark-niulai",
@@ -25,8 +34,17 @@
       "mouth": false,
       "walking": false,
       "bones": 27,
-      "animations": ["idle", "look", "bow", "nod", "tilt", "reflect", "wave"],
-      "sha256": "29c5be47b3a93ee9689a03abaab45a90ecf2c7e7cb25d478b3b35a10089952a7"
+      "animations": [
+        "idle",
+        "look",
+        "bow",
+        "nod",
+        "tilt",
+        "reflect",
+        "wave"
+      ],
+      "sha256": "29c5be47b3a93ee9689a03abaab45a90ecf2c7e7cb25d478b3b35a10089952a7",
+      "formId": "dark"
     }
   ]
 }

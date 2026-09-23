@@ -30,3 +30,11 @@ test('mouth controls tolerate a character without mouth shapes',()=>{
  assert.deepEqual(prepareMouth(new Group()),[]);
  assert.doesNotThrow(()=>updateMouth([],'open',1/60));
 });
+test('voice amplitude overrides a manual pose, closes during silence and stays bounded',()=>{
+ const {scene}=fixture();const mouths=prepareMouth(scene);
+ for(let i=0;i<120;i++)updateMouth(mouths,'round',1/60,2);
+ assert.ok(mouths[0].morphTargetInfluences[0]>.99);
+ assert.ok(mouths[0].morphTargetInfluences[2]<.001);
+ for(let i=0;i<120;i++)updateMouth(mouths,'round',1/60,0);
+ assert.ok(mouths[0].morphTargetInfluences.every(w=>w<.001));
+});

@@ -1,8 +1,9 @@
-import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, useGLTF } from "@react-three/drei";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
 import * as THREE from "three";
+import { PROCEDURAL_CLIPS, proceduralPose } from "../live/animation.mjs";
 import { damp, gazeTargets, clamp } from "./motion.mjs";
 import { NIULAI_ASSET, prepareMouth, updateMouth } from "./niulai.mjs";
 const MASCOT = NIULAI_ASSET,
@@ -29,7 +30,7 @@ function CachedRig({ asset, ...props }) {
 function ModelRig({ gltf, ...props }) {
   return gltf ? <Rig {...props} gltf={gltf} /> : <CachedRig {...props} />;
 }
-function Rig({ human, asset, gltf, controller, placement, visible, onReady, entrance }) {
+function Rig({ human, asset, gltf, controller, placement, visible, onReady, entrance, onTap }) {
   const { camera, gl } = useThree(),
     root = useRef(),
     initialScale = useRef(entrance ? 0.7 : placement.scale);
@@ -91,6 +92,8 @@ function Rig({ human, asset, gltf, controller, placement, visible, onReady, entr
     body: 0,
     head: 0,
     pitch: 0,
+    roll: 0,
+    liveMotion: null,
     active: null,
     until: 0,
     started: false,
@@ -177,12 +180,19 @@ function Rig({ human, asset, gltf, controller, placement, visible, onReady, entr
       const next = controller.queue.take(
         controller.dragging || (st.time < 3.6 && entrance),
       );
-      if (next)
+      if (next && PROCEDURAL_CLIPS.includes(next.name)) {
+        st.active?.fadeOut(0.18); st.active = null;
+        actions.idle?.reset().setEffectiveWeight(1).fadeIn(0.18).play();
+        st.liveMotion = { name: next.name, start: st.time };
+      } else if (next) {
+        st.liveMotion = null;
         play(
           gestures[next.name] || next.name,
           st.time,
           next.priority === "ambient" ? 2.8 : 2.3,
         );
+      }
+      if (st.liveMotion && st.time - st.liveMotion.start >= 1.8) st.liveMotion = null;
       if (st.active && st.time >= st.until) {
         st.active.fadeOut(0.28);
         actions.idle?.reset().setEffectiveWeight(1).fadeIn(0.28).play();
@@ -196,7 +206,7 @@ function Rig({ human, asset, gltf, controller, placement, visible, onReady, entr
       }
       mixer.update(dt);
     }
-    updateMouth(mouths, controller.mouthPose, dt);
+    updateMouth(mouths, controller.mouthPose, dt, controller.voiceActive ? controller.voiceLevel : null);
     const half =
         Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z,
       t = entrance ? clamp(st.time / 3.6, 0, 1) : 1,
@@ -246,7 +256,7 @@ function Rig({ human, asset, gltf, controller, placement, visible, onReady, entr
       (controller.mouse.active || controller.gaze) &&
       bones.head &&
       !controller.dragging &&
-      !st.active
+      !st.active && !st.liveMotion
     ) {
       bones.head.getWorldPosition(st.headScreen).project(camera);
       target = gazeTargets(
@@ -256,11 +266,14 @@ function Rig({ human, asset, gltf, controller, placement, visible, onReady, entr
         human,
       );
     }
+    const livePose = st.liveMotion ? proceduralPose(st.liveMotion.name, st.time - st.liveMotion.start) : { yaw: 0, pitch: 0, roll: 0 };
+    target.yaw += livePose.yaw; target.pitch += livePose.pitch;
     if (controller.dragging) target.body = controller.dragYaw;
     if (moving) {
       st.body = damp(st.body, target.body, human ? 3.5 : 2.2, dt);
       st.head = damp(st.head, target.yaw + controller.tilt.x * 0.26, 9, dt);
       st.pitch = damp(st.pitch, target.pitch - controller.tilt.y * 0.15, 9, dt);
+      st.roll = damp(st.roll, livePose.roll, 9, dt);
     }
     group.rotation.y = st.body;
     group.rotation.z = controller.tilt.x * 0.035;
@@ -271,7 +284,7 @@ function Rig({ human, asset, gltf, controller, placement, visible, onReady, entr
       if (!bone?.parent) continue;
       st.base.set(bone, bone.quaternion.clone());
       bone.parent.getWorldQuaternion(st.parentQ);
-      st.angles.set(st.pitch * weight, st.head * weight, 0, "YXZ");
+      st.angles.set(st.pitch * weight, st.head * weight, st.roll * weight, "YXZ");
       st.deltaQ.setFromEuler(st.angles);
       st.conj
         .copy(st.parentQ)
@@ -282,7 +295,7 @@ function Rig({ human, asset, gltf, controller, placement, visible, onReady, entr
     }
     controller.rig = {
       asset,
-      animation: st.active?.getClip().name || "idle",
+      animation: st.liveMotion?.name || st.active?.getClip().name || "idle",
       animations: Object.keys(actions),
       mouth: mouths.map(mesh => ({
         shapes: mesh.morphTargetDictionary,
@@ -302,13 +315,20 @@ function Rig({ human, asset, gltf, controller, placement, visible, onReady, entr
   return (
     <group ref={root} scale={initialScale.current}>
       <group scale={metrics.s} position={metrics.pos}>
-        <primitive object={model} />
+        <primitive object={model} onClick={event => {
+          event.stopPropagation();
+          if (visible && event.button === 0 && event.delta < 6 && !controller.lastPointerWasDrag)
+            (onTap || controller.onCharacterTap)?.();
+        }} />
       </group>
     </group>
   );
 }
 class SceneBoundary extends React.Component {
-  state = { error: null };
+  state = { error: null, asset: this.props.asset };
+  static getDerivedStateFromProps(props, state) {
+    return props.asset !== state.asset ? { error: null, asset: props.asset } : null;
+  }
   static getDerivedStateFromError(error) {
     return { error };
   }
@@ -327,7 +347,8 @@ class SceneBoundary extends React.Component {
   }
 }
 export default function Character({
-  model,
+  modelName = "牛来",
+  rigKey = "default",
   gltf,
   controller,
   mode,
@@ -336,49 +357,49 @@ export default function Character({
   onReady,
   boot,
   overlay,
+  modelAsset = MASCOT,
+  onError,
+  onTap,
 }) {
-  const [human, setHuman] = useState(mode === "about"),
-    [glitch, setGlitch] = useState(false);
+  // All project pages show Niulai, including About's contained model stage.
+  const stageRef = useRef();
   useEffect(() => {
     controller.queue.clear();
     controller.mouthPose = "closed";
     controller.mouthPreview = false;
     controller.dragging = false;
     controller.error = null;
-  }, [model.asset, controller]);
-  useEffect(() => {
-    if (human === (mode === "about")) return;
-    setGlitch(true);
-    controller.gesture("spin", "conversation");
-    const a = setTimeout(() => setHuman(mode === "about"), 480),
-      b = setTimeout(() => setGlitch(false), 1050);
-    return () => {
-      clearTimeout(a);
-      clearTimeout(b);
-    };
-  }, [mode]);
+  }, [modelAsset, controller]);
   const placement = useMemo(() => {
     // Loading has its own full-body framing. The mobile homepage deliberately
     // crops the legs, which would hide the walking animation during boot.
     if (!boot && mobile) return { scale: 0.95, x: 0, y: -0.18 };
+    if (mode === "about") return { scale: mobile ? 1.3 : 1.4, x: 0, y: 0.02 };
+    // WORK is Niulai's main stage, including on narrow screens. Supporting
+    // content scrolls below it instead of turning the model into a thumbnail.
+    if (mode === "work")
+      return mobile
+        ? { scale: 1.45, x: 0, y: 0.02 }
+        : { scale: 1.22, x: -0.12, y: 0.02 };
     if (overlay) return { scale: 0.24, x: 0.37, y: -0.3, ground: false };
     if (mobile)
       return mode === "home"
         ? { scale: 1.4, x: 0, y: 0.16 }
-        : mode === "about"
-          ? { scale: 0.86, x: 0, y: 0.16 }
-          : { scale: 0.38, x: 0.3, y: -0.13, ground: false };
-    if (mode === "work") return { scale: 1.22, x: -0.12, y: 0.02 };
-    if (mode === "about") return { scale: 1.22, x: -0.2, y: 0.02 };
+        : { scale: 0.38, x: 0.3, y: -0.13, ground: false };
     if (mode === "contact") return { scale: 1.22, x: 0, y: 0.04 };
     return { scale: 1.25, x: 0, y: -0.02 };
   }, [mode, mobile, overlay, boot]);
   useEffect(() => {
     let drag = null;
+    const blocked = mode === "about" && overlay;
+    const point = (x, y) => {
+      const r = mode === "about" ? stageRef.current.getBoundingClientRect() : { left: 0, top: 0, width: innerWidth, height: innerHeight };
+      return { x: ((x - r.left) / r.width) * 2 - 1, y: 1 - ((y - r.top) / r.height) * 2 };
+    };
     const move = (e) => {
+      if (blocked) return;
       controller.mouse = {
-        x: (e.clientX / innerWidth) * 2 - 1,
-        y: 1 - (e.clientY / innerHeight) * 2,
+        ...point(e.clientX, e.clientY),
         // Layout width does not identify the input device (e.g. a narrow
         // desktop preview). Follow mice and pens, not touch scrolling.
         active: e.pointerType !== "touch",
@@ -393,6 +414,7 @@ export default function Character({
       }
     };
     const hover = (e) => {
+      if (blocked) return;
       if (e.pointerType === "touch") {
         controller.gaze = null;
         controller.mouse.active = false;
@@ -401,18 +423,17 @@ export default function Character({
       const el = e.target.closest?.("button,a,[data-gaze]");
       if (el) {
         const r = el.getBoundingClientRect();
-        controller.gaze = {
-          x: ((r.x + r.width / 2) / innerWidth) * 2 - 1,
-          y: 1 - ((r.y + r.height / 2) / innerHeight) * 2,
-        };
+        controller.gaze = point(r.x + r.width / 2, r.y + r.height / 2);
       } else controller.gaze = null;
     };
     const down = (e) => {
       if (
+        blocked || e.button !== 0 || !e.isPrimary ||
         !e.target.closest?.(".character-stage") ||
         e.target.closest?.("button")
       )
         return;
+      controller.lastPointerWasDrag = false;
       drag = {
         x: e.clientX,
         y: e.clientY,
@@ -425,7 +446,8 @@ export default function Character({
       controller.queue.clear();
     };
     const up = () => {
-      if (drag && drag.distance < 6 && performance.now() - drag.time < 500)
+      controller.lastPointerWasDrag = !drag || drag.distance >= 6 || performance.now() - drag.time >= 500;
+      if (!controller.lastPointerWasDrag && !controller.onCharacterTap && !onTap)
         controller.gesture("perk");
       drag = null;
       controller.dragging = false;
@@ -456,11 +478,13 @@ export default function Character({
       removeEventListener("blur", cancel);
       cancel();
     };
-  }, [controller]);
+  }, [controller, mode, overlay, !!onTap]);
   return (
     <div
-      className={`character-stage ${glitch ? "transforming" : ""} ${mobile ? "mobile-character" : ""} mode-${mode} ${ready ? "ready" : ""}`}
-      aria-label={human ? "Interactive 3D avatar" : `互动 3D 角色 · ${model.name}`}
+      ref={stageRef}
+      className={`character-stage ${mobile ? "mobile-character" : ""} mode-${mode} ${ready ? "ready" : ""}`}
+      aria-label={modelAsset === MASCOT ? "Interactive 3D Niulai" : `Interactive 3D · ${modelName}`}
+      aria-disabled={mode === "about" && overlay ? true : undefined}
     >
       <div
         className="ground-shadow"
@@ -470,7 +494,10 @@ export default function Character({
           transform: `translateX(-50%) scale(${placement.scale})`,
         }}
       />
-      <SceneBoundary onError={(e) => (controller.error = e.message)}>
+      <SceneBoundary asset={modelAsset} onError={(e) => {
+        controller.error = e.message;
+        onError?.(e);
+      }}>
         <Canvas
           camera={{ position: [0, 0, 6.2], fov: 40 }}
           dpr={[1, 1.5]}
@@ -486,35 +513,23 @@ export default function Character({
           <Suspense fallback={null}>
             <Environment
               files="/env/studio_fuch.hdr"
-              environmentIntensity={human ? 1 : 0.3}
+              environmentIntensity={0.3}
             />
             <ModelRig
-              key={model.id}
-              asset={model.asset}
+              key={`${modelAsset}:${rigKey}`}
+              asset={modelAsset}
               gltf={gltf}
               human={false}
+              onTap={onTap}
               controller={controller}
               placement={placement}
-              visible={!human}
+              visible
               entrance={!boot}
               onReady={() => {
                 controller.ready = true;
-                if (!human) onReady();
+                onReady();
               }}
             />
-            {human && (
-              <Suspense fallback={null}>
-                <ModelRig
-                  asset={HUMAN}
-                  human
-                  controller={controller}
-                  placement={placement}
-                  visible
-                  entrance={!boot}
-                  onReady={onReady}
-                />
-              </Suspense>
-            )}
           </Suspense>
         </Canvas>
       </SceneBoundary>

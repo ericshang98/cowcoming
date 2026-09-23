@@ -1,0 +1,42 @@
+.voice-launch { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 9px 13px; border-radius: 20px; border: 1px solid #087f7329; color: #087f73; background: #ffffff94; font-size: 12px; }
+.voice-launch:hover { background: #e6f1ef; }
+.voice-panel { position: fixed; z-index: 60; right: 24px; bottom: 30px; width: 370px; max-height: calc(100dvh - 125px); display: flex; flex-direction: column; overflow: hidden; overscroll-behavior: contain; padding: 22px; border: 1px solid #d6e4df; border-radius: 22px; background: #f8fcfb; box-shadow: 0 20px 70px #18372f25; pointer-events: auto; text-align: left; }
+.voice-panel > :not(.voice-list) { flex-shrink: 0; }
+.voice-panel header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.voice-panel h2 { margin-top: 6px; font-size: 23px; }
+.voice-panel .eyebrow { font-size: 9px; }
+.voice-panel header > button { width: 38px; height: 38px; border-radius: 50%; background: #eaf2ef; }
+.voice-intro { color: #667970; font-size: 13px; margin: 10px 0; }
+.voice-settings { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.voice-settings button { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #087f73; padding: 7px 10px; background: #eaf3ef; border-radius: 15px; }
+.voice-list { display: grid; gap: 5px; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.voice-list > button { display: flex; align-items: center; text-align: left; gap: 11px; padding: 10px; border-radius: 12px; border: 1px solid transparent; min-height: 58px; }
+.voice-list > button:hover { background: #edf5f1; }
+.voice-list > button.is-active { background: #e0f0e9; border-color: #8ac1b1; }
+.voice-play-icon { color: #087f73; flex-shrink: 0; }
+.voice-line { min-width: 0; display: grid; gap: 4px; }
+.voice-line strong { font-size: 13px; font-weight: 500; line-height: 1.55; }
+.voice-line small { font-size: 10px; color: #74847d; }
+.voice-caption { margin-top: 15px; padding-top: 14px; border-top: 1px solid #dce6e1; min-height: 56px; }
+.voice-caption > span { font-size: 10px; color: #087f73; }
+.voice-caption p { font-size: 13px; line-height: 1.6; color: #475c52; }
+.voice-caption[data-status="error"] p { color: #a54930; }
+@media (max-width: 768px) {
+  .voice-panel { left: 12px; right: 12px; bottom: 94px; width: auto; max-height: 48dvh; padding: 16px; }
+  .voice-panel h2 { font-size: 20px; margin-top: 3px; }
+  .voice-intro { display: none; }
+  .voice-caption { margin-top: 10px; padding-top: 10px; min-height: 42px; }
+  .voice-launch { margin-top: 0; padding: 8px 12px; }
+}
+
+.interaction-hint { font-size: 12px; color: #687c74; margin: -12px 0 15px; }
+.suggestions kbd { margin-left: 8px; font: 10px var(--mono); opacity: .65; }
+.interaction-resume { display: block; margin: 8px 0; color: #087f73; font-size: 12px; }
+.greeting > .interaction-line { max-width: 510px; font-size: 23px; }
+@media (max-width: 768px) {
+  .greeting > .interaction-line { font-size: 19px; min-height: 45px; margin: 8px 0; }
+  .interaction-hint { margin: 0 0 9px; font-size: 10px; }
+  .home-page .greeting { top: auto; bottom: 94px; }
+  .home-page .suggestions { margin-bottom: 10px; }
+  .snapshot-tag { display: none; }
+}
