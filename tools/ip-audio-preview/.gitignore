@@ -1,0 +1,7 @@
+source/
+audio/
+manifest.json
+validation.json
+*.png
+models/
+vendor/

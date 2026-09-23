@@ -1,12 +1,7 @@
 // Each entry is [Chinese, English]. Canonical source text stays unchanged in
 // components and data; only rendered copy and accessible labels are localized.
 export const messages = [
-  ['奶龙', 'Nailong'], ['蜘蛛侠', 'Spider-Man'], ['小黑龙', 'Black Dragon'],
-  ['选择首页模型', 'Choose HOME model'], ['模型选择（仅 HOME 可用）', 'Model selection (HOME only)'],
-  ['仅 HOME 可切换模型', 'Model switching is available on HOME'], ['选择模型', 'Choose a model'],
-  ['仅 HOME', 'HOME only'], ['首页角色', 'HOME characters'],
-  ['只更换首页角色，其他页面保持原样。', 'Changes the HOME character only.'],
-
+['声音暂时无法播放，请再试一次。','Sound could not play. Please try again.'],
 ['重置为小牛','Reset to calf'],['选择你的形态。','Choose your next form.'],
 ['点击任意形态，切换到手动进化。','Select any form to switch to manual evolution.'],
 ['返回舞台','Return to stage'],['进化路线','Evolution paths'],

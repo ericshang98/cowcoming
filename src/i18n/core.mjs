@@ -23,10 +23,6 @@ export function translateText(value, language='zh') {
   if(!pair && text.startsWith('Preview ') && dictionary.has(text.slice(8))) return `${locale==='zh'?'预览':'Preview'} ${translateText(text.slice(8),locale)}`;
   if(!translated) {
     const patterns = [
-      [/^选择模型 · 当前(.+)$/,m=>`Choose a model · Current: ${translateText(m[1],'en')}`],
-      [/^正在加载(.+)，当前仍显示(.+)。$/,m=>`Loading ${translateText(m[1],'en')}. Still showing ${translateText(m[2],'en')}.`],
-      [/^(.+)加载失败，仍显示(.+)。请重试。$/,m=>`Could not load ${translateText(m[1],'en')}. Still showing ${translateText(m[2],'en')}. Try again.`],
-      [/^(.+)暂不支持口型$/,m=>`${translateText(m[1],'en')} does not support mouth poses yet`],
       [/^星光 \+1 · 已点亮 (\d+) \/ (\d+)$/, (m)=>`Star +1 · Collected ${m[1]} / ${m[2]}`],
       [/^已点亮 (\d+) \/ (\d+) 颗星光$/,m=>`${m[1]} / ${m[2]} stars collected`],
       [/^已收集 (\d+) \/ (\d+) 颗星光$/,m=>`${m[1]} of ${m[2]} stars collected`],

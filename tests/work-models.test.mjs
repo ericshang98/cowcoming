@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { HOME_MODELS } from "../src/scene/home-models.mjs";
+import { ipCatalog } from "../src/ip-catalog.mjs";
 import { forms, resolvePreview } from "../src/evolution.mjs";
 const catalog = JSON.parse(
   readFileSync(
@@ -19,7 +19,7 @@ test("仙牛与暗黑牛属于 WORK 路线，不出现在 HOME 菜单", () => {
     ],
   );
   for (const model of catalog.models) {
-    assert.ok(!HOME_MODELS.some((home) => home.id === model.id));
+    assert.ok(!ipCatalog.some((home) => home.id === model.id));
     const preview = resolvePreview(forms[model.formId].branch, model.formId, Object.keys(forms));
     assert.equal(preview.model, model.asset);
     assert.equal(preview.placeholder, false);

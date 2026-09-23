@@ -29,11 +29,22 @@ try {
     viewport: { width: 1440, height: 900 },
   });
   const page = await context.newPage();
-  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("pageerror", (e) => errors.push(e.stack || e.message));
   await page.goto(base + "/?section=work");
   await page
     .getByRole("button", { name: "Switch to English", exact: true })
     .click();
+  assert.equal(await page.locator('.evolution-node, .evolution-footer, [role="tablist"]').count(), 0);
+  await page.getByRole('heading', {name:'Bind your Niulai first',exact:true}).waitFor();
+  await page.waitForFunction(() => window.__replica?.controller.ready);
+  await page.screenshot({path:'.pwc/binding-desktop.png'});
+  const mobile = await browser.newPage({viewport:{width:390,height:844}});
+  await mobile.goto(base + '/?section=work');
+  await mobile.locator('.binding-card').waitFor();
+  assert.ok((await mobile.locator('.live-connection').boundingBox()).y < 700);
+  assert.equal(await mobile.locator('.evolution-node, [role="tablist"]').count(), 0);
+  await mobile.screenshot({path:'.pwc/binding-mobile.png'});
+  await mobile.close();
   await page.getByRole("button", { name: /CONNECT MY/ }).click();
   await page.getByLabel("Relay URL").fill(relay);
   await page.getByLabel("Browser connection key").fill("wrong-key");
@@ -54,6 +65,8 @@ try {
     .getByRole("button", { name: "WAITING FOR DEVICE", exact: true })
     .waitFor();
   assert.equal(await page.evaluate(() => location.href.includes("cw1")), false);
+  assert.equal(await page.locator('.evolution-node, .evolution-footer, [role="tablist"]').count(), 0);
+  await page.getByRole('heading',{name:'Bound. Waiting for your computer.',exact:true}).waitFor();
   const devicePage = await context.newPage();
   await devicePage.goto(base + "/robots.txt");
   await devicePage.evaluate(
@@ -285,14 +298,13 @@ try {
       exact: true,
     })
     .waitFor();
+  await page.getByRole('button',{name:'Evolution settings',exact:true}).click();
   await devicePage.evaluate(() => window.device.ws.close());
   await page
     .getByRole("button", { name: "WAITING FOR DEVICE", exact: true })
     .waitFor();
-  assert.equal(
-    await page.getByRole("button", { name: "Stop", exact: true }).isDisabled(),
-    true,
-  );
+  assert.equal(await page.locator('.evolution-node, .evolution-footer, [role="tablist"], .evolution-settings').count(), 0);
+  assert.equal(await page.locator('video').count(), 0);
   for (const width of [900, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     assert.equal(
@@ -308,7 +320,7 @@ try {
   await page.screenshot({ path: ".pwc/live-mobile.png" });
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: key rejection, role hints, connection, prompt sync, mapped animation, direct video/CV, LLM streaming, refresh without replay, offline controls, EN/ZH and 3 responsive widths.",
+    "PASS: binding gate on desktop/mobile, invalid keys, bound-but-offline lock, offline dialog/video cleanup, connection, prompt sync, mapped animation, direct video/CV, LLM streaming, refresh without replay, offline controls, EN/ZH and 3 responsive widths.",
   );
 } finally {
   await browser.close();

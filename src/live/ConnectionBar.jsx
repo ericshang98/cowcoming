@@ -36,7 +36,7 @@ export function LiveDialog({ title, children, onClose }) {
     document.body,
   );
 }
-export default function ConnectionBar({ live }) {
+export default function ConnectionBar({ live, binding = false }) {
   const { language } = useLanguage(),
     t = (zh, en) => (language === "zh" ? zh : en);
   const [open, setOpen] = useState(false),
@@ -57,7 +57,7 @@ export default function ConnectionBar({ live }) {
         ? t("正在连接", "CONNECTING")
         : live.status === "reconnecting"
           ? t("正在重连", "RECONNECTING")
-          : t("连接我的牛来", "CONNECT MY 牛来");
+          : t(binding ? "绑定我的牛来" : "连接我的牛来", "CONNECT MY 牛来");
   return (
     <>
       <div className="live-connection">
@@ -68,7 +68,7 @@ export default function ConnectionBar({ live }) {
         {live.snapshot && (
           <span className="live-room-name">{live.snapshot.label}</span>
         )}
-        {live.status === "connected" && (
+        {(live.status === "connected" || live.status === "reconnecting" || live.status === "connecting") && (
           <button
             aria-label={t("断开连接", "Disconnect")}
             onClick={live.disconnect}

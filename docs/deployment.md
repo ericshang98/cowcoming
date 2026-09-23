@@ -11,13 +11,19 @@
 | Cloudflare 账户 ID | `2dda3e857959219ddd0bd2bf990bd7a1` |
 | Pages 项目 | `niulai-preview-20260922` |
 | Pages 地址 | https://niulai-preview-20260922.pages.dev/ |
-| 旧域名 | https://niulai.nexting.design/ |
+| 已停用旧域名 | `niulai.nexting.design`（Pages 绑定已移除） |
 | 生产分支 | `main` |
 | 工作流 | `.github/workflows/ci.yml` — Verify and publish Cowcoming |
 | 构建 / 输出 | `npm run build` / `dist/` |
 | 线上版本 | https://cowcoming.world/build-info.json |
 
 当前 Cloudflare 项目是 Direct Upload，不能原地改为 Cloudflare 原生 Git integration。通过 GitHub Actions 直接上传即可连接 Git 与网站，不需要迁移项目或改 DNS。官方依据：[Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/)、[Direct Upload with CI](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/)。
+
+## 旧域名下线（2026-09-23）
+
+Eric 明确要求停用 `niulai.nexting.design`。已删除它在现有 Pages 项目中的自定义域名绑定；`cowcoming.world` 与 `www.cowcoming.world` 保持 active，生产部署 ID 未改变。以后使用主域名，不再恢复旧域名绑定，也不调用旧仓库中会重建此绑定的临时发布步骤。
+
+当前 Wrangler OAuth 没有 DNS 读取/编辑权限，DNS 记录尚未核验或删除；这与已完成的 Pages 绑定移除分别记录。后续通过具有 DNS 权限的 Cloudflare 管理入口，仅清理 `niulai.nexting.design` 对应记录，不删除整个 `nexting.design` 区域或其他子域名。
 
 ## 当前发布状态（2026-09-23）
 

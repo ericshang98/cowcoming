@@ -1,4 +1,4 @@
-import { Localized, useLanguage, translateText } from "../i18n/Language";
+import { Localized } from "../i18n/Language";
 import { useEffect, useRef } from "react";
 import { Play, Square, Volume2, VolumeX, X } from "lucide-react";
 import { useApp } from "../context";
@@ -6,8 +6,7 @@ import voices from "../voices.json";
 import "./niulai-voice.css";
 
 export default function NiulaiVoice() {
-  const { language } = useLanguage();
-  const { homeModel, voiceOpen, setVoiceOpen, muted, setMuted, paused, setPaused,
+  const { voiceOpen, setVoiceOpen, muted, setMuted, paused, setPaused,
     voiceState: state, playVoice, stopVoice, collection } = useApp();
   const closeButton = useRef(null);
   const wasOpen = useRef(voiceOpen);
@@ -36,7 +35,6 @@ export default function NiulaiVoice() {
             <button ref={closeButton} onClick={close} aria-label="Close voice collection"><X size={19} /></button>
           </header>
           <p className="voice-intro">Pick a line. Hear it in my own voice.</p>
-          {!homeModel.mouth && <p className="voice-intro">{translateText(`${homeModel.name}暂不支持口型`, language)}</p>}
           <div className="voice-settings">
             <button onClick={() => { stopVoice(); setMuted(!muted); }}>
               {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
@@ -61,7 +59,7 @@ export default function NiulaiVoice() {
           </div>
           <div className="voice-caption" role="status" aria-live="polite" data-status={state.status}>
             <span>{state.status === "loading" ? "Getting ready…" : state.status === "playing" ? "Now speaking" : state.status === "ended" ? "Just heard" : ""}</span>
-            <p>{state.error || (busy || state.status === "ended" ? state.track?.textEn : homeModel.mouth ? "Pick a line to hear me speak. Watch my mouth move with the sound." : "Pick a line. Hear it in my own voice.")}</p>
+            <p>{state.error || (busy || state.status === "ended" ? state.track?.textEn : "Pick a line to hear me speak. Watch my mouth move with the sound.")}</p>
           </div>
         </section>
       )}

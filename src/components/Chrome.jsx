@@ -1,7 +1,8 @@
-import { Localized, LanguageToggle } from "../i18n/Language";
+import { Localized, LanguageToggle, useLanguage } from "../i18n/Language";
 import { useEffect, useRef, useState } from "react";
 import {
   MessageCircle,
+  UsersRound,
   House,
   FolderGit2,
   Sparkles,
@@ -19,7 +20,6 @@ import {
   Maximize2,
 } from "lucide-react";
 import { useApp } from "../context";
-import ModelPicker from "./ModelPicker";
 export const routes = [
   ["home", "HOME", House],
   ["work", "WORK", FolderGit2],
@@ -37,6 +37,8 @@ export function Controls({ music = true, onExpand, onReset }) {
     setPaused,
     setVoiceOpen,
     voiceOpen,
+    activeIp,
+    mode,
   } = useApp();
   return (
     <Localized><div className="scene-controls">
@@ -67,7 +69,7 @@ export function Controls({ music = true, onExpand, onReset }) {
       >
         {onReset ? <RotateCcw size={15} /> : paused ? <Play size={15} /> : <Pause size={15} />}
       </button>
-      {music && (
+      {music && !(mode === 'home' && activeIp.id !== 'niulai') && (
         <button
           aria-label="牛来的声音"
           title="牛来的声音"
@@ -87,23 +89,29 @@ export function Header() {
     mobile,
     navigate,
     openChat,
+    openIp,
+    ipOpen,
+    activeIp,
     muted,
     setMuted,
     tracking,
     collection,
   } = useApp();
+  const { language } = useLanguage();
+  const name = mode === 'home' ? (language === 'en' ? activeIp.nameEn : activeIp.name) : '牛来';
+  const switchLabel = language === 'en' ? (mode === 'home' ? 'Switch IP' : 'Switch IP (HOME only)') : (mode === 'home' ? '切换 IP' : '切换 IP（仅首页可用）');
   return (
     <Localized><>
       <header className="identity">
-        <button onClick={() => navigate("home")} aria-label={mode === "about" ? "Cowcoming" : "牛来"}>
-          {mode === "about" ? "Cowcoming" : "牛来"}
+        <button onClick={() => navigate("home")} aria-label={mode === "about" ? "Cowcoming" : name}>
+          {mode === "about" ? "Cowcoming" : name}
         </button>
         <div className="identity-desktop">
-          {mode === "about" ? "基于 JEV 决策模型的可进化 AI 宠物" : mode === "work" ? "牛来 IP · Powered by Cowcoming" : "牛来 IP · 由 Cowcoming 承载"}
+          {mode === "about" ? "基于 JEV 决策模型的可进化 AI 宠物" : mode === 'home' ? `${name} IP · Powered by Cowcoming` : "牛来 IP · Powered by Cowcoming"}
         </div>
         <div className="identity-mobile">
           <i />
-          {mode === "about" ? "可进化 AI 宠物" : mode === "work" ? "Explore how 牛来 evolves" : "点点牛来，听它说话"}
+          {mode === "about" ? "可进化 AI 宠物" : mode === "work" ? "Explore how 牛来 evolves" : mode === 'home' && activeIp.id !== 'niulai' ? (language === 'en' ? `Tap ${activeIp.nameEn} for a reply` : `点点${activeIp.name}，听听回应`) : "点点牛来，听它说话"}
         </div>
       </header>
       <div className="mobile-actions">
@@ -113,7 +121,9 @@ export function Header() {
         >
           {muted ? <VolumeX /> : <Volume2 />}
         </button>
-        {mobile && <ModelPicker />}
+        <button disabled={mode !== "home"} aria-label={switchLabel} title={switchLabel} aria-haspopup="dialog" aria-expanded={ipOpen} aria-controls="ip-switcher" onClick={openIp}>
+          <UsersRound />
+        </button>
         <button
           className="chat-dot"
           aria-label="About JEV"
@@ -131,7 +141,16 @@ export function Header() {
         >
           <MessageCircle size={15} />
         </button>
-        {!mobile && <ModelPicker />}
+        <button
+          className="desktop-nav-icon"
+          disabled={mode !== "home"}
+          aria-label={switchLabel}
+          title={switchLabel}
+          aria-haspopup="dialog" aria-expanded={ipOpen} aria-controls="ip-switcher"
+          onClick={openIp}
+        >
+          <UsersRound size={15} />
+        </button>
         <LanguageToggle />
         {routes.map(([id, title, Icon]) => (
           <button
@@ -149,7 +168,7 @@ export function Header() {
         <div className="snapshot-tag" aria-live="polite">
           <b>{tracking ? "鼠标跟随已开启" : "鼠标跟随已关闭"}</b>
           <span>
-            {collection.unlocked ? "左键叫妈妈 · L 挥挥手" : "WORLD 集齐星光，解锁叫妈妈 · L 挥手"}
+            {activeIp.id !== 'niulai' ? activeIp.hint[language === 'en' ? 1 : 0] : collection.unlocked ? "左键叫妈妈 · L 挥挥手" : "WORLD 集齐星光，解锁叫妈妈 · L 挥手"}
           </span>
         </div>
       )}

@@ -23,15 +23,9 @@ const gestures = {
   spin: "bow",
   curious: "bow",
 };
-function CachedRig({ asset, ...props }) {
-  const gltf = useGLTF(asset);
-  return <Rig {...props} asset={asset} gltf={gltf} />;
-}
-function ModelRig({ gltf, ...props }) {
-  return gltf ? <Rig {...props} gltf={gltf} /> : <CachedRig {...props} />;
-}
-function Rig({ human, asset, gltf, controller, placement, visible, onReady, entrance, onTap }) {
-  const { camera, gl } = useThree(),
+function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, visible, onReady, entrance, onTap }) {
+  const gltf = useGLTF(human ? HUMAN : modelAsset),
+    { camera, gl } = useThree(),
     root = useRef(),
     initialScale = useRef(entrance ? 0.7 : placement.scale);
   const model = useMemo(() => {
@@ -167,7 +161,28 @@ function Rig({ human, asset, gltf, controller, placement, visible, onReady, entr
     if (moving) st.time += dt;
     for (const [bone, q] of st.base) bone.quaternion.copy(q);
     st.base.clear();
-    if (moving) {
+    if (moving && characterId !== 'niulai') {
+      const playback = controller.ipPlayback;
+      if (st.ipPlayback !== playback) {
+        st.active?.stop(); st.active = null;
+        actions.idle?.reset().setEffectiveWeight(1).play();
+        st.ipPlayback = playback;
+        if (playback && actions[playback.clip]) {
+          st.active = actions[playback.clip];
+          st.active.reset().setLoop(THREE.LoopOnce, 1).setEffectiveWeight(1).play();
+          st.active.clampWhenFinished = true;
+        }
+      }
+      controller.queue.clear();
+      if (st.active && playback) {
+        st.active.time = Math.min(st.active.getClip().duration - .001,
+          playback.audio.currentTime / playback.duration * st.active.getClip().duration);
+        const weight = Math.min(1, playback.audio.currentTime / .12,
+          Math.max(0, playback.duration - playback.audio.currentTime) / .16);
+        st.active.setEffectiveWeight(weight); actions.idle?.setEffectiveWeight(1 - weight);
+        mixer.update(0);
+      } else mixer.update(dt);
+    } else if (moving) {
       if (!st.started) {
         st.started = true;
         if (entrance && play(human ? "walk" : "walking", st.time)) {
@@ -294,7 +309,9 @@ function Rig({ human, asset, gltf, controller, placement, visible, onReady, entr
       bone.quaternion.premultiply(st.conj);
     }
     controller.rig = {
-      asset,
+      asset: human ? HUMAN : modelAsset,
+      characterId,
+      animationTime: st.active?.time || 0,
       animation: st.liveMotion?.name || st.active?.getClip().name || "idle",
       animations: Object.keys(actions),
       mouth: mouths.map(mesh => ({
@@ -347,9 +364,7 @@ class SceneBoundary extends React.Component {
   }
 }
 export default function Character({
-  modelName = "牛来",
   rigKey = "default",
-  gltf,
   controller,
   mode,
   mobile,
@@ -360,16 +375,10 @@ export default function Character({
   modelAsset = MASCOT,
   onError,
   onTap,
+  characterId = 'niulai',
 }) {
   // All project pages show Niulai, including About's contained model stage.
   const stageRef = useRef();
-  useEffect(() => {
-    controller.queue.clear();
-    controller.mouthPose = "closed";
-    controller.mouthPreview = false;
-    controller.dragging = false;
-    controller.error = null;
-  }, [modelAsset, controller]);
   const placement = useMemo(() => {
     // Loading has its own full-body framing. The mobile homepage deliberately
     // crops the legs, which would hide the walking animation during boot.
@@ -483,7 +492,7 @@ export default function Character({
     <div
       ref={stageRef}
       className={`character-stage ${mobile ? "mobile-character" : ""} mode-${mode} ${ready ? "ready" : ""}`}
-      aria-label={modelAsset === MASCOT ? "Interactive 3D Niulai" : `Interactive 3D · ${modelName}`}
+      aria-label={characterId !== 'niulai' ? `Interactive 3D ${characterId}` : 'Interactive 3D Niulai'}
       aria-disabled={mode === "about" && overlay ? true : undefined}
     >
       <div
@@ -515,10 +524,10 @@ export default function Character({
               files="/env/studio_fuch.hdr"
               environmentIntensity={0.3}
             />
-            <ModelRig
+            <Rig
               key={`${modelAsset}:${rigKey}`}
-              asset={modelAsset}
-              gltf={gltf}
+              modelAsset={modelAsset}
+              characterId={characterId}
               human={false}
               onTap={onTap}
               controller={controller}
@@ -526,6 +535,7 @@ export default function Character({
               visible
               entrance={!boot}
               onReady={() => {
+                controller.error = null;
                 controller.ready = true;
                 onReady();
               }}
