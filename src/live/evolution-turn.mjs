@@ -2,12 +2,13 @@
 export function completedEvolutionTurn(snapshot, commandId, context, software) {
   const result = snapshot.events.findLast(e => e.type === 'command.result' && e.commandId === commandId && e.status !== 'accepted');
   if (!result) return { terminal: false };
-  if(snapshot.profile.actionContractVersion===2 && result.status==='completed'){
+  const decision = snapshot.events.find(e => e.type === 'decision' && e.commandId === commandId);
+
+  if(snapshot.profile.actionContractVersion===2 && result.status==='completed' && decision?.actionId!=='WAIT'){
     if(!software)return {terminal:false};
     if(software.status!=='completed')return {terminal:true};
   }
   const replies = snapshot.messages.filter(message => message.commandId === commandId && message.role === 'assistant');
-  const decision = snapshot.events.find(e => e.type === 'decision' && e.commandId === commandId);
   const completed = snapshot.events.some(e => e.type === 'action' && e.decisionId === decision?.decisionId && e.status === 'completed');
   if (result.status !== 'completed' || snapshot.device.simulation || snapshot.profile.revision !== context.profileRevision || !completed || (!replies.length && context.replyMode !== "silent") || !replies.every(reply => reply.status === 'complete')) return { terminal: true };
   return { terminal: true, turn: { ...context, id: commandId, source: 'live', status: 'completed', replyText: replies.map(reply => reply.text).join('\n'), actionCompleted: true } };
