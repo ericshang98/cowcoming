@@ -1,0 +1,222 @@
+{
+  "passed": true,
+  "scope": "synthetic text, real providers, silent PCM sink, no hardware or microphone",
+  "rows": [
+    {
+      "form_id": "calf",
+      "input": "你怎么这么小，还敢吹牛？",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "哼！",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 671.8
+      },
+      "passed": true
+    },
+    {
+      "form_id": "calf",
+      "input": "请点一下头，陪我聊聊今天的心情。",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "哞？",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 611.5
+      },
+      "decision": {
+        "reaction_id": "nod",
+        "elapsed_ms": 1407.8,
+        "provider": "openrouter_jev"
+      },
+      "speech": {
+        "completed": true,
+        "model": "s2.1-pro-free",
+        "streaming": true,
+        "first_chunk_ms": 1033.9,
+        "elapsed_ms": 1437.6
+      },
+      "passed": true
+    },
+    {
+      "form_id": "normal",
+      "input": "你怎么这么小，还敢吹牛？",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "别看我小，我吹过的牛已经成年了。",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 629.5
+      },
+      "passed": true
+    },
+    {
+      "form_id": "normal",
+      "input": "请点一下头，陪我聊聊今天的心情。",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "点头这一块，我多少算个头部。你今天心情咋样？",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 850.7
+      },
+      "decision": {
+        "reaction_id": "nod",
+        "elapsed_ms": 1092.7,
+        "provider": "openrouter_jev"
+      },
+      "speech": {
+        "completed": true,
+        "model": "s2.1-pro-free",
+        "streaming": true,
+        "first_chunk_ms": 492.5,
+        "elapsed_ms": 3245.5
+      },
+      "passed": true
+    },
+    {
+      "form_id": "playful",
+      "input": "你怎么这么小，还敢吹牛？",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "个小怎么了？我这吹牛的调门，能把你耳朵震出小漩涡～",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 797.8
+      },
+      "passed": true
+    },
+    {
+      "form_id": "playful",
+      "input": "请点一下头，陪我聊聊今天的心情。",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "给你点个头哦，快把今天的心情拆成碎碎念说给我听听，我耳朵都竖成小雷达啦～",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 1337.8
+      },
+      "decision": {
+        "reaction_id": "nod",
+        "elapsed_ms": 955.9,
+        "provider": "openrouter_jev"
+      },
+      "speech": {
+        "completed": true,
+        "model": "s2.1-pro-free",
+        "streaming": true,
+        "first_chunk_ms": 475.4,
+        "elapsed_ms": 4715.9
+      },
+      "passed": true
+    },
+    {
+      "form_id": "tough",
+      "input": "你怎么这么小，还敢吹牛？",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "小怎么了？吹牛又不需要占地方，我这叫浓缩的都是“牛”！",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 809.3
+      },
+      "passed": true
+    },
+    {
+      "form_id": "tough",
+      "input": "请点一下头，陪我聊聊今天的心情。",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "我点我的头，跟你有什么关系？要聊就赶紧说，别耽误我装牛！",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 859.8
+      },
+      "decision": {
+        "reaction_id": "nod",
+        "elapsed_ms": 908.4,
+        "provider": "openrouter_jev"
+      },
+      "speech": {
+        "completed": true,
+        "model": "s2.1-pro-free",
+        "streaming": true,
+        "first_chunk_ms": 427.3,
+        "elapsed_ms": 4679.3
+      },
+      "passed": true
+    },
+    {
+      "form_id": "celestial",
+      "input": "你怎么这么小，还敢吹牛？",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "贫道这不是小，是仙体收了神通。吹牛是渡小气劫，不是吹牛皮。",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 1455.3
+      },
+      "passed": true
+    },
+    {
+      "form_id": "celestial",
+      "input": "请点一下头，陪我聊聊今天的心情。",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "贫道这就点头应你了。你这心情是沾了啥凡间烟火气？快唠唠。",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 999.8
+      },
+      "decision": {
+        "reaction_id": "nod",
+        "elapsed_ms": 874.7,
+        "provider": "openrouter_jev"
+      },
+      "speech": {
+        "completed": true,
+        "model": "s2.1-pro-free",
+        "streaming": true,
+        "first_chunk_ms": 376.0,
+        "elapsed_ms": 3842.5
+      },
+      "passed": true
+    },
+    {
+      "form_id": "dark",
+      "input": "你怎么这么小，还敢吹牛？",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "块头小是为了躲过灭世监控，你没发现这桌已经成我专属领地了？",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 1164.5
+      },
+      "passed": true
+    },
+    {
+      "form_id": "dark",
+      "input": "请点一下头，陪我聊聊今天的心情。",
+      "prompt_version": "niulai-six-v1-6194348364b6",
+      "generation": {
+        "text": "点头就当作我恩准你把心情说出来了，这桌领地的事，说出来也不碍事。",
+        "provider": "doubao",
+        "model": "doubao-seed-2-0-mini-260428",
+        "elapsed_ms": 826.1
+      },
+      "decision": {
+        "reaction_id": "nod",
+        "elapsed_ms": 955.9,
+        "provider": "openrouter_jev"
+      },
+      "speech": {
+        "completed": true,
+        "model": "s2.1-pro-free",
+        "streaming": true,
+        "first_chunk_ms": 440.1,
+        "elapsed_ms": 4389.0
+      },
+      "passed": true
+    }
+  ]
+}

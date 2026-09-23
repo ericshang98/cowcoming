@@ -8,6 +8,17 @@ const add = (s, id, extra) => reduce(s, { type: 'turn', turn: turn(s, id, extra)
 const rounds = (s, count = 5, offset = 0) => { for(let i = 0; i < count; i++) s = add(s, i + offset); return s; };
 const result = (s, decision, targetForm) => ({ requestId: s.pending.requestId, sessionId: s.sessionId, generation: s.generation, decision, targetForm, reason: '足够互动，开始形成表达。' });
 
+test('fresh sessions default to manual selection and never evolve just from turn count', () => {
+  let s = createEvolutionSession('simple');
+  s = rounds(s, 20);
+  assert.equal(evolutionStatus(s), 'manual');
+  assert.equal(evaluationDue(s), false);
+  assert.equal(s.form, 'calf');
+  s = reduce(s, { type: 'select', form: 'playful' });
+  assert.equal(s.form, 'playful');
+  assert.equal(s.settings.mode, 'manual');
+});
+
 test('exactly N complete unique live turns trigger evaluation; action-only calf replies count', () => {
   let s = fresh();
   for (const invalid of [{ source: 'demo' }, { status: 'streaming' }, { userText: '' }, { replyText: '' }, { generation: 99 }, { sessionId: 'other' }, { formId: 'dark' }]) assert.equal(add(s, 'bad', invalid), s);

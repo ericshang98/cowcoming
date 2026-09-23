@@ -1,0 +1,158 @@
+{
+  "format": "cowcoming-motion-tuning",
+  "version": 1,
+  "actionContractVersion": 2,
+  "scope": "software-only",
+  "forms": {
+    "calf": {
+      "modelSha256": "0807b58bd77ce30ceabf068a5d88ad1940ceb1ad45bf00f24c0db81319e31403",
+      "actions": {
+        "NOD": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "SHAKE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "NOD_DOUBLE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_LEFT": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_RIGHT": {
+          "speed": 1,
+          "amplitude": 1
+        }
+      }
+    },
+    "normal": {
+      "modelSha256": "68b24def9c3840e583a81fa5445c10044b1cd46ce33a84cb00cdede847791e40",
+      "actions": {
+        "NOD": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "SHAKE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "NOD_DOUBLE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_LEFT": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_RIGHT": {
+          "speed": 1,
+          "amplitude": 1
+        }
+      }
+    },
+    "playful": {
+      "modelSha256": "e2ed5a89b3fc51d305265425584ba3bb60507609ffe33c085440c287f1534c03",
+      "actions": {
+        "NOD": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "SHAKE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "NOD_DOUBLE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_LEFT": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_RIGHT": {
+          "speed": 1,
+          "amplitude": 1
+        }
+      }
+    },
+    "tough": {
+      "modelSha256": "17f77ddddf366c03382a93b7065cf16dbb20c5390345f2a3de11310a4a88ed6b",
+      "actions": {
+        "NOD": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "SHAKE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "NOD_DOUBLE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_LEFT": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_RIGHT": {
+          "speed": 1,
+          "amplitude": 1
+        }
+      }
+    },
+    "celestial": {
+      "modelSha256": "748f4e40ccd7d23a3d47e763b1350f891b65b91305b0ae8345ff3384f351e703",
+      "actions": {
+        "NOD": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "SHAKE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "NOD_DOUBLE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_LEFT": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_RIGHT": {
+          "speed": 1,
+          "amplitude": 1
+        }
+      }
+    },
+    "dark": {
+      "modelSha256": "aedfc75fa076f254aa554dcd529a33194939b555566e5b990dc95493a129d2b4",
+      "actions": {
+        "NOD": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "SHAKE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "NOD_DOUBLE": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_LEFT": {
+          "speed": 1,
+          "amplitude": 1
+        },
+        "TILT_RIGHT": {
+          "speed": 1,
+          "amplitude": 1
+        }
+      }
+    }
+  }
+}

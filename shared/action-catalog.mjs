@@ -51,8 +51,7 @@ export function availableDeviceActions(state) {
   return state.profile.allowedActions.filter(
     (a) =>
       a === "WAIT" ||
-      (state.profile.formId !== "playful" &&
-        state.device.hardware === "ready" &&
+      (state.device.hardware === "ready" &&
         supported.includes(a)),
   );
 }
