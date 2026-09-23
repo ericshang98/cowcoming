@@ -93,7 +93,7 @@ test('an unbound visitor can preview another form without changing the saved evo
 test('the lower-left debug button accepts clicks above the full-screen model', async () => {
   const { readFile } = await import('node:fs/promises');
   const css = await readFile(new URL('../src/pages/evolution.css', import.meta.url), 'utf8');
-  const rule = css.match(/\.evolution-debug-toggle\s*\{[^}]+\}/);
-  assert.ok(rule, 'expected a base debug-button rule');
+  const rule = css.match(/\.evolution-debug-toggle\s*\{[^}]*position:\s*fixed[^}]*\}/);
+  assert.ok(rule, 'expected the fixed debug-button rule');
   assert.match(rule[0], /pointer-events:\s*auto/);
 });
