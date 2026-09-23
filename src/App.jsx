@@ -163,7 +163,7 @@ export default function App() {
     enabled: otherIpHome && bootDone && !worldBlocked });
   const currentVoice = otherIpHome ? ipVoice : voice;
   const closeIp = () => { setIpOpen(false); selection.cancel(); };
-  const openIp = () => { if (mode !== 'home') return; voice.stopVoice(); ipVoice.stopVoice(); controller.queue.clear(); setChat('closed'); setCv('closed'); setSearch(false); setVoiceOpen(false); setIpOpen(true); };
+  const openIp = () => { if (mode !== 'home') return; if (ipOpen) { closeIp(); return; } voice.stopVoice(); ipVoice.stopVoice(); controller.queue.clear(); setChat('closed'); setCv('closed'); setSearch(false); setVoiceOpen(false); setIpOpen(true); };
   useEffect(() => {
     controller.queue.clear(); controller.gaze = null; controller.dragYaw = 0;
   }, [selection.active, controller]);
