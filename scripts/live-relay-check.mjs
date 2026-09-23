@@ -1,3 +1,4 @@
+import { PERSONA_VERSION } from '../shared/personas.mjs';
 import assert from "node:assert/strict";
 import fs from "node:fs";
 const base = process.env.TEST_RELAY_URL || "http://127.0.0.1:8794";
@@ -99,7 +100,7 @@ try {
   browser.send({ type: "command", command: "action", actionId: "NOD" });
   await browser.wait((m) => m.type === "error" && /profile/.test(m.error));
   device.send({type:"device.status",eventId:"caps",actionContractVersion:2,supportedActions:["NOD","SHAKE","NOD_DOUBLE","TILT_LEFT","TILT_RIGHT","WAIT"],hardware:"ready",jev:"ready",simulation:true});
-  device.send({ type: "profile.applied", eventId: "applied-1", revision: 1 });
+  device.send({ type: "profile.applied", eventId: "applied-1", revision: 1, formId: "calf", personaVersion: PERSONA_VERSION });
   await browser.wait((m) => m.type === "snapshot" && m.appliedRevision === 1);
   browser.send({
     type: "profile.update",
@@ -109,7 +110,7 @@ try {
   });
   const profile = await device.wait((m) => m.type === "profile");
   assert.equal(profile.profile.revision, 2);
-  device.send({ type: "profile.applied", eventId: "applied-2", revision: 2 });
+  device.send({ type: "profile.applied", eventId: "applied-2", revision: 2, formId: "normal", personaVersion: PERSONA_VERSION });
   await browser.wait((m) => m.type === "snapshot" && m.appliedRevision === 2);
   browser.send({
     type: "command",

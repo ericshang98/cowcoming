@@ -31,6 +31,7 @@ try {
     "README.md",
   ])
     await copyFile(resolve("examples/device", file), join(kit, file));
+  await copyFile(resolve("shared/niulai-personas.json"), join(kit, "niulai-personas.json"));
   await copyFile(resolve("shared/form-profiles.json"), join(kit, "form-profiles.json"));
   await copyFile(
     resolve("docs/live-device.md"),

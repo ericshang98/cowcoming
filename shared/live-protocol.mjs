@@ -1,3 +1,4 @@
+import { PERSONA_VERSION, personaProfile } from './personas.mjs';
 import formProfilesDefaults from "./form-profiles.json" with { type: "json" };
 export const FORM_IDS = [
   "calf",
@@ -42,12 +43,11 @@ export function initialRoom(roomId, label) {
     label,
     version: 1,
     evolutionMode: "manual",
-    personalityVersion: 1,
+    personalityVersion: PERSONA_VERSION,
     profile: {
       revision: 1,
       actionContractVersion: ACTION_CONTRACT_VERSION,
-      formId: "calf",
-      ...structuredClone(formProfilesDefaults.calf),
+      ...personaProfile('calf'),
       allowedActions: [...ACTION_IDS],
       animationMap: structuredClone(DEFAULT_MAP),
     },
@@ -95,13 +95,13 @@ export function updateProfile(state, patch) {
     p.allowedActions = [...ACTION_IDS];
     p.animationMap = structuredClone(DEFAULT_MAP);
   }
-  if (patch.formId && patch.formId !== state.profile.formId && !formProfiles[patch.formId]) {
-    check(FORM_IDS.includes(patch.formId), "Unknown form");
-    Object.assign(p, structuredClone(formProfilesDefaults[patch.formId]));
-  }
   if (patch.formId !== undefined) {
     check(FORM_IDS.includes(patch.formId), "Unknown form");
     p.formId = patch.formId;
+  }
+  if (p.personaVersion !== PERSONA_VERSION ||
+      (patch.formId && patch.formId !== state.profile.formId && !formProfiles[patch.formId])) {
+    Object.assign(p, personaProfile(p.formId));
   }
   if (patch.prompt !== undefined) p.prompt = text(patch.prompt, 8000);
   if (patch.languagePrompt !== undefined) p.languagePrompt = text(patch.languagePrompt, 8000);
@@ -145,6 +145,7 @@ export function updateProfile(state, patch) {
     formProfiles,
     appliedRevision: null,
     updatedAt: now,
+    messages: state.messages.map(m => m.status === "streaming" ? {...m, status:"interrupted"} : m),
     revealed: [...new Set([...state.revealed, p.formId])],
     history:
       p.formId === state.profile.formId
@@ -159,6 +160,10 @@ export function applyDeviceEvent(state, raw) {
   check(raw && typeof raw === "object", "Invalid event");
   const eventId = id(raw.eventId);
   if (state.seen.includes(eventId)) return state;
+  if (raw.type?.startsWith('language.') && raw.profileRevision !== undefined) {
+    check(raw.profileRevision === state.profile.revision && state.appliedRevision === raw.profileRevision,
+      'Language uses a stale or unapplied profile');
+  }
   const e = { type: raw.type, eventId, at: Date.now() };
   let device = state.device,
     appliedRevision = state.appliedRevision,
@@ -196,6 +201,10 @@ export function applyDeviceEvent(state, raw) {
         raw.revision === state.profile.revision && state.profile.actionContractVersion === ACTION_CONTRACT_VERSION && state.device.actionContractVersion === ACTION_CONTRACT_VERSION,
         "Stale profile acknowledgement",
       );
+      if (state.profile.personaVersion) {
+        check(raw.formId === state.profile.formId && raw.personaVersion === state.profile.personaVersion,
+          'Persona version or form was not applied by device');
+      }
       appliedRevision = raw.revision;
       e.revision = raw.revision;
       break;
@@ -420,14 +429,17 @@ export function validateSignal(raw) {
 
 // One-time additive upgrade of persisted rooms. Preserve user-authored JEV prompts.
 export function upgradeRoomPersonality(state) {
-  if (!state?.profile || state.personalityVersion === 1) return state;
+  if (!state?.profile || state.personalityVersion === PERSONA_VERSION) return state;
   const oldDefault = "你是牛来。根据现场输入，在允许的动作中选择合适的回应。提示词只影响行为选择，不改变机械臂的运动限制。";
   function upgrade(profile) {
-    const defaults = formProfilesDefaults[profile.formId];
-    return {...defaults, ...profile, languagePrompt: profile.languagePrompt || defaults.languagePrompt,
-      replyMode: defaults.replyMode, prompt: !profile.prompt || profile.prompt === oldDefault ? defaults.prompt : profile.prompt};
+    const defaults = personaProfile(profile.formId);
+    const prior = formProfilesDefaults[profile.formId];
+    return {...profile, ...defaults,
+      prompt: !profile.prompt || profile.prompt === oldDefault || profile.prompt === prior?.prompt
+        ? defaults.prompt : profile.prompt};
   }
-  return {...state, personalityVersion: 1, version: state.version + 1,
+  return {...state, personalityVersion: PERSONA_VERSION, version: state.version + 1,
     profile: {...upgrade(state.profile), revision: state.profile.revision + 1}, appliedRevision: null,
+    messages: state.messages.map(m => m.status === "streaming" ? {...m, status:"interrupted"} : m),
     formProfiles: Object.fromEntries(Object.entries(state.formProfiles || {}).map(([id,p])=>[id,upgrade(p)]))};
 }

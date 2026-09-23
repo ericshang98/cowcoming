@@ -15,7 +15,7 @@ test('local silent round is correlated, counted once by runtime, and stale start
  let state=initialRoom('test','test');let seq=0;
  const emit=(type,data)=>state=applyDeviceEvent(state,{type,eventId:`event_${++seq}`,...data});
  emit('device.status',{actionContractVersion:2,supportedActions:['NOD'],hardware:'ready'});
- emit('profile.applied',{revision:1});
+ emit('profile.applied',{revision:1,formId:state.profile.formId,personaVersion:state.profile.personaVersion});
  emit('interaction.start',{commandId:'local',profileRevision:1,userText:'你好',replyMode:'silent'});
  const start=state.events.at(-1), ctx=localInteractionContext(start,state.profile,{formId:'calf',sessionId:'s',generation:1});
  assert.ok(ctx);assert.equal(localInteractionContext(start,{...state.profile,revision:2},ctx),null);
@@ -58,7 +58,7 @@ test('switching device mode cannot turn an earlier simulated round into a real c
  let state=initialRoom('test','test');let n=0;
  const emit=(type,data)=>state=applyDeviceEvent(state,{type,eventId:`mode_${++n}`,...data});
  emit('device.status',{hardware:'ready',simulation:true,actionContractVersion:2,supportedActions:['NOD']});
- emit('profile.applied',{revision:1});
+ emit('profile.applied',{revision:1,formId:state.profile.formId,personaVersion:state.profile.personaVersion});
  emit('interaction.start',{commandId:'preview',profileRevision:1,userText:'hello',replyMode:'silent'});
  emit('decision',{decisionId:'preview_d',commandId:'preview',profileRevision:1,actionId:'NOD'});
  emit('action',{decisionId:'preview_d',status:'completed'});

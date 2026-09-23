@@ -1,4 +1,4 @@
-import formDefaults from "../../shared/form-profiles.json";
+import { personaProfile } from '../../shared/personas.mjs';
 import { useEffect, useState } from "react";
 import { useLanguage } from "../i18n/Language";
 import { LiveDialog } from "./ConnectionBar";
@@ -63,7 +63,7 @@ export default function DeviceDebug({ live, onClose }) {
                       revision: draft.revision,
                       animationMap: JSON.stringify(saved.animationMap, null, 2),
                     }
-                  : { ...draft, ...formDefaults[e.target.value], formId: e.target.value },
+                  : { ...draft, ...personaProfile(e.target.value) },
               );
             }}
           >
@@ -86,9 +86,10 @@ export default function DeviceDebug({ live, onClose }) {
         </label>
         <label>
           {t("给独立语言模型的人格提示词", "Personality prompt for the language model")}
-          <textarea rows={5} value={draft.languagePrompt || ""} maxLength={8000}
+          <textarea rows={5} readOnly={Boolean(draft.personaVersion)} value={draft.languagePrompt || ""} maxLength={8000}
             onChange={e=>setDraft({...draft, languagePrompt:e.target.value})}/>
         </label>
+        {draft.personaVersion && <p>{t('语言人格按版本与本地配置同步，此处只预览；形态提示词供 JEV 使用。','Language persona is versioned with the local configuration; this field is a preview. The form prompt is for JEV.')}</p>}
         <fieldset>
           <legend>{t("允许选择的动作", "Allowed actions")}</legend>
           <div className="live-action-options">
