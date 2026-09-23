@@ -114,7 +114,10 @@ export default function ModelPicker() {
         </div>
       )}
       {enabled && (pendingModel || modelError) && (
-        <div className={`model-feedback glass ${open ? "with-menu" : ""}`}>
+        <div
+          className={`model-feedback glass ${open ? "with-menu" : ""}`}
+          style={{ "--model-count": HOME_MODELS.length }}
+        >
           {pendingModel ? (
             <>
               <p role="status">

@@ -97,10 +97,26 @@ fs.mkdirSync(output, { recursive: true });
     await choose("蜘蛛侠");
     await asset("spiderman-web");
     await page.screenshot({ path: `${output}/spiderman-home.png` });
+    await choose("小黑龙");
+    await asset("black-dragon-web");
+    await page.getByText("小黑龙暂不支持口型", { exact: true }).waitFor();
+    await page.waitForTimeout(1200);
+    await page.screenshot({ path: `${output}/black-dragon-home.png` });
+    await page.getByRole("button", { name: "WORK", exact: true }).click();
+    await asset("niulai-mouth");
+    assert.ok(
+      await page
+        .getByRole("button", { name: "模型选择（仅 HOME 可用）" })
+        .isDisabled(),
+    );
+    await page.getByRole("button", { name: "HOME", exact: true }).click();
+    await asset("black-dragon-web");
     await choose("牛来");
     await asset("niulai-mouth");
     await page.getByText("试口型", { exact: true }).waitFor();
-    check("All three models switch; Niulai mouth controls return");
+    check(
+      "All four models switch; Black Dragon stays HOME-only; Niulai mouth controls return",
+    );
     // Fresh page cache: leave HOME while a custom file is still in flight.
     let release;
     await page.route("**/models/nailong-web.glb", async (r) => {

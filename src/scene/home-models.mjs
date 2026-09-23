@@ -22,6 +22,13 @@ export const HOME_MODELS = [
     color: "#d95e55",
     mouth: false,
   },
+  {
+    id: "black-dragon",
+    name: "小黑龙",
+    asset: "/models/black-dragon-web.glb",
+    color: "#30343c",
+    mouth: false,
+  },
 ];
 export const DEFAULT_HOME_MODEL = HOME_MODELS[0];
 export function modelForPage(mode, selected) {
