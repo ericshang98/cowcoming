@@ -5,6 +5,9 @@ import { clone } from "three/addons/utils/SkeletonUtils.js";
 import * as THREE from "three";
 import { PROCEDURAL_CLIPS, proceduralPose } from "../live/animation.mjs";
 import { damp, gazeTargets, clamp } from "./motion.mjs";
+import { refineIpSkin } from "./ip-skin.mjs";
+import { createIpClips } from "./ip-motion.mjs";
+import IpWeb from "./IpWeb";
 import { NIULAI_ASSET, prepareMouth, updateMouth } from "./niulai.mjs";
 const MASCOT = NIULAI_ASSET,
   HUMAN = "/models/fuch-human-spin.glb";
@@ -37,8 +40,9 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
           : o.material.clone();
       }
     });
+    refineIpSkin(m, characterId);
     return m;
-  }, [gltf]);
+  }, [gltf, characterId]);
   const mouths = useMemo(() => prepareMouth(model), [model]);
   const bones = useMemo(() => {
     let head, neck, hips, armature;
@@ -69,6 +73,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     return {
       s,
       minY: box.min.y,
+      width: size.x,
       pos: [0, -center.y * s + size.y * s * 0.06, -center.z * s],
     };
   }, [model]);
@@ -76,9 +81,9 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
   const actions = useMemo(
     () =>
       Object.fromEntries(
-        gltf.animations.map((c) => [c.name, mixer.clipAction(c)]),
+        [...gltf.animations, ...createIpClips(model, characterId)].map((c) => [c.name, mixer.clipAction(c)]),
       ),
-    [gltf, mixer],
+    [gltf, mixer, model, characterId],
   );
   const state = useRef({
     time: 0,
@@ -120,6 +125,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
       mixer.stopAllAction();
       mixer.uncacheRoot(model);
       model.traverse((o) => {
+        if (o.userData.ipOwnGeometry) o.geometry.dispose();
         if (o.isMesh)
           (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) =>
             m.dispose(),
@@ -163,6 +169,8 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     if (moving && characterId !== 'niulai') {
       const playback = controller.ipPlayback;
       if (st.ipPlayback !== playback) {
+        st.ipBlend = { start: st.time, poses: [] };
+        model.traverse(b => { if (b.isBone) st.ipBlend.poses.push([b, b.quaternion.clone(), b.position.clone()]); });
         st.active?.stop(); st.active = null;
         actions.idle?.reset().setEffectiveWeight(1).play();
         st.ipPlayback = playback;
@@ -181,6 +189,14 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
         st.active.setEffectiveWeight(weight); actions.idle?.setEffectiveWeight(1 - weight);
         mixer.update(0);
       } else mixer.update(dt);
+      if (st.ipBlend) {
+        const p = Math.min(1, (st.time - st.ipBlend.start) / .18), ease = p * p * (3 - 2 * p);
+        for (const [b, q, pos] of st.ipBlend.poses) {
+          b.quaternion.slerp(q, 1 - ease);
+          b.position.lerp(pos, 1 - ease);
+        }
+        if (p === 1) st.ipBlend = null;
+      }
     } else if (moving) {
       if (!st.started) {
         st.started = true;
@@ -224,8 +240,9 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     const half =
         Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z,
       t = entrance ? clamp(st.time / 3.6, 0, 1) : 1,
+      fit = characterId === "niulai" ? placement.scale : Math.min(placement.scale, 2 * half * camera.aspect * .88 / (metrics.width * metrics.s * 1.12)),
       size =
-        placement.scale * (entrance ? 0.68 + 0.32 * (1 - (1 - t) ** 3) : 1);
+        fit * (entrance ? 0.68 + 0.32 * (1 - (1 - t) ** 3) : 1);
     controller.entranceProgress = t;
     group.scale.setScalar(damp(group.scale.x, size, 7, dt));
     group.position.x = damp(
@@ -307,7 +324,16 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
         .multiply(st.parentQ);
       bone.quaternion.premultiply(st.conj);
     }
+    model.updateMatrixWorld(true);
+    const joints = {};
+    if (characterId !== 'niulai') model.traverse(b => {
+      if (b.isBone && /Head|Hand|WingTip|Root/.test(b.name)) {
+        const point = b.getWorldPosition(new THREE.Vector3()).project(camera);
+        joints[b.name] = [(point.x + 1) * gl.domElement.clientWidth / 2, (1 - point.y) * gl.domElement.clientHeight / 2];
+      }
+    });
     controller.rig = {
+      joints,
       asset: human ? HUMAN : modelAsset,
       characterId,
       animationTime: st.active?.time || 0,
@@ -336,6 +362,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
           if (visible && event.button === 0 && event.delta < 6 && !controller.lastPointerWasDrag)
             (onTap || controller.onCharacterTap)?.();
         }} />
+        {characterId === "spiderman" && <IpWeb model={model} controller={controller} />}
       </group>
     </group>
   );
@@ -386,13 +413,14 @@ export default function Character({
         ? { scale: 1.45, x: 0, y: 0.02 }
         : { scale: 1.22, x: -0.12, y: 0.02 };
     if (overlay) return { scale: 0.24, x: 0.37, y: -0.3, ground: false };
+    if (mobile && mode === "home" && characterId !== "niulai") return { scale: 1.2, x: 0, y: -.06 };
     if (mobile)
       return mode === "home"
         ? { scale: 1.4, x: 0, y: 0.16 }
         : { scale: 0.38, x: 0.3, y: -0.13, ground: false };
     if (mode === "contact") return { scale: 1.22, x: 0, y: 0.04 };
     return { scale: 1.25, x: 0, y: -0.02 };
-  }, [mode, mobile, overlay, boot]);
+  }, [mode, mobile, overlay, boot, characterId]);
   useEffect(() => {
     let drag = null;
     const blocked = mode === "about" && overlay;
@@ -486,6 +514,7 @@ export default function Character({
   return (
     <div
       ref={stageRef}
+      data-character={characterId}
       className={`character-stage ${mobile ? "mobile-character" : ""} mode-${mode} ${ready ? "ready" : ""}`}
       aria-label={characterId !== 'niulai' ? `Interactive 3D ${characterId}` : 'Interactive 3D Niulai'}
       aria-disabled={mode === "about" && overlay ? true : undefined}
