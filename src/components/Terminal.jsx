@@ -27,7 +27,7 @@ export default function Terminal() {
       navigate(command.slice(1));
       return;
     }
-    setMessages((prev) => [...prev, { q: display.trim(), a: answerJevQuestion(text) }]);
+    setMessages((prev) => [...prev, { q: display.trim(), a: answerJevQuestion(translateText(text, "zh")) }]);
     field.current?.focus();
   }
 
@@ -54,6 +54,7 @@ export default function Terminal() {
     >
       <div className="terminal-scroll" ref={scroll}>
         <p className="terminal-welcome">JEV · 从快速决策到硬件行动</p>
+        <p>让不同 IP 感知环境、及时回应，并在互动中成长。</p>
         <p>
           点击下方问题，或输入关键词：<span>决策 / 硬件 / 示例</span>
         </p>
