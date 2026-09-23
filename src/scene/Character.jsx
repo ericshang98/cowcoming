@@ -419,7 +419,7 @@ export default function Character({
   onTap,
   characterId = 'niulai',
 }) {
-  // All project pages show Niulai, including About's contained model stage.
+  // About contains the shared selected IP in its own model stage.
   const stageRef = useRef();
   const placement = useMemo(() => {
     // Loading has its own full-body framing. The mobile homepage deliberately

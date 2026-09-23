@@ -14,12 +14,15 @@ import {
   Dribbble,
 } from "lucide-react";
 import { useApp } from "../context";
+import Character from "../scene/Character";
 import { PageLead } from "./Portfolio";
 import { Controls } from "../components/Chrome";
 import "./contact-left.css";
 import { topics, questions, validateAnswer } from "./contact-flow.mjs";
 export default function Contact() {
-  const { controller, portfolio, navigate } = useApp();
+  const { controller, portfolio, navigate, mobile, activeIp, tap, worldBlocked } = useApp();
+  const [modelReady, setModelReady] = useState(false);
+  useEffect(() => setModelReady(false), [activeIp.id]);
   const [topic, setTopic] = useState(null),
     [step, setStep] = useState(0),
     [answers, setAnswers] = useState({}),
@@ -94,6 +97,13 @@ export default function Contact() {
       <PageLead number="04" title="VOTE US">
         牛来参加 EvoTavern 进化酒馆，期待你的一票。
       </PageLead>
+      {mobile && <div className="contact-character cowcoming-about-stage">
+        <Character controller={controller} mode="about" mobile boot
+          ready={modelReady} overlay={worldBlocked}
+          modelAsset={activeIp.model} characterId={activeIp.id}
+          onReady={() => setModelReady(true)}
+          onTap={activeIp.id !== 'niulai' ? tap : undefined} />
+      </div>}
       <div className="contact-layout">
         <div className="conversation glass">
           <header>

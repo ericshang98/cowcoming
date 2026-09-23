@@ -72,7 +72,7 @@ export default function App() {
   const [mobile, setMobile] = useState(innerWidth <= 768),
     [ready, setReady] = useState(false),
     [bootDone, setBootDone] = useState(() =>
-      ["blog", "about", "work"].includes(route().mode),
+      ["blog", "about", "work", "contact"].includes(route().mode),
     ),
     [chat, setChat] = useState("closed"),
     [cv, setCv] = useState("closed"),
@@ -85,9 +85,10 @@ export default function App() {
     [wordle, setWordle] = useState(false),
     [worldEntered, setWorldEntered] = useState(false);
   const [ipOpen, setIpOpen] = useState(false);
-  const selection = useIpSelection(() => { setIpOpen(false); navigate('home'); });
-  const homeIp = getIp(selection.active);
-  const otherIpHome = mode === 'home' && selection.active !== 'niulai';
+  const selection = useIpSelection(() => setIpOpen(false));
+  const selectedIp = getIp(selection.active);
+  const canSwitchIp = ['home', 'about', 'contact'].includes(mode);
+  const otherIpPage = canSwitchIp && selection.active !== 'niulai';
   const controller = useMemo(makeController, []),
     sound = useRef(null),
     viewRef = useRef();
@@ -106,7 +107,7 @@ export default function App() {
   }, [controller, evolutionSession.context, evolutionSession.recordTurn, deviceFormReady]);
   const [previewModelState, setPreviewModelState] = useState({ model: null, status: 'loading' });
   const evolutionPreview = resolvePreview(forms[evolutionSession.state.form].branch || evolutionRoute, evolutionSession.state.form, Object.keys(forms));
-  const activeModel = mode === 'home' ? homeIp.model : mode === 'work' ? evolutionPreview.model : NIULAI_ASSET;
+  const activeModel = canSwitchIp ? selectedIp.model : mode === 'work' ? evolutionPreview.model : NIULAI_ASSET;
   const evolutionPage = <Evolution
     live={live}
     preview={evolutionPreview}
@@ -159,13 +160,14 @@ export default function App() {
   const worldBlocked = ipOpen || chat === "open" || cv === "open" || search || wordle || voiceOpen;
   const voice = useNiulaiVoice({
     controller, muted, paused, mode, collected: collection.collected,
-    enabled: !otherIpHome && !ipOpen && (mode === "home" || (mode === "blog" && worldEntered)) && bootDone && chat !== "open" && cv !== "open" && !search && !wordle,
+    enabled: !otherIpPage && !ipOpen && (mode === "home" || (mode === "blog" && worldEntered)) && bootDone && chat !== "open" && cv !== "open" && !search && !wordle,
   });
   const ipVoice = useIpVoice({ controller, ipId: selection.active, muted, paused,
-    enabled: otherIpHome && bootDone && !worldBlocked });
-  const currentVoice = otherIpHome ? ipVoice : voice;
+    enabled: otherIpPage && bootDone && !worldBlocked });
+  const currentVoice = otherIpPage ? ipVoice : voice;
+  useEffect(() => { ipVoice.stopVoice(); controller.queue.clear(); }, [mode, ipVoice.stopVoice, controller]);
   const closeIp = () => { setIpOpen(false); selection.cancel(); };
-  const openIp = () => { if (mode !== 'home') return; if (ipOpen) { closeIp(); return; } voice.stopVoice(); ipVoice.stopVoice(); controller.queue.clear(); setChat('closed'); setCv('closed'); setSearch(false); setVoiceOpen(false); setIpOpen(true); };
+  const openIp = () => { if (!canSwitchIp) return; if (ipOpen) { closeIp(); return; } voice.stopVoice(); ipVoice.stopVoice(); controller.queue.clear(); setChat('closed'); setCv('closed'); setSearch(false); setVoiceOpen(false); setIpOpen(true); };
   useEffect(() => {
     controller.queue.clear(); controller.gaze = null; controller.dragYaw = 0;
   }, [selection.active, controller]);
@@ -203,11 +205,11 @@ export default function App() {
     viewRef.current?.scrollTo(0, 0);
   }, [mode, project, idea]);
   useEffect(() => {
-    const title = mode === "about"
-      ? "Cowcoming — 基于 JEV 决策模型的可进化 AI 宠物"
-      : `${mode === 'home' ? homeIp.name : '牛来'} — ${mode === "home" ? `和${homeIp.name}玩` : mode === "blog" ? "WORLD" : mode === "contact" ? "为牛来投一票" : mode.toUpperCase()}`;
-    document.title = mode === 'home' && language === 'en' ? `${homeIp.nameEn} — Play with ${homeIp.nameEn}` : translateText(title, language);
-  }, [mode, language, homeIp]);
+    const section = mode === 'home' ? '基于 JEV 决策模型的可进化 AI 宠物'
+      : mode === 'about' ? 'ABOUT' : mode === 'contact' ? 'VOTE US'
+      : mode === 'blog' ? 'WORLD' : 'WORK';
+    document.title = `Cowcoming — ${translateText(section, language)}`;
+  }, [mode, language]);
   useEffect(() => {
     const key = (e) => {
       if (ipOpen) return;
@@ -227,7 +229,7 @@ export default function App() {
         setSearch((v) => !v);
         return;
       }
-      if (mode === "home" && isWaveShortcut(e)) {
+      if ((mode === "home" || otherIpPage) && isWaveShortcut(e)) {
         e.preventDefault();
         currentVoice.wave();
         return;
@@ -286,7 +288,8 @@ export default function App() {
     portfolio,
     ideas,
     controller,
-    activeIp: homeIp,
+    activeIp: selectedIp,
+    canSwitchIp,
     ipOpen,
     openIp,
     bootDone,
@@ -345,7 +348,7 @@ export default function App() {
           <Suspense fallback={null}><IpAssetProbe ip={selection.pending.ip} onReady={selection.complete} onError={selection.fail} /></Suspense>
         </IpLoadBoundary>}
         <Ambient />
-        {mode !== "blog" && mode !== "about" && (
+        {mode !== "blog" && mode !== "about" && !(mode === "contact" && mobile) && (
           <Character
             rigKey={mode === "work" ? "work-character" : "default-character"}
             controller={controller}
@@ -353,8 +356,8 @@ export default function App() {
             mobile={mobile}
             ready={ready}
             modelAsset={activeModel}
-            characterId={otherIpHome ? selection.active : 'niulai'}
-            onTap={otherIpHome ? ipVoice.tap : undefined}
+            characterId={otherIpPage ? selection.active : 'niulai'}
+            onTap={otherIpPage ? ipVoice.tap : undefined}
             onReady={() => {
               setReady(true);
               setPreviewModelState({ model: activeModel, status: 'ready' });
