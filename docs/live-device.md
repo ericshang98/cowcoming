@@ -223,7 +223,9 @@ bbox 为相机原图坐标归一化的 `[x,y,width,height]`，范围 0–1，不
 5. 网站构建可设置公开变量 `VITE_COWCOMING_RELAY_URL`（GitHub Actions 使用仓库变量 `COWCOMING_RELAY_URL`），省去用户填写服务 URL；不设置时 UI 仍可手动填写。不能把任何密钥放进 VITE_*。
 6. 按 `docs/deployment.md` 把已验证网站版本发布到原 Pages 项目。网站和 Worker 是两个分别可核对的部署步骤。
 
-当前本机未完成 Cloudflare 登录，GitHub 仓库尚无部署 Secret/启用变量，因此本次本地验证不代表线上已更新。无需为接口联调安装或替换用户电脑上的产品程序。
+2026-09-23 已经 Eric 授权完成本机 OAuth 发布：实时服务为 `https://cowcoming-live.shangyiyong98.workers.dev`，网站仍为 `https://cowcoming.world/?section=work`。正式房间与角色密钥已生成，密钥仅保存在私密交接文件。GitHub 仓库设置了 `COWCOMING_RELAY_URL`，尚无部署 Secret/启用变量，所以后续 main 合并仍不会自动上线。完整状态见 [部署说明](deployment.md)。无需为接口联调安装或替换用户电脑上的产品程序。
+
+生产验收已通过公网鉴权、角色隔离、提示词版本确认、动作和文本同步、信令、重连、密钥撤销；正式页面通过直连合成视频/CV、动画映射、文本流、刷新不重放、中英文和手机宽度检查。合成视频不是用户摄像头，也不是实际人物识别或机械臂验收。
 
 ## 验证命令与交付边界
 
