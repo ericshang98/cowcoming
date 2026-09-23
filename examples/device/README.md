@@ -27,7 +27,7 @@ python run.py --adapter my_adapter:Adapter --camera 0
 - `stop()` → `{confirmed: bool, detail: str}`. Stop the physical controller, not just this Python task.
 - `reply(user_input)` is an async generator yielding text from your local LLM process.
 
-Current protocol actions: NOD / LOOK / TILT / WAVE / WAIT. These are legacy IDs, not the newly confirmed six-action product contract. See [the developer handoff](https://github.com/ericshang98/cowcoming/blob/main/docs/hardware-handoff.md) (also included as `hardware-handoff.md` in the kit) before adapting actions. Do not send the proposed new IDs until the protocol is updated.
+Current protocol actions: NOD / LOOK / TILT / WAVE / WAIT. These are legacy IDs, not the newly confirmed five-action product contract. See [the developer handoff](https://github.com/ericshang98/cowcoming/blob/main/docs/hardware-handoff.md) (also included as `hardware-handoff.md` in the kit) before adapting actions. Do not send the proposed new IDs until the protocol is updated.
 
 Manual form selection, reset and configurable conversation-based evolution evaluation are implemented. Automatic evolution requires a configured evaluation model and gateway; see `evolution-runtime.md` in the kit or [the repository contract](https://github.com/ericshang98/cowcoming/blob/main/docs/evolution-runtime.md). Profiles remain editable per form. An update stops the current interaction, applies the new prompt, and acknowledges its revision. Reconnection receives a fresh profile and does not replay old commands.
 
