@@ -9,7 +9,7 @@ import EvolutionSettings from '../components/EvolutionSettings';
 import { SlidersHorizontal } from 'lucide-react';
 import { evolutionStatus } from '../evolution-session.mjs';
 
-export default function Evolution({ preview, onSelectRoute, onSelectForm, modelStatus, session, browseRoute }) {
+export default function Evolution({ live, preview, onSelectRoute, onSelectForm, modelStatus, session, browseRoute }) {
   const { form, placeholder } = preview;
   const route = evolutionRoutes.find(item => item.id === browseRoute) || preview.route;
   const [treeOpen, setTreeOpen] = useState(false);
@@ -31,6 +31,7 @@ export default function Evolution({ preview, onSelectRoute, onSelectForm, modelS
             <button key={item.id} aria-pressed={route.id === item.id} onClick={() => onSelectRoute(item.id)}>{item.name}</button>
           ))}
         </div>
+        {live?.snapshot && <div className="live-profile-note"><strong>{t('设备形态', 'Device form')}: {forms[live.snapshot.profile.formId]?.name}</strong><span>{live.snapshot.profile.formId === form.id && live.online && live.snapshot.appliedRevision === live.snapshot.profile.revision ? t('提示词已在电脑端应用', 'Prompt applied on the local computer') : t('等待电脑端同步；当前设备配置尚未确认', 'Waiting for local sync; device configuration is not confirmed')} · v{live.snapshot.profile.revision}</span></div>}
         <p className="evolution-hint">{t('点击形态，亲自决定它现在是谁。', 'Select a form to take control of its evolution.')}</p>
         <ol>
           {route.nodes.map((id, index) => (
@@ -51,7 +52,7 @@ export default function Evolution({ preview, onSelectRoute, onSelectForm, modelS
 
       </aside>
 
-      <ObservationPanel />
+      <ObservationPanel live={live} />
       <footer className="evolution-footer"><Controls music={false} onExpand={() => setTreeOpen(true)} onReset={session.reset} /><button className="evolution-settings-trigger" aria-label={t('进化设置', 'Evolution settings')} title={t('进化设置', 'Evolution settings')} aria-haspopup="dialog" onClick={() => setSettingsOpen(true)}><SlidersHorizontal size={15} /><i className={status === 'error' || status === 'unconfigured' ? 'needs-setup' : ''} /></button><span role="status">{status === 'manual' ? t('手动形态', 'Manual form') : status === 'terminal' ? t('已到终点 · 重置可返璞归真', 'Final form · reset to begin again') : status === 'unconfigured' ? t('自动进化待配置', 'Automatic evolution needs setup') : status === 'error' ? t('评估未完成 · 在设置中重试', 'Evaluation failed · retry in settings') : t('自动进化', 'Automatic evolution')}</span></footer>
     </section>
     {treeOpen && <EvolutionTree revealed={Object.keys(forms)} selected={form} onSelect={onSelectForm} onClose={() => setTreeOpen(false)} />}

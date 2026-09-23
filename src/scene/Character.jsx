@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, useGLTF } from "@react-three/drei";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
 import * as THREE from "three";
+import { PROCEDURAL_CLIPS, proceduralPose } from "../live/animation.mjs";
 import { damp, gazeTargets, clamp } from "./motion.mjs";
 import { NIULAI_ASSET, prepareMouth, updateMouth } from "./niulai.mjs";
 const MASCOT = NIULAI_ASSET,
@@ -84,6 +85,8 @@ function Rig({ human, modelAsset = MASCOT, controller, placement, visible, onRea
     body: 0,
     head: 0,
     pitch: 0,
+    roll: 0,
+    liveMotion: null,
     active: null,
     until: 0,
     started: false,
@@ -170,12 +173,19 @@ function Rig({ human, modelAsset = MASCOT, controller, placement, visible, onRea
       const next = controller.queue.take(
         controller.dragging || (st.time < 3.6 && entrance),
       );
-      if (next)
+      if (next && PROCEDURAL_CLIPS.includes(next.name)) {
+        st.active?.fadeOut(0.18); st.active = null;
+        actions.idle?.reset().setEffectiveWeight(1).fadeIn(0.18).play();
+        st.liveMotion = { name: next.name, start: st.time };
+      } else if (next) {
+        st.liveMotion = null;
         play(
           gestures[next.name] || next.name,
           st.time,
           next.priority === "ambient" ? 2.8 : 2.3,
         );
+      }
+      if (st.liveMotion && st.time - st.liveMotion.start >= 1.8) st.liveMotion = null;
       if (st.active && st.time >= st.until) {
         st.active.fadeOut(0.28);
         actions.idle?.reset().setEffectiveWeight(1).fadeIn(0.28).play();
@@ -239,7 +249,7 @@ function Rig({ human, modelAsset = MASCOT, controller, placement, visible, onRea
       (controller.mouse.active || controller.gaze) &&
       bones.head &&
       !controller.dragging &&
-      !st.active
+      !st.active && !st.liveMotion
     ) {
       bones.head.getWorldPosition(st.headScreen).project(camera);
       target = gazeTargets(
@@ -249,11 +259,14 @@ function Rig({ human, modelAsset = MASCOT, controller, placement, visible, onRea
         human,
       );
     }
+    const livePose = st.liveMotion ? proceduralPose(st.liveMotion.name, st.time - st.liveMotion.start) : { yaw: 0, pitch: 0, roll: 0 };
+    target.yaw += livePose.yaw; target.pitch += livePose.pitch;
     if (controller.dragging) target.body = controller.dragYaw;
     if (moving) {
       st.body = damp(st.body, target.body, human ? 3.5 : 2.2, dt);
       st.head = damp(st.head, target.yaw + controller.tilt.x * 0.26, 9, dt);
       st.pitch = damp(st.pitch, target.pitch - controller.tilt.y * 0.15, 9, dt);
+      st.roll = damp(st.roll, livePose.roll, 9, dt);
     }
     group.rotation.y = st.body;
     group.rotation.z = controller.tilt.x * 0.035;
@@ -264,7 +277,7 @@ function Rig({ human, modelAsset = MASCOT, controller, placement, visible, onRea
       if (!bone?.parent) continue;
       st.base.set(bone, bone.quaternion.clone());
       bone.parent.getWorldQuaternion(st.parentQ);
-      st.angles.set(st.pitch * weight, st.head * weight, 0, "YXZ");
+      st.angles.set(st.pitch * weight, st.head * weight, st.roll * weight, "YXZ");
       st.deltaQ.setFromEuler(st.angles);
       st.conj
         .copy(st.parentQ)
@@ -275,7 +288,7 @@ function Rig({ human, modelAsset = MASCOT, controller, placement, visible, onRea
     }
     controller.rig = {
       asset: human ? HUMAN : modelAsset,
-      animation: st.active?.getClip().name || "idle",
+      animation: st.liveMotion?.name || st.active?.getClip().name || "idle",
       animations: Object.keys(actions),
       mouth: mouths.map(mesh => ({
         shapes: mesh.morphTargetDictionary,

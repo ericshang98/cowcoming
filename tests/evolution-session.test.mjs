@@ -84,3 +84,51 @@ test('configuration rejects unsafe URLs and fractional intervals; no gateway mea
   for (const interval of [0, 1.5, 101, NaN]) assert.throws(() => validateSettings({ ...config, interval }));
   assert.equal(evaluationDue(rounds(createEvolutionSession('offline'))), false);
 });
+
+// Profile synchronization preserves the relay's revision authority and latest local choice.
+import { planEvolutionSync } from '../src/live/evolution-sync.mjs';
+test('device profile sync adopts initial room, queues latest choice, and reset invalidates even the same form', () => {
+  let s = fresh(), snapshot = { roomId: 'room', profile: { revision: 1, formId: 'calf' } };
+  let plan = planEvolutionSync(null, s, snapshot, true);
+  assert.equal(plan.patch, undefined);
+  s = reduce(s, { type: 'select', form: 'normal' });
+  plan = planEvolutionSync(plan.memory, s, snapshot, true);
+  assert.deepEqual(plan.patch, { formId: 'normal', expectedRevision: 1, source: 'manual' });
+  s = reduce(s, { type: 'reset', sessionId: 'new' });
+  plan = planEvolutionSync(plan.memory, s, snapshot, true);
+  assert.equal(plan.patch, undefined);
+  snapshot = { ...snapshot, profile: { revision: 2, formId: 'normal' } };
+  plan = planEvolutionSync(plan.memory, s, snapshot, true);
+  assert.equal(plan.adoptForm, undefined);
+  assert.deepEqual(plan.patch, { formId: 'calf', expectedRevision: 2, source: 'reset' });
+  snapshot = { ...snapshot, profile: { revision: 3, formId: 'calf' } };
+  plan = planEvolutionSync(plan.memory, s, snapshot, true);
+  assert.equal(plan.memory.pending, null);
+  s = reduce(s, { type: 'reset', sessionId: 'another' });
+  plan = planEvolutionSync(plan.memory, s, snapshot, true);
+  assert.deepEqual(plan.patch, { formId: 'calf', expectedRevision: 3, source: 'reset' });
+});
+test('external form change takes manual control; profile errors do not retry in a loop', () => {
+  const snapshot = { roomId: 'room', profile: { revision: 1, formId: 'calf' } };
+  let s = fresh(), plan = planEvolutionSync(null, s, snapshot, true);
+  s = reduce(s, { type: 'select', form: 'dark' });
+  plan = planEvolutionSync(plan.memory, s, snapshot, true);
+  plan = planEvolutionSync(plan.memory, s, snapshot, true, 'conflict');
+  assert.equal(plan.memory.pending, null);
+  assert.equal(planEvolutionSync(plan.memory, s, snapshot, true).patch, undefined);
+  const external = planEvolutionSync(plan.memory, s, { ...snapshot, profile: { revision: 2, formId: 'tough' } }, true);
+  assert.equal(external.adoptForm, 'tough');
+  assert.equal(planEvolutionSync(external.memory, s, snapshot, false).memory, null);
+});
+
+import { completedEvolutionTurn } from '../src/live/evolution-turn.mjs';
+test('live adapter requires correlated assistant completion and physical receipt, excludes simulated/old/failed events', () => {
+ const context = { ...turn(fresh(), 'c'), profileRevision: 1 };
+ const snapshot = { device: { simulation: false }, profile: { revision: 1 }, events: [
+  { type: 'decision', commandId: 'c', decisionId: 'd' }, { type: 'action', decisionId: 'd', status: 'completed' }, { type: 'command.result', commandId: 'c', status: 'completed' }
+ ], messages: [{ role: 'assistant', commandId: 'c', status: 'complete', text: '哞？' }] };
+ assert.equal(completedEvolutionTurn(snapshot,'c',context).turn.replyText, '哞？');
+ assert.equal(completedEvolutionTurn({...snapshot, messages:[{...snapshot.messages[0], text:''}]},'c',context).turn.actionCompleted,true);
+ for (const change of [{ device: { simulation:true } }, {profile:{revision:2}}, {messages:[]}, {messages:[{...snapshot.messages[0],status:'streaming'}]}, {events:snapshot.events.filter(e=>e.type!=='action')}]) assert.equal(completedEvolutionTurn({...snapshot,...change},'c',context).turn,undefined);
+ assert.equal(completedEvolutionTurn(snapshot,'unknown',context).terminal,false);
+});

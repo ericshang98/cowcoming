@@ -18,6 +18,8 @@ import { useNiulaiVoice } from "./useNiulaiVoice";
 import { isWaveShortcut } from "./voice-interactions.mjs";
 import Character from "./scene/Character";
 import Evolution from "./pages/Evolution";
+import useLiveDevice from "./live/useLiveDevice";
+import { useEvolutionDeviceSync } from "./live/useEvolutionDeviceSync";
 import { useEvolutionSession } from "./useEvolutionSession";
 import { resolvePreview, forms } from "./evolution.mjs";
 import { Header, Ambient, Boot } from "./components/Chrome";
@@ -80,6 +82,8 @@ export default function App() {
     sound = useRef(null),
     viewRef = useRef();
   const evolutionSession = useEvolutionSession();
+  const live = useLiveDevice(controller, mode === "work");
+  const deviceFormReady = useEvolutionDeviceSync(evolutionSession, live);
   const [evolutionRoute, setEvolutionRoute] = useState('celestial');
   useEffect(() => {
     const branch = forms[evolutionSession.state.form].branch;
@@ -87,16 +91,20 @@ export default function App() {
   }, [evolutionSession.state.form]);
   useEffect(() => {
     // Connection adapters capture context at input start and report only completed turns.
-    controller.evolution = { context: evolutionSession.context, recordTurn: evolutionSession.recordTurn };
+    controller.evolution = { context: evolutionSession.context, recordTurn: evolutionSession.recordTurn, deviceFormReady };
     return () => { delete controller.evolution; };
-  }, [controller, evolutionSession.context, evolutionSession.recordTurn]);
+  }, [controller, evolutionSession.context, evolutionSession.recordTurn, deviceFormReady]);
   const [previewModelState, setPreviewModelState] = useState({ model: null, status: 'loading' });
   const evolutionPreview = resolvePreview(forms[evolutionSession.state.form].branch || evolutionRoute, evolutionSession.state.form, Object.keys(forms));
   const activeModel = mode === 'work' ? evolutionPreview.model : resolvePreview().model;
   const evolutionPage = <Evolution
+    live={live}
     preview={evolutionPreview}
     modelStatus={previewModelState.model === evolutionPreview.model ? previewModelState.status : 'loading'}
-    session={evolutionSession}
+    session={{ ...evolutionSession, reset: () => {
+      if (live.online) live.command({ command: "stop" });
+      evolutionSession.reset();
+    } }}
     browseRoute={evolutionRoute}
     onSelectRoute={setEvolutionRoute}
     onSelectForm={form => evolutionSession.dispatch({ type: 'select', form })}

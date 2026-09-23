@@ -2,6 +2,9 @@ const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 fs.mkdirSync('output/evolution-qa', {recursive:true});
+ fs.writeFileSync('output/evolution-qa/harness.html', '<div id="root"></div><script type="module" src="/output/evolution-qa/harness.jsx"></script>');
+ fs.writeFileSync('output/evolution-qa/harness.jsx', `import React from 'react'; import {createRoot} from 'react-dom/client'; import {useEvolutionSession} from '/src/useEvolutionSession.js'; function Harness(){const session=useEvolutionSession();window.qaEvolution=session;return <p>{session.state.form}</p>;} createRoot(document.getElementById('root')).render(<React.StrictMode><Harness/></React.StrictMode>);`);
+
 (async () => {
  const browser = await chromium.launch({headless:true,channel:"chrome"});
  const page = await browser.newPage({viewport:{width:1440,height:900}});
@@ -38,8 +41,6 @@ fs.mkdirSync('output/evolution-qa', {recursive:true});
  assert.deepEqual(errors,[]);
  console.log('PASS: 10-turn configuration, branch browsing, manual switching, reset, retained settings, modal focus, English, mobile, no runtime errors');
  // An isolated fixture validates the actual asynchronous React hook without a live provider.
- fs.writeFileSync('output/evolution-qa/harness.html', '<div id="root"></div><script type="module" src="/output/evolution-qa/harness.jsx"></script>');
- fs.writeFileSync('output/evolution-qa/harness.jsx', `import React from 'react'; import {createRoot} from 'react-dom/client'; import {useEvolutionSession} from '/src/useEvolutionSession.js'; function Harness(){const session=useEvolutionSession();window.qaEvolution=session;return <p>{session.state.form}</p>;} createRoot(document.getElementById('root')).render(<React.StrictMode><Harness/></React.StrictMode>);`);
  await page.evaluate(()=>localStorage.setItem('cowcoming-evolution-settings-v1',JSON.stringify({mode:'auto',interval:5,endpoint:'/api/evolution/evaluate',model:'test-evaluator'})));
  let calls=[]; let release;
  await page.route('**/api/evolution/evaluate',async route=>{
@@ -48,14 +49,16 @@ fs.mkdirSync('output/evolution-qa', {recursive:true});
    const result={requestId:payload.requestId,sessionId:payload.sessionId,generation:payload.generation,decision:calls.length===1?'stay':'evolve',targetForm:calls.length===1?'calf':calls.length===2?'normal':'playful',reason:'QA fixture'};
    try{await route.fulfill({json:result});}catch{/* Reset may already have aborted this request. */}
  });
+ await page.addInitScript(()=>{if(location.pathname.endsWith('/harness.html'))localStorage.setItem('cowcoming-evolution-settings-v1',JSON.stringify({mode:'auto',interval:5,endpoint:'/api/evolution/evaluate',model:'test-evaluator'}));});
  await page.goto('http://127.0.0.1:5187/output/evolution-qa/harness.html');
  await page.waitForFunction(()=>window.qaEvolution);
  const complete=async (from,to)=>page.evaluate(({from,to})=>{const q=window.qaEvolution;for(let i=from;i<to;i++)q.recordTurn({...q.context(),id:String(i),source:'live',status:'completed',userText:'hello '+i,replyText:'moo'});},{from,to});
  await complete(0,4);await page.waitForTimeout(100);assert.equal(calls.length,0);
- await complete(4,5);await page.waitForFunction(()=>window.qaEvolution.state.checkpoint===5);assert.equal(calls.length,1);assert.equal(calls[0].turns.length,5);
+ await complete(4,5);await page.waitForFunction(()=>window.qaEvolution.state.checkpoint===5, null, {timeout:5000}).catch(async error=>{console.error(JSON.stringify({calls,errors,state:await page.evaluate(()=>window.qaEvolution.state)}));throw error;});assert.equal(calls.length,1);assert.equal(calls[0].turns.length,5);
  await complete(5,10);await page.waitForFunction(()=>window.qaEvolution.state.form==='normal');assert.equal(calls.length,2);assert.equal(calls[1].turns.length,10);
  await complete(10,15);await page.waitForFunction(()=>window.qaEvolution.state.status==='evaluating');
- while(!release)await page.waitForTimeout(20);
+ for(let i=0;!release && i<250;i++)await page.waitForTimeout(20);
+ assert.ok(release, JSON.stringify({calls:calls.length,state:await page.evaluate(()=>window.qaEvolution.state)}));
  await page.evaluate(()=>window.qaEvolution.reset());release();await page.waitForTimeout(150);
  assert.equal(await page.evaluate(()=>window.qaEvolution.state.form),'calf');assert.equal(await page.evaluate(()=>window.qaEvolution.state.turns.length),0);
  assert.deepEqual(errors,[]);
