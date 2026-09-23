@@ -68,4 +68,4 @@ Eric 本轮要求用黑客松开发接口替代打包 Mac App：服务器发密�
 - 右侧相机通过 WebRTC 直连，CV 框通过 DataChannel，不经云端媒体转发。默认同机/同局域网，不配置 TURN；跨公网连通性不保证。LLM 文本来自本地进程，经云端同步。
 - Python 设备套件可从页面下载，含模拟适配器、可替换 JEV/硬件/LLM hooks、本机 OpenCV HOG 摄像头和合成测试视频。示例模拟会明确标识；未控制真实机械臂、未打开用户真实摄像头、未安装或覆盖产品运行时。
 - 44 项 Node 测试、4 项 Python 测试、独立 Worker 集成、浏览器直连视频/CV/流式文本和 Python aiortc 端到端验证通过；桌面及 900/390/320 像素宽度、中英文、刷新不重放和断线状态已检查。生产构建通过。
-- Cloudflare 本机登录和 GitHub 部署凭据仍未配置；本地接口验证不能据此宣称 cowcoming.world 已更新。实时 Worker 和现有 Pages 网站需分别发布。
+- PR #2 已合并为 `9a3e362`；经 Eric 授权，本机 OAuth 发布了实时 Worker 和原 Pages 网站。主域名提交/入口资源哈希、公网接口和正式页面的合成视频/CV/流式文本验收通过。真实摄像头、JEV 和机械臂未验收。GitHub 自动发布仍未启用；详见 [部署说明](deployment.md)。

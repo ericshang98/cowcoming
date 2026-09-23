@@ -19,9 +19,17 @@
 
 当前 Cloudflare 项目是 Direct Upload，不能原地改为 Cloudflare 原生 Git integration。通过 GitHub Actions 直接上传即可连接 Git 与网站，不需要迁移项目或改 DNS。官方依据：[Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/)、[Direct Upload with CI](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/)。
 
-## 首次启用状态（2026-09-23）
+## 当前发布状态（2026-09-23）
 
-发布工作流已加入仓库；**在配置下面的 Secret 和启用变量之前，main 只完成检查和保存构建，deploy 作业跳过，不会声称网站已更新。** 本次检查时 cowcoming 仓库还没有 Cloudflare Secret，本机 Wrangler 也未登录。旧 pinclaw-dev 仓库中的 Secret 不能从 GitHub 读取或自动迁移。
+硬件接入 PR #2 已合并。经 Eric 授权，本机完成 Cloudflare OAuth，已把 `9a3e362` 发布到原 Pages 项目，并核对主域名提交 SHA 与入口 JS/CSS 哈希。实时 Worker 已单独发布到 https://cowcoming-live.shangyiyong98.workers.dev ，服务端 ADMIN_KEY 已配置；生产环境已通过鉴权、提示词确认、动作/文本同步、信令、重连、密钥撤销及浏览器直连合成视频/CV 验证。真实硬件接入仍见 [接口说明](live-device.md)。当前线上版本始终以 [build-info.json](https://cowcoming.world/build-info.json) 为准。
+
+**这次是本机授权发布，GitHub 自动发布仍未启用。** 仓库已设置公开变量 `COWCOMING_RELAY_URL`，但没有 `CLOUDFLARE_API_TOKEN` Secret 或 `CLOUDFLARE_DEPLOY_ENABLED=true`。本机 OAuth 不会自动变成 GitHub Actions 凭据。不要把“合并 main”直接写成“网站已更新”。
+
+下述 Actions 工作流只发布 Pages；修改实时服务时，还需按 [Worker 部署步骤](live-device.md#部署到现有网站) 单独部署 Worker。Pages/Edit Token 不具有 Workers 部署权限。生产连接密钥仅保存在私密交接文件中，不进入 Git、构建产物或文档。
+
+## GitHub 自动发布的首次配置
+
+发布工作流已加入仓库；**在配置下面的 Secret 和启用变量之前，main 只完成检查和保存构建，deploy 作业跳过，不会声称网站已更新。** 旧 pinclaw-dev 仓库中的 Secret 不能从 GitHub 读取或自动迁移。
 
 一次性配置：
 
