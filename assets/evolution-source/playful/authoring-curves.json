@@ -1,0 +1,218 @@
+[
+  {
+    "id": "playful_nod_confirm",
+    "label": "确认点头",
+    "base": "nod",
+    "group": "点头",
+    "duration": 2.6,
+    "description": "侧躺着慢半拍，轻轻点一下，停住再回正。",
+    "peak": 1.15,
+    "channels": {
+      "Head": {
+        "pitch": [
+          [
+            0,
+            0
+          ],
+          [
+            0.45,
+            0
+          ],
+          [
+            1.02,
+            5.5
+          ],
+          [
+            1.25,
+            5.5
+          ],
+          [
+            2.15,
+            0
+          ],
+          [
+            2.6,
+            0
+          ]
+        ]
+      }
+    },
+    "logicalId": "nod_confirm"
+  },
+  {
+    "id": "playful_head_shake",
+    "label": "摇头",
+    "base": "head_shake",
+    "group": "摇头",
+    "duration": 3.4,
+    "description": "保持托头姿态，懒懒地左右摇头，最后一摆收小。",
+    "peak": 1.2,
+    "channels": {
+      "Head": {
+        "yaw": [
+          [
+            0,
+            0
+          ],
+          [
+            0.4,
+            0
+          ],
+          [
+            0.83,
+            6
+          ],
+          [
+            1.25,
+            -6
+          ],
+          [
+            1.68,
+            5
+          ],
+          [
+            2.1,
+            -4
+          ],
+          [
+            2.5,
+            2
+          ],
+          [
+            2.95,
+            0
+          ],
+          [
+            3.4,
+            0
+          ]
+        ]
+      }
+    },
+    "logicalId": "head_shake"
+  },
+  {
+    "id": "playful_nod_proud",
+    "label": "得意双点头",
+    "base": "nod",
+    "group": "点头",
+    "duration": 3.2,
+    "description": "微抬下巴，得意地点两下，第二下更轻；身体继续侧躺。",
+    "peak": 1.08,
+    "channels": {
+      "Head": {
+        "pitch": [
+          [
+            0,
+            0
+          ],
+          [
+            0.43,
+            -1.5
+          ],
+          [
+            1.05,
+            6
+          ],
+          [
+            1.42,
+            -1
+          ],
+          [
+            1.98,
+            4.5
+          ],
+          [
+            2.5,
+            0
+          ],
+          [
+            3.2,
+            0
+          ]
+        ]
+      }
+    },
+    "logicalId": "nod_proud"
+  },
+  {
+    "id": "playful_tilt_curious_left",
+    "label": "左侧好奇歪头",
+    "base": "head_tilt_left",
+    "group": "左歪头",
+    "duration": 3.6,
+    "description": "维持侧躺托头，向自己的左侧轻歪头，停一拍再回正。",
+    "peak": 1.7,
+    "channels": {
+      "Head": {
+        "roll": [
+          [
+            0,
+            0
+          ],
+          [
+            0.55,
+            0
+          ],
+          [
+            1.35,
+            5.5
+          ],
+          [
+            2.35,
+            5.5
+          ],
+          [
+            3.12,
+            0
+          ],
+          [
+            3.6,
+            0
+          ]
+        ]
+      }
+    },
+    "logicalId": "tilt_curious_left"
+  },
+  {
+    "id": "playful_tilt_curious_right",
+    "label": "右侧好奇歪头",
+    "base": "head_tilt_right",
+    "group": "右歪头",
+    "duration": 3.6,
+    "description": "维持侧躺托头，向自己的右侧轻歪头，停一拍再回正。",
+    "peak": 1.7,
+    "channels": {
+      "Head": {
+        "roll": [
+          [
+            0,
+            0
+          ],
+          [
+            0.55,
+            0
+          ],
+          [
+            1.35,
+            -5.5
+          ],
+          [
+            2.35,
+            -5.5
+          ],
+          [
+            3.12,
+            0
+          ],
+          [
+            3.6,
+            0
+          ]
+        ]
+      }
+    },
+    "logicalId": "tilt_curious_right"
+  }
+]

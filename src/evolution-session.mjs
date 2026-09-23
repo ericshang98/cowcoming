@@ -1,7 +1,7 @@
 import { forms } from './evolution.mjs';
 
 export const EVOLUTION_SETTINGS_KEY = 'cowcoming-evolution-settings-v1';
-export const defaultEvolutionSettings = { mode: 'auto', interval: 5, endpoint: '', model: '' };
+export const defaultEvolutionSettings = { mode: 'manual', interval: 5, endpoint: '', model: '' };
 export const successors = id => Object.values(forms).filter(form => form.parent === id).map(form => form.id);
 export function validateSettings(settings) {
   if (!['auto', 'manual'].includes(settings.mode) || !Number.isInteger(settings.interval) || settings.interval < 1 || settings.interval > 100) throw new Error('invalid_settings');

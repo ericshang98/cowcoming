@@ -44,7 +44,7 @@ async function until(fn, label, timeout = 20000) {
 const admin = crypto.randomBytes(32).toString('hex');
 const relay = `http://127.0.0.1:${await port()}`;
 const web = `http://127.0.0.1:${await port()}`;
-const report = [];
+const report = [], errors = [];
 try {
   await writeFile(join(folder, 'wrangler.json'), JSON.stringify({
     name: 'cowcoming-benben-synthetic-test', main: resolve('server/worker.mjs'),
@@ -80,8 +80,9 @@ try {
     return r.json();
   };
   await mkdir('.pwc', { recursive: true });
-  await writeFile('.pwc/benben-harness.html', '<html><body><div id="root"></div><script type="module" src="/.pwc/benben-harness.jsx"></script></body></html>');
-  await writeFile('.pwc/benben-harness.jsx', `
+  await mkdir('tmp', { recursive: true });
+  await writeFile('tmp/benben-harness.html', '<html><head><link rel="icon" href="data:,"></head><body><div id="root"></div><script type="module" src="/tmp/benben-harness.jsx"></script></body></html>');
+  await writeFile('tmp/benben-harness.jsx', `
 import React from 'react';import{createRoot}from'react-dom/client';
 import * as THREE from 'three';import{GLTFLoader}from'three/addons/loaders/GLTFLoader.js';
 import useLiveDevice from '/src/live/useLiveDevice';
@@ -103,11 +104,12 @@ const controller={responsePlayer:player,responseForm:'normal',queue:{clear(){}}}
 let last=performance.now();renderer.setAnimationLoop(now=>{const dt=Math.min(.1,(now-last)/1000);last=now;player.update(dt);mixer.update(dt);renderer.render(scene,camera)});
 function App(){const live=useLiveDevice(controller,true);window.live=live;return <><h2>点头联调 · 合成执行器 / 真实模型动画</h2><pre>{JSON.stringify({connection:live.status,animation:live.lastAnimation,receipt:live.snapshot?.events.filter(e=>e.type==='action').at(-1)},null,2)}</pre></>}
 createRoot(document.getElementById('root')).render(<App/>);`);
-  browser = await chromium.launch({ channel: 'chrome', headless: true });
+  browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--enable-unsafe-swiftshader'] });
   const page = await browser.newPage({ viewport: { width: 1000, height: 820 } });
-  const errors = [];
   page.on('pageerror', e => errors.push(e.message));
-  await page.goto(web + '/.pwc/benben-harness.html');
+  page.on('response', r => {if(r.status() >= 400 && r.url().startsWith(web)) errors.push('HTTP ' + r.status() + ' ' + new URL(r.url()).pathname);});
+  page.on('console', m => {if(m.type() === 'error') errors.push(m.text().replace(/(?:key|ticket)=[^ &]+/g, 'key=REDACTED'));});
+  await page.goto(web + '/tmp/benben-harness.html');
   await page.waitForFunction(() => window.live,null,{polling:100,timeout:30000});
   await page.evaluate(({ relay, key }) => window.live.connect(relay, key, false), { relay, key: room.browserKey });
   await page.waitForFunction(() => window.live.snapshot);
@@ -170,12 +172,20 @@ createRoot(document.getElementById('root')).render(<App/>);`);
     const localState = await localResponse.json();
     assert.equal(localState.form_id, formId);
     assert.equal(localState.persona_version, current.personaVersion);
+    if (formId === 'playful') {
+      await localPost('/run', {request_id: 'qa_playful_nod', mode: 'hardware', form_id: formId,
+        reply_mode: 'fast', text: '点一下头'});
+      await page.waitForFunction(() => window.live.snapshot.events.some(e =>
+        e.type === 'decision' && e.actionId === 'NOD' && e.formId === 'playful'));
+      await until(async () => !(await (await fetch(local + '/state')).json()).busy, 'playful turn finish');
+    }
   }
-  report.push('All six webpage forms reach the real local controller and return matching persona-version acknowledgements without any motor command.');
+  report.push('All six webpage forms reach the real local controller and return matching persona-version acknowledgements with a synthetic playful NOD projection and no real motor command.');
   assert.deepEqual(errors, []);
   await writeFile('.pwc/benben-bridge-qa.json', JSON.stringify({ synthetic: true, checks: report, pageErrors: errors }, null, 2));
   console.log(JSON.stringify({ passed: report.length, synthetic: true, checks: report }, null, 2));
 } catch (error) {
+  console.error('Browser errors:', JSON.stringify(errors));
   // Fixture/bridge logs contain no keys or user model output; do not dump room/ticket URLs.
   for (const p of children) if (p.spawnfile === python) console.error(logs.get(p));
   throw error;
@@ -183,4 +193,6 @@ createRoot(document.getElementById('root')).render(<App/>);`);
   await browser?.close();
   for (const p of children.reverse()) await stop(p);
   await rm(folder, { recursive: true, force: true });
+  await rm('tmp/benben-harness.html', {force: true});
+  await rm('tmp/benben-harness.jsx', {force: true});
 }

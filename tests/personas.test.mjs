@@ -3,6 +3,16 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { initialRoom, updateProfile, applyDeviceEvent, upgradeRoomPersonality, FORM_IDS } from '../shared/live-protocol.mjs';
 import { PERSONA_VERSION, personaProfile } from '../shared/personas.mjs';
+import { availableDeviceActions } from '../shared/action-catalog.mjs';
+
+test('playful uses the same real device capability gate as the other five forms', () => {
+  let s = initialRoom('test', 'Playful');
+  s = updateProfile(s, { expectedRevision: s.profile.revision, formId: 'playful' });
+  s.device = { ...s.device, actionContractVersion: 2, supportedActions: ['NOD', 'WAIT'], hardware: 'ready' };
+  assert.deepEqual(availableDeviceActions(s), ['NOD', 'WAIT']);
+  s.device.hardware = 'offline';
+  assert.deepEqual(availableDeviceActions(s), ['WAIT']);
+});
 
 test('all six forms load their own prompt and need a matching local persona acknowledgement', () => {
   let s = initialRoom('test','Personas');

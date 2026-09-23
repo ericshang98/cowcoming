@@ -1,11 +1,11 @@
 import { evolutionAssets } from './evolution-assets.mjs';
 import { NIULAI_ASSET } from './scene/niulai.mjs';
 
-// Five verified forms; the missing playful model stays explicitly marked as a reference.
+// All six evolution forms have their own verified rig and five response clips.
 export const forms = {
   calf: { id: 'calf', name: '小牛', parent: null, depth: 0, branch: null, description: 'Where every evolution begins.', model: evolutionAssets.calf.model },
   normal: { id: 'normal', name: '普通牛来', parent: 'calf', depth: 1, branch: null, description: 'The next step. The rest is yet to be discovered.', model: evolutionAssets.normal.model },
-  playful: { id: 'playful', name: '骚牛', parent: 'normal', depth: 2, branch: 'celestial', description: 'The left branch, leading to 仙牛.', model: null },
+  playful: { id: 'playful', name: '骚牛', parent: 'normal', depth: 2, branch: 'celestial', description: 'The left branch, leading to 仙牛.', model: evolutionAssets.playful.model },
   tough: { id: 'tough', name: '硬牛', parent: 'normal', depth: 2, branch: 'dark', description: 'The right branch, leading to 暗黑牛.', model: evolutionAssets.tough.model },
   celestial: { id: 'celestial', name: '仙牛', parent: 'playful', depth: 3, branch: 'celestial', description: 'The next evolution of 骚牛.', model: evolutionAssets.celestial.model },
   dark: { id: 'dark', name: '暗黑牛', parent: 'tough', depth: 3, branch: 'dark', description: 'The next evolution of 硬牛.', model: evolutionAssets.dark.model },

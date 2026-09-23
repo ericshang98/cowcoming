@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { DEFAULT_TUNING, validateTuning } from "./motion-tuning.mjs";
+import { tuneClip } from "./tuned-clip.mjs";
 import { ACTION_CATALOG } from "../../shared/action-catalog.mjs";
 
 /** Plays only a registered, loaded clip and resolves after its actual finish + recovery. */
@@ -8,6 +10,7 @@ export function createResponsePlayer({
   manifest,
   bones,
   onStart = () => {},
+  getTuning = () => DEFAULT_TUNING,
 }) {
   const seen = new Map();
   const queue = [];
@@ -24,8 +27,10 @@ export function createResponsePlayer({
     const done = current;
     current = null;
     recovery = null;
+    if (done.tunedClip) mixer.uncacheClip(done.tunedClip);
     done.resolve({
       status,
+      tuning: done.tuning,
       clip: done.clip,
       eventId: done.eventId,
       formId: manifest.formId,
@@ -41,7 +46,7 @@ export function createResponsePlayer({
     if (current || disposed) return;
     const job = queue.shift();
     if (!job) return;
-    const { request, variant, resolve } = job;
+    const { request, variant, resolve, tuning } = job;
     if (request.actionId === "WAIT") {
       resolve({status: "completed", clip: "idle", eventId: request.eventId, formId: manifest.formId});
       drain();
@@ -50,12 +55,13 @@ export function createResponsePlayer({
     onStart();
     mixer.stopAllAction();
     const incoming = idle();
-    const action = actions[variant.clip];
-    action.reset().setEffectiveWeight(1).setEffectiveTimeScale(1).setLoop(THREE.LoopOnce, 1);
+    const tunedClip = tuning.amplitude === 1 ? null : tuneClip(actions[variant.clip].getClip(), tuning.amplitude);
+    const action = tunedClip ? mixer.clipAction(tunedClip) : actions[variant.clip];
+    action.reset().setEffectiveWeight(1).setEffectiveTimeScale(tuning.speed).setLoop(THREE.LoopOnce, 1);
     action.clampWhenFinished = true;
     action.play();
     if (incoming) action.crossFadeFrom(incoming, 0.18, false);
-    current = { action, resolve, clip: variant.clip, eventId: request.eventId };
+    current = { action, tunedClip, tuning, resolve, clip: variant.clip, eventId: request.eventId };
   }
   const finished = (e) => {
     if (current && e.action === current.action && !recovery)
@@ -91,12 +97,15 @@ export function createResponsePlayer({
           status: "unavailable",
           reason: "animation-not-loaded",
         });
+      let tuning;
+      try { tuning = validateTuning(getTuning(request.actionId)); }
+      catch { return Promise.resolve({status: "unavailable", reason: "invalid-tuning"}); }
       if (queue.length >= 32)
         return Promise.resolve({status: "unavailable", reason: "animation-queue-full"});
       seen.set(request.eventId, true);
       if (seen.size > 1000) seen.delete(seen.keys().next().value);
       return new Promise(resolve => {
-        queue.push({request, variant, resolve});
+        queue.push({request, variant, resolve, tuning});
         drain();
       });
     },

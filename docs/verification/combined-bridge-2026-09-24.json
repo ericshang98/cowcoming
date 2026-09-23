@@ -8,7 +8,7 @@
     "Device disconnect marks offline; accepted clip completes and reconnect skips the in-flight/old turn.",
     "A new turn after reconnect works normally.",
     "Unsupported web interaction is explicitly rejected instead of invoking a second JEV.",
-    "All six webpage forms reach the real local controller and return matching persona-version acknowledgements without any motor command."
+    "All six webpage forms reach the real local controller and return matching persona-version acknowledgements with a synthetic playful NOD projection and no real motor command."
   ],
   "pageErrors": []
 }

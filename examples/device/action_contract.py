@@ -21,4 +21,4 @@ def executable_actions(profile, status):
         raise ValueError('Unsupported device capability')
     if status.get('actionContractVersion') != ACTION_CONTRACT_VERSION:
         return []
-    return [a for a in profile['allowedActions'] if a=='WAIT' or (profile['formId']!='playful' and status.get('hardware')=='ready' and a in supported)]
+    return [a for a in profile['allowedActions'] if a=='WAIT' or (status.get('hardware')=='ready' and a in supported)]

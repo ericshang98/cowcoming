@@ -1,6 +1,6 @@
-"""Reproducible, non-destructive animation authoring for five Niulai evolution rigs.
+"""Reproducible, non-destructive animation authoring for six Niulai evolution rigs.
 Run with Blender 5.2: blender -b --python source/build_actions.py
-NIULAI_FORM selects normal/celestial/dark/calf/tough; NIULAI_SOURCE and NIULAI_OUTPUT override paths.
+NIULAI_FORM selects normal/celestial/dark/calf/tough/playful; NIULAI_SOURCE and NIULAI_OUTPUT override paths.
 """
 import bpy
 import copy
@@ -15,7 +15,7 @@ from mathutils import Quaternion, Vector
 OUT = Path(os.environ.get('NIULAI_OUTPUT', Path(__file__).resolve().parents[1]))
 SOURCE = Path(os.environ.get('NIULAI_SOURCE', Path(__file__).resolve().parent / 'niulai-mouth-source.glb'))
 FORM = os.environ.get('NIULAI_FORM', 'normal')
-LABELS = {'normal':'普通牛来','celestial':'仙牛','dark':'暗黑牛','calf':'小牛','tough':'硬牛'}
+LABELS = {'normal':'普通牛来','celestial':'仙牛','dark':'暗黑牛','calf':'小牛','tough':'硬牛','playful':'骚牛'}
 assert FORM in LABELS
 STEM = f'niulai-{FORM}-actions'
 OUT.mkdir(parents=True, exist_ok=True)
@@ -27,7 +27,7 @@ scene.render.fps = FPS
 bpy.ops.import_scene.gltf(filepath=str(SOURCE))
 arm = next(o for o in scene.objects if o.type == 'ARMATURE')
 meshes = [o for o in scene.objects if o.type == 'MESH' and any(m.type == 'ARMATURE' and m.object == arm for m in o.modifiers)]
-assert len(arm.data.bones) == {'normal':21,'celestial':20,'dark':27,'calf':13,'tough':17}[FORM]
+assert len(arm.data.bones) == {'normal':21,'celestial':20,'dark':27,'calf':13,'tough':17,'playful':17}[FORM]
 # glTF skins already follow their joint matrices. Keep skinned mesh nodes at
 # scene root so no importer/exporter adds an ambiguous armature parent transform.
 for obj in meshes:
@@ -53,9 +53,13 @@ for obj in [arm, *meshes]:
 # an arbitrary Blender bone's local Euler axes equal head/servo axes.
 def rotate(bone, pitch=0, roll=0, yaw=0):
     rest = arm.data.bones[bone].matrix_local.to_quaternion()
+    # The reclining model faces diagonally. Use its anatomical forward/left
+    # frame rather than the standing model's global axes.
+    roll_axis = (.6, .8, 0) if FORM == 'playful' else (0, 1, 0)
+    pitch_axis = (.8, -.6, 0) if FORM == 'playful' else (1, 0, 0)
     desired = (Quaternion((0, 0, 1), math.radians(yaw)) @
-               Quaternion((0, 1, 0), math.radians(roll)) @
-               Quaternion((1, 0, 0), math.radians(pitch)))
+               Quaternion(roll_axis, math.radians(roll)) @
+               Quaternion(pitch_axis, math.radians(pitch)))
     arm.pose.bones[bone].rotation_quaternion = rest.inverted() @ desired @ rest
 
 
@@ -120,6 +124,24 @@ DEFS.sort(key=lambda d:order.index(d['id']))
 for d in DEFS:
     d['logicalId']=d['id'].removeprefix('normal_')
     d['id']=f"{FORM}_{d['logicalId']}"
+
+if FORM == 'playful':
+    # Head only: the elbow, supporting hand, reclining torso and legs stay put.
+    # Small gestures preserve the close-contact pose; cadence conveys character.
+    by_id = {d['logicalId']: d for d in DEFS}
+    by_id['nod_confirm'].update(duration=2.6, peak=1.15,
+        description='侧躺着慢半拍，轻轻点一下，停住再回正。',
+        channels={'Head': {'pitch': [(0,0),(.45,0),(1.02,5.5),(1.25,5.5),(2.15,0),(2.6,0)]}})
+    by_id['head_shake'].update(duration=3.4, peak=1.2,
+        description='保持托头姿态，懒懒地左右摇头，最后一摆收小。',
+        channels={'Head': {'yaw': [(0,0),(.4,0),(.83,6),(1.25,-6),(1.68,5),(2.1,-4),(2.5,2),(2.95,0),(3.4,0)]}})
+    by_id['nod_proud'].update(duration=3.2, peak=1.08,
+        description='微抬下巴，得意地点两下，第二下更轻；身体继续侧躺。',
+        channels={'Head': {'pitch': [(0,0),(.43,-1.5),(1.05,6),(1.42,-1),(1.98,4.5),(2.5,0),(3.2,0)]}})
+    for side, sign in [('left',1),('right',-1)]:
+        by_id[f'tilt_curious_{side}'].update(duration=3.6, peak=1.7,
+            description=f'维持侧躺托头，向自己的{"左" if side=="left" else "右"}侧轻歪头，停一拍再回正。',
+            channels={'Head': {'roll': [(0,0),(.55,0),(1.35,sign*5.5),(2.35,sign*5.5),(3.12,0),(3.6,0)]}})
 
 if FORM in ('calf','tough'):
     aliases={'Chest':'Spine','UpperArm.L':'UpperArm_L','UpperArm.R':'UpperArm_R'}
@@ -219,12 +241,14 @@ manifest = {
     'schemaVersion': 1, 'packageId': STEM, 'version': '3.0.0', 'actionContractVersion': 2,
     'formId': FORM, 'formLabel': LABELS[FORM], 'model': f'{STEM}.glb',
     'boneCount': len(arm.data.bones), 'sourceFile': 'source/niulai-mouth-source.glb' if FORM=='normal' else 'source/niulai-source.glb',
-    'morphNames': ['MouthOpen','MouthRound','MouthWide'] if FORM in ('normal','calf','tough') else [],
+    'morphNames': ['MouthOpen','MouthRound','MouthWide'] if FORM in ('normal','calf','tough','playful') else [],
     'sourceSha256': hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
-    'coordinateConvention': 'glTF Y up, character front +Z; left means character left (+X)',
+    'coordinateConvention': 'glTF Y up; reclining face forward (-0.6,0,0.8), character left (0.8,0,0.6)' if FORM=='playful' else 'glTF Y up, character front +Z; left means character left (+X)',
+    'headTracking': FORM != 'playful',
+    'viewYawRadians': math.atan2(.6,.8) if FORM=='playful' else 0,
     'execution': 'software-animation-only', 'hardwareProfile': None,
     'preservedClips': sorted(a.name for a in original_actions),
-    'idleClip': 'idle', 'neutralPose': 'standing',
+    'idleClip': 'idle', 'neutralPose': 'reclining' if FORM=='playful' else 'standing',
     'selection': {'mode': 'single-verified-clip-per-semantic-action', 'deduplicateBy': 'sessionId+eventId', 'emptyCandidate': 'idle-with-unavailable-status'},
     'variants': [],
 }
@@ -234,7 +258,7 @@ for d in DEFS:
         'baseActionId': {'nod_confirm':'NOD','head_shake':'SHAKE','nod_proud':'NOD_DOUBLE','tilt_curious_left':'TILT_LEFT','tilt_curious_right':'TILT_RIGHT'}[d['logicalId']], 'authoringPrimitive': d['base'], 'baseActionLabel': d['group'],
         'durationSeconds': d['duration'], 'description': d['description'],
         'requiredBones': list(d['channels']), 'occupiedBones': list(d['channels']),
-        'entryPose': 'standing', 'exitPose': 'standing',
+        'entryPose': manifest['neutralPose'], 'exitPose': manifest['neutralPose'],
         'interruptible': True, 'recoverySeconds': .35, 'interruptionRecoverySeconds': 0,
         'semanticTags': {'nod_confirm':['confirmation'], 'nod_proud':['proud-confirmation'], 'tilt_curious_left':['curiosity'], 'tilt_curious_right':['curiosity'], 'head_shake':['disagreement']}[d['logicalId']],
         'historicalScreenshotJointReference': {'nod':[3],'head_tilt_left':[4],'head_tilt_right':[4],'head_shake':[5]}[d['base']],

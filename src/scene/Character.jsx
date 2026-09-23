@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, useGLTF } from "@react-three/drei";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
 import * as THREE from "three";
+import { DEFAULT_TUNING, browserTuningStorage, loadTuning } from '../live/motion-tuning.mjs';
 import { createResponsePlayer } from '../live/response-player.mjs';
 import { evolutionAssets } from '../evolution-assets.mjs';
 import { PROCEDURAL_CLIPS, proceduralPose } from "../live/animation.mjs";
@@ -89,6 +90,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     [gltf, mixer, model, characterId],
   );
   const responseManifest=Object.values(evolutionAssets).find(asset=>asset.model===modelAsset);
+  const reclining = responseManifest?.neutralPose === 'reclining';
   const responsePlayer=useRef(null);
   const state = useRef({
     time: 0,
@@ -142,7 +144,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
   useEffect(() => {
     if(!responseManifest)return;
     const names=new Set();model.traverse(o=>{if(o.isBone){names.add(o.name);if(o.userData.name)names.add(o.userData.name);}});
-    const player=createResponsePlayer({mixer,actions,manifest:responseManifest,bones:names,onStart:()=>{
+    const player=createResponsePlayer({mixer,actions,manifest:responseManifest,bones:names,getTuning:(id)=>(controller.motionTuning || loadTuning(browserTuningStorage()).document).forms[responseManifest.formId]?.actions[id] || DEFAULT_TUNING,onStart:()=>{
       const st=state.current;st.started=true;st.active=null;st.liveMotion=null;st.head=0;st.pitch=0;st.roll=0;controller.queue.clear();
     }});
     responsePlayer.current=player;
@@ -257,7 +259,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     const half =
         Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z,
       t = entrance ? clamp(st.time / 3.6, 0, 1) : 1,
-      fit = characterId === "niulai" ? placement.scale : Math.min(placement.scale, 2 * half * camera.aspect * .88 / (metrics.width * metrics.s * 1.12)),
+      fit = reclining ? Math.min(placement.scale, 2 * half * camera.aspect * (gl.domElement.clientWidth < 769 ? .88 : .38) / (metrics.width * metrics.s * 1.12)) : characterId === "niulai" ? placement.scale : Math.min(placement.scale, 2 * half * camera.aspect * .88 / (metrics.width * metrics.s * 1.12)),
       size =
         fit * (entrance ? 0.68 + 0.32 * (1 - (1 - t) ** 3) : 1);
     controller.entranceProgress = t;
@@ -307,7 +309,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     group.updateMatrixWorld(true);
     let target = { body: 0, yaw: 0, pitch: 0 };
     if (
-      controller.tracking &&
+      !reclining && controller.tracking &&
       !controller.mouthPreview &&
       (controller.mouse.active || controller.gaze) &&
       bones.head &&
@@ -327,12 +329,12 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     if (controller.dragging) target.body = controller.dragYaw;
     if (moving) {
       st.body = damp(st.body, target.body, human ? 3.5 : 2.2, dt);
-      st.head = damp(st.head, responsePlayer.current?.busy ? 0 : target.yaw + controller.tilt.x * 0.26, 9, dt);
-      st.pitch = damp(st.pitch, responsePlayer.current?.busy ? 0 : target.pitch - controller.tilt.y * 0.15, 9, dt);
-      st.roll = damp(st.roll, livePose.roll, 9, dt);
+      st.head = damp(st.head, (reclining || responsePlayer.current?.busy) ? 0 : target.yaw + controller.tilt.x * 0.26, 9, dt);
+      st.pitch = damp(st.pitch, (reclining || responsePlayer.current?.busy) ? 0 : target.pitch - controller.tilt.y * 0.15, 9, dt);
+      st.roll = damp(st.roll, reclining ? 0 : livePose.roll, 9, dt);
     }
-    group.rotation.y = st.body;
-    group.rotation.z = controller.tilt.x * 0.035;
+    group.rotation.y = st.body + (responseManifest?.viewYawRadians || 0);
+    group.rotation.z = reclining ? 0 : controller.tilt.x * 0.035;
     for (const [bone, weight] of [
       [bones.neck, 0.4],
       [bones.head, 0.6],
@@ -438,10 +440,12 @@ export default function Character({
     if (mode === "contained") return { scale: mobile ? 1.3 : 1.4, x: 0, y: 0.02 };
     // WORK is Niulai's main stage, including on narrow screens. Supporting
     // content scrolls below it instead of turning the model into a thumbnail.
-    if (mode === "work")
+    if (mode === "work") {
+      const formScale = modelAsset === evolutionAssets.calf.model ? 0.85 : 1;
       return mobile
-        ? { scale: 1.45, x: 0, y: 0.02 }
-        : { scale: 1.22, x: -0.12, y: 0.02 };
+        ? { scale: 1.45 * formScale, x: 0, y: 0.02 }
+        : { scale: 1.22 * formScale, x: -0.12, y: 0.02 };
+    }
     if (overlay) return { scale: 0.24, x: 0.37, y: -0.3, ground: false };
     if (mode === "home" && characterId === "fengge") return { scale: mobile ? 1.45 : 1.6, x: 0, y: .055 };
     if (mobile && mode === "home" && characterId !== "niulai") return { scale: 1.2, x: 0, y: -.06 };
@@ -452,7 +456,7 @@ export default function Character({
     if (mode === "contact" && characterId === "fengge") return { scale: 1.5, x: 0, y: .065 };
     if (mode === "contact") return { scale: 1.22, x: 0, y: 0.04 };
     return { scale: 1.25, x: 0, y: -0.02 };
-  }, [mode, mobile, overlay, boot, characterId]);
+  }, [mode, mobile, overlay, boot, characterId, modelAsset]);
   useEffect(() => {
     let drag = null;
     const blocked = mode === "contained" && overlay;

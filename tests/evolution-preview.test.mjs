@@ -20,14 +20,14 @@ test('selecting the other branch in the atlas selects its matching sidebar route
   assert.equal(resolvePreview('missing', 'missing').form.id, 'calf');
 });
 
-test('all missing models remain honest placeholders backed by the reference asset', () => {
+test('all six model nodes resolve to their own shipped resource', () => {
   for (const form of Object.values(forms)) {
     const selection = selectEvolutionForm('celestial', form.id, allRevealed);
     const preview = resolvePreview(selection.route, selection.form, allRevealed);
     assert.equal(preview.form.id, form.id);
-    assert.equal(preview.placeholder, form.id === 'playful');
+    assert.equal(preview.placeholder, false);
     assert.equal(preview.model, form.model || NIULAI_ASSET);
-    if(form.id !== 'playful') assert.match(form.model, /models\/evolution\/.*\.glb$/);
+    assert.match(form.model, /models\/evolution\/.*\.glb$/);
   }
 });
 
@@ -58,4 +58,13 @@ test('unrevealed forms cannot be selected or exposed by previewing or supplying 
   } finally {
     forms.dark.model = previous;
   }
+});
+
+test('a temporarily missing model remains an honest placeholder', () => {
+  const previous = forms.playful.model;
+  try {
+    forms.playful.model = null;
+    const preview = resolvePreview('celestial', 'playful', allRevealed);
+    assert.equal(preview.placeholder, true); assert.equal(preview.model, NIULAI_ASSET);
+  } finally { forms.playful.model = previous; }
 });
