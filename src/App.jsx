@@ -17,6 +17,7 @@ import { useWorldCollection } from "./useWorldCollection";
 import { useNiulaiVoice } from "./useNiulaiVoice";
 import { isWaveShortcut } from "./voice-interactions.mjs";
 import Character from "./scene/Character";
+import useLiveDevice from "./live/useLiveDevice";
 import Evolution from "./pages/Evolution";
 import { resolvePreview, selectEvolutionForm } from "./evolution.mjs";
 import { Header, Ambient, Boot } from "./components/Chrome";
@@ -80,13 +81,19 @@ export default function App() {
     viewRef = useRef();
   const [evolutionSelection, setEvolutionSelection] = useState({ route: 'celestial', form: 'calf' });
   const [previewModelState, setPreviewModelState] = useState({ model: null, status: 'loading' });
-  const evolutionPreview = resolvePreview(evolutionSelection.route, evolutionSelection.form);
+  const live = useLiveDevice(controller, mode === 'work');
+  const revealed = live.snapshot?.revealed;
+  const evolutionPreview = resolvePreview(evolutionSelection.route, evolutionSelection.form, revealed);
+  useEffect(() => {
+    if (live.snapshot?.profile.formId) setEvolutionSelection(previous => selectEvolutionForm(previous.route, live.snapshot.profile.formId, live.snapshot.revealed));
+  }, [live.snapshot?.profile.formId, live.snapshot?.profile.revision]);
   const activeModel = mode === 'work' ? evolutionPreview.model : resolvePreview().model;
   const evolutionPage = <Evolution
+    live={live}
     preview={evolutionPreview}
     modelStatus={previewModelState.model === evolutionPreview.model ? previewModelState.status : 'loading'}
     onSelectRoute={route => setEvolutionSelection({ route, form: 'calf' })}
-    onSelectForm={form => setEvolutionSelection(previous => selectEvolutionForm(previous.route, form))}
+    onSelectForm={form => setEvolutionSelection(previous => selectEvolutionForm(previous.route, form, revealed))}
   />;
   const change = useCallback(
     (next) => {
@@ -192,12 +199,12 @@ export default function App() {
       }
       if (e.key === " " && mode !== "blog" && mode !== "about") {
         e.preventDefault();
-        controller.gesture("happy");
+        if (mode !== "work" || !live.snapshot) controller.gesture("happy");
       }
     };
     addEventListener("keydown", key);
     return () => removeEventListener("keydown", key);
-  }, [mode, chat, cv, project, idea, voice.wave, wordle]);
+  }, [mode, chat, cv, project, idea, voice.wave, wordle, Boolean(live.snapshot)]);
   useEffect(() => {
     const down = (e) => {
       if (muted) return;
