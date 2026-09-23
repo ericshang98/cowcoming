@@ -1,0 +1,503 @@
+import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Environment, useGLTF } from "@react-three/drei";
+import { clone } from "three/addons/utils/SkeletonUtils.js";
+import * as THREE from "three";
+import { damp, gazeTargets, clamp } from "./motion.mjs";
+import { NIULAI_ASSET, prepareMouth, updateMouth } from "./niulai.mjs";
+const MASCOT = NIULAI_ASSET,
+  HUMAN = "/models/fuch-human-spin.glb";
+useGLTF.setDecoderPath("/draco/");
+useGLTF.preload(MASCOT);
+const gestures = {
+  greet: "wave",
+  wave: "wave",
+  perk: "bow",
+  nod: "bow",
+  cheer: "wave",
+  happy: "wave",
+  dance: "wave",
+  flair: "wave",
+  flip: "wave",
+  spin: "bow",
+  curious: "bow",
+};
+function Rig({ human, controller, placement, visible, onReady, entrance }) {
+  const gltf = useGLTF(human ? HUMAN : MASCOT),
+    { camera, gl } = useThree(),
+    root = useRef();
+  const model = useMemo(() => {
+    const m = clone(gltf.scene);
+    m.traverse((o) => {
+      if (o.isMesh) {
+        o.frustumCulled = false;
+        o.material = Array.isArray(o.material)
+          ? o.material.map((x) => x.clone())
+          : o.material.clone();
+      }
+    });
+    return m;
+  }, [gltf]);
+  const mouths = useMemo(() => prepareMouth(model), [model]);
+  const bones = useMemo(() => {
+    let head, neck, hips, armature;
+    const toes = [];
+    model.traverse((b) => {
+      if (b.name === "Head") head = b;
+      if (/^neck$/i.test(b.name)) neck = b;
+      if (b.name === "Hips") hips = b;
+      if (b.name === "Armature") armature = b;
+      if (/ToeBase$/.test(b.name)) toes.push(b);
+    });
+    return {
+      head,
+      neck,
+      hips,
+      armature,
+      toes,
+      hipBase: hips?.position.clone(),
+      armBase: armature?.position.clone(),
+    };
+  }, [model]);
+  const metrics = useMemo(() => {
+    model.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(model),
+      size = box.getSize(new THREE.Vector3()),
+      center = box.getCenter(new THREE.Vector3()),
+      s = 2.4 / size.y;
+    return {
+      s,
+      minY: box.min.y,
+      pos: [0, -center.y * s + size.y * s * 0.06, -center.z * s],
+    };
+  }, [model]);
+  const mixer = useMemo(() => new THREE.AnimationMixer(model), [model]);
+  const actions = useMemo(
+    () =>
+      Object.fromEntries(
+        gltf.animations.map((c) => [c.name, mixer.clipAction(c)]),
+      ),
+    [gltf, mixer],
+  );
+  const state = useRef({
+    time: 0,
+    body: 0,
+    head: 0,
+    pitch: 0,
+    active: null,
+    until: 0,
+    started: false,
+    nextIdle: 18,
+    prevVisible: false,
+    foot: new THREE.Vector3(),
+    headScreen: new THREE.Vector3(),
+    parentQ: new THREE.Quaternion(),
+    deltaQ: new THREE.Quaternion(),
+    conj: new THREE.Quaternion(),
+    angles: new THREE.Euler(0, 0, 0, "YXZ"),
+    base: new Map(),
+  });
+  useEffect(() => {
+    model.traverse((o) => {
+      if (!o.isMesh) return;
+      const paint = (m) => {
+        // Keep the supplied character's PBR texture and roughness.
+        // The previous robot's steel/AO shader does not apply to Niulai.
+        m.envMapIntensity = 0.22;
+        return m;
+      };
+      o.material = Array.isArray(o.material)
+        ? o.material.map(paint)
+        : paint(o.material);
+    });
+    actions.idle?.reset().play();
+    gl.compile(model, camera);
+    onReady?.();
+    return () => {
+      mixer.stopAllAction();
+      mixer.uncacheRoot(model);
+      model.traverse((o) => {
+        if (o.isMesh)
+          (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) =>
+            m.dispose(),
+          );
+      });
+    };
+  }, [model, mixer, actions, human, gl, camera]);
+  function play(name, time, limit) {
+    const action = actions[name];
+    if (!action) return false;
+    const st = state.current;
+    if (st.active) st.active.fadeOut(0.18);
+    action.reset().setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = true;
+    const duration = action.getClip().duration;
+    action.timeScale = limit ? Math.max(1, duration / limit) : 1;
+    action.setEffectiveWeight(1).fadeIn(0.18).play();
+    actions.idle?.fadeOut(0.18);
+    st.active = action;
+    st.until = time + duration / action.timeScale;
+    return true;
+  }
+  useFrame((_, raw) => {
+    const st = state.current,
+      group = root.current;
+    if (!group) return;
+    group.visible = visible;
+    if (!visible) {
+      st.prevVisible = false;
+      return;
+    }
+    const dt = Math.min(raw, 0.05),
+      moving = !controller.paused;
+    if (!st.prevVisible) {
+      st.prevVisible = true;
+      if (human) play("spin", st.time, 1.5);
+    }
+    if (moving) st.time += dt;
+    for (const [bone, q] of st.base) bone.quaternion.copy(q);
+    st.base.clear();
+    if (moving) {
+      if (!st.started) {
+        st.started = true;
+        if (entrance && play(human ? "walk" : "walking", st.time)) {
+          // The supplied walk is a 1.5s cycle. Repeat it for the whole
+          // approach instead of stopping halfway through the entrance.
+          st.active.setLoop(THREE.LoopRepeat, Infinity);
+          st.until = 3.6;
+        }
+      }
+      const next = controller.queue.take(
+        controller.dragging || (st.time < 3.6 && entrance),
+      );
+      if (next)
+        play(
+          gestures[next.name] || next.name,
+          st.time,
+          next.priority === "ambient" ? 2.8 : 2.3,
+        );
+      if (st.active && st.time >= st.until) {
+        st.active.fadeOut(0.28);
+        actions.idle?.reset().setEffectiveWeight(1).fadeIn(0.28).play();
+        st.active = null;
+      }
+      if (st.time > st.nextIdle && !st.active && !controller.dragging) {
+        st.nextIdle = st.time + 18;
+        const alternate = actions.idle2 || actions.idle;
+        alternate?.reset().fadeIn(0.8).play();
+        if (alternate !== actions.idle) actions.idle?.fadeOut(0.8);
+      }
+      mixer.update(dt);
+    }
+    updateMouth(mouths, controller.mouthPose, dt);
+    const half =
+        Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z,
+      t = entrance ? clamp(st.time / 3.6, 0, 1) : 1,
+      size =
+        placement.scale * (entrance ? 0.68 + 0.32 * (1 - (1 - t) ** 3) : 1);
+    controller.entranceProgress = t;
+    group.scale.setScalar(damp(group.scale.x, size, 7, dt));
+    group.position.x = damp(
+      group.position.x,
+      placement.x * 2 * half * camera.aspect,
+      7,
+      dt,
+    );
+    if (bones.armature && bones.armBase) {
+      bones.armature.position.x = bones.armBase.x;
+      bones.armature.position.z = bones.armBase.z;
+    }
+    if (bones.hips && bones.hipBase) {
+      bones.hips.position.x = bones.hipBase.x;
+      bones.hips.position.z = bones.hipBase.z;
+    }
+    const floor = -1.5 - placement.y * 2 * half;
+    if (placement.ground !== false && !human) {
+      // Niulai has a fixed root and no ToeBase bones. Anchor the bind-pose
+      // sole to the floor, preserving the vertical motion in its clips.
+      const sole = (metrics.pos[1] + metrics.minY * metrics.s) * group.scale.y;
+      group.position.y = damp(group.position.y, floor - sole, 24, dt);
+    } else if (placement.ground !== false) {
+      group.updateMatrixWorld(true);
+      let lowest = Infinity;
+      for (const foot of bones.toes) {
+        foot.getWorldPosition(st.foot);
+        lowest = Math.min(lowest, st.foot.y);
+      }
+      if (
+        Number.isFinite(lowest) &&
+        !st.active?.getClip().name.match(/flip|jump/)
+      )
+        group.position.y += (floor - lowest) * (1 - Math.exp(-24 * dt));
+    } else
+      group.position.y = damp(group.position.y, -placement.y * 2 * half, 7, dt);
+    group.updateMatrixWorld(true);
+    let target = { body: 0, yaw: 0, pitch: 0 };
+    if (
+      controller.tracking &&
+      !controller.mouthPreview &&
+      (controller.mouse.active || controller.gaze) &&
+      bones.head &&
+      !controller.dragging &&
+      !st.active
+    ) {
+      bones.head.getWorldPosition(st.headScreen).project(camera);
+      target = gazeTargets(
+        controller.gaze || controller.mouse,
+        st.headScreen,
+        st.body,
+        human,
+      );
+    }
+    if (controller.dragging) target.body = controller.dragYaw;
+    if (moving) {
+      st.body = damp(st.body, target.body, human ? 3.5 : 2.2, dt);
+      st.head = damp(st.head, target.yaw + controller.tilt.x * 0.26, 9, dt);
+      st.pitch = damp(st.pitch, target.pitch - controller.tilt.y * 0.15, 9, dt);
+    }
+    group.rotation.y = st.body;
+    group.rotation.z = controller.tilt.x * 0.035;
+    for (const [bone, weight] of [
+      [bones.neck, 0.4],
+      [bones.head, 0.6],
+    ]) {
+      if (!bone?.parent) continue;
+      st.base.set(bone, bone.quaternion.clone());
+      bone.parent.getWorldQuaternion(st.parentQ);
+      st.angles.set(st.pitch * weight, st.head * weight, 0, "YXZ");
+      st.deltaQ.setFromEuler(st.angles);
+      st.conj
+        .copy(st.parentQ)
+        .invert()
+        .multiply(st.deltaQ)
+        .multiply(st.parentQ);
+      bone.quaternion.premultiply(st.conj);
+    }
+    controller.rig = {
+      asset: human ? HUMAN : MASCOT,
+      animation: st.active?.getClip().name || "idle",
+      animations: Object.keys(actions),
+      mouth: mouths.map(mesh => ({
+        shapes: mesh.morphTargetDictionary,
+        weights: [...mesh.morphTargetInfluences],
+      })),
+      position: group.position.toArray(),
+      scale: group.scale.x,
+      metrics,
+      head: st.headScreen.toArray(),
+      viewport: [gl.domElement.width, gl.domElement.height],
+      model: model.position.toArray(),
+    };
+    controller.bodyYaw = st.body;
+    controller.headYaw = st.head;
+    controller.headPitch = st.pitch;
+  });
+  return (
+    <group ref={root} scale={0.7}>
+      <group scale={metrics.s} position={metrics.pos}>
+        <primitive object={model} />
+      </group>
+    </group>
+  );
+}
+class SceneBoundary extends React.Component {
+  state = { error: null };
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+  componentDidCatch(error) {
+    this.props.onError?.(error);
+  }
+  render() {
+    return this.state.error ? (
+      <div className="scene-error" role="alert">
+        The 3D scene couldn't load.
+        <button onClick={() => location.reload()}>Reload scene</button>
+      </div>
+    ) : (
+      this.props.children
+    );
+  }
+}
+export default function Character({
+  controller,
+  mode,
+  mobile,
+  ready,
+  onReady,
+  boot,
+  overlay,
+}) {
+  const [human, setHuman] = useState(mode === "about"),
+    [glitch, setGlitch] = useState(false);
+  useEffect(() => {
+    if (human === (mode === "about")) return;
+    setGlitch(true);
+    controller.gesture("spin", "conversation");
+    const a = setTimeout(() => setHuman(mode === "about"), 480),
+      b = setTimeout(() => setGlitch(false), 1050);
+    return () => {
+      clearTimeout(a);
+      clearTimeout(b);
+    };
+  }, [mode]);
+  const placement = useMemo(() => {
+    // Loading has its own full-body framing. The mobile homepage deliberately
+    // crops the legs, which would hide the walking animation during boot.
+    if (!boot && mobile) return { scale: 0.95, x: 0, y: -0.18 };
+    if (overlay) return { scale: 0.24, x: 0.37, y: -0.3, ground: false };
+    if (mobile)
+      return mode === "home"
+        ? { scale: 1.4, x: 0, y: 0.16 }
+        : mode === "about"
+          ? { scale: 0.86, x: 0, y: 0.16 }
+          : { scale: 0.38, x: 0.3, y: -0.13, ground: false };
+    if (mode === "work") return { scale: 1.22, x: -0.12, y: 0.02 };
+    if (mode === "about") return { scale: 1.22, x: -0.2, y: 0.02 };
+    if (mode === "contact") return { scale: 1.22, x: 0, y: 0.04 };
+    return { scale: 1.25, x: 0, y: -0.02 };
+  }, [mode, mobile, overlay, boot]);
+  useEffect(() => {
+    let drag = null;
+    const move = (e) => {
+      controller.mouse = {
+        x: (e.clientX / innerWidth) * 2 - 1,
+        y: 1 - (e.clientY / innerHeight) * 2,
+        // Layout width does not identify the input device (e.g. a narrow
+        // desktop preview). Follow mice and pens, not touch scrolling.
+        active: e.pointerType !== "touch",
+      };
+      if (drag) {
+        controller.dragYaw += (e.clientX - drag.last) * 0.009;
+        drag.last = e.clientX;
+        drag.distance = Math.max(
+          drag.distance,
+          Math.hypot(e.clientX - drag.x, e.clientY - drag.y),
+        );
+      }
+    };
+    const hover = (e) => {
+      if (e.pointerType === "touch") {
+        controller.gaze = null;
+        controller.mouse.active = false;
+        return;
+      }
+      const el = e.target.closest?.("button,a,[data-gaze]");
+      if (el) {
+        const r = el.getBoundingClientRect();
+        controller.gaze = {
+          x: ((r.x + r.width / 2) / innerWidth) * 2 - 1,
+          y: 1 - ((r.y + r.height / 2) / innerHeight) * 2,
+        };
+      } else controller.gaze = null;
+    };
+    const down = (e) => {
+      if (
+        !e.target.closest?.(".character-stage") ||
+        e.target.closest?.("button")
+      )
+        return;
+      drag = {
+        x: e.clientX,
+        y: e.clientY,
+        last: e.clientX,
+        time: performance.now(),
+        distance: 0,
+      };
+      controller.dragging = true;
+      controller.dragYaw = controller.bodyYaw;
+      controller.queue.clear();
+    };
+    const up = () => {
+      if (drag && drag.distance < 6 && performance.now() - drag.time < 500)
+        controller.gesture("perk");
+      drag = null;
+      controller.dragging = false;
+    };
+    const cancel = () => {
+      drag = null;
+      controller.dragging = false;
+      controller.gaze = null;
+      controller.mouse.active = false;
+    };
+    const leave = (e) => {
+      if (e.relatedTarget === null) cancel();
+    };
+    addEventListener("pointermove", move);
+    addEventListener("pointerover", hover);
+    addEventListener("pointerdown", down);
+    addEventListener("pointerup", up);
+    addEventListener("pointercancel", cancel);
+    addEventListener("pointerout", leave);
+    addEventListener("blur", cancel);
+    return () => {
+      removeEventListener("pointermove", move);
+      removeEventListener("pointerover", hover);
+      removeEventListener("pointerdown", down);
+      removeEventListener("pointerup", up);
+      removeEventListener("pointercancel", cancel);
+      removeEventListener("pointerout", leave);
+      removeEventListener("blur", cancel);
+      cancel();
+    };
+  }, [controller]);
+  return (
+    <div
+      className={`character-stage ${glitch ? "transforming" : ""} ${mobile ? "mobile-character" : ""} mode-${mode} ${ready ? "ready" : ""}`}
+      aria-label={human ? "Interactive 3D avatar" : "Interactive 3D Niulai"}
+    >
+      <div
+        className="ground-shadow"
+        style={{
+          left: `${50 + placement.x * 100}%`,
+          opacity: placement.ground === false ? 0 : 1,
+          transform: `translateX(-50%) scale(${placement.scale})`,
+        }}
+      />
+      <SceneBoundary onError={(e) => (controller.error = e.message)}>
+        <Canvas
+          camera={{ position: [0, 0, 6.2], fov: 40 }}
+          dpr={[1, 1.5]}
+          gl={{
+            alpha: true,
+            antialias: true,
+            toneMapping: THREE.AgXToneMapping,
+            toneMappingExposure: 0.66,
+          }}
+        >
+          <ambientLight intensity={0.02} />
+          <directionalLight position={[-4, 6, 6]} intensity={0.9} />
+          <Suspense fallback={null}>
+            <Environment
+              files="/env/studio_fuch.hdr"
+              environmentIntensity={human ? 1 : 0.3}
+            />
+            <Rig
+              human={false}
+              controller={controller}
+              placement={placement}
+              visible={!human}
+              entrance={!boot}
+              onReady={() => {
+                controller.ready = true;
+                if (!human) onReady();
+              }}
+            />
+            {human && (
+              <Suspense fallback={null}>
+                <Rig
+                  human
+                  controller={controller}
+                  placement={placement}
+                  visible
+                  entrance={!boot}
+                  onReady={onReady}
+                />
+              </Suspense>
+            )}
+          </Suspense>
+        </Canvas>
+      </SceneBoundary>
+    </div>
+  );
+}

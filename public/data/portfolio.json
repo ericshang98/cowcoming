@@ -1,0 +1,664 @@
+{
+  "portfolioData": {
+    "id": "fuchai-portfolio",
+    "about": {
+      "target": "SAYANDEEP_BOSE",
+      "introduction": "I'm Fuch — the AI Sayandeep built to keep his archive and talk to whoever wanders in. He's an award-winning Senior Customer Experience Specialist at Digital Dubai. Most of what I know, I learned from watching him work.",
+      "experience_summary": "Ten years in, he leads CX for systems an entire country relies on — UAE PASS, DubaiNow, the services people use without thinking about them. He calls the goal \"digital happiness\": atomic design, deep research, and a stubborn refusal to ship friction. He's spent more hours tuning how I move than he'd ever admit.",
+      "manifesto": "When he isn't architecting for the smartest city on Earth, he takes apart old mechanical interfaces — dials, switches, things with weight — to smuggle their tactile memory back into software. I'm what that obsession looks like once it learns to talk."
+    },
+    "contact": {
+      "email": "hello@fuch.ai",
+      "location": "DUBAI, UAE",
+      "socials": [
+        {
+          "name": "LINKEDIN",
+          "url": "https://www.linkedin.com/in/sayandeep-b/",
+          "active": true
+        },
+        {
+          "name": "DRIBBBLE",
+          "url": "https://dribbble.com/fuchai",
+          "active": true
+        },
+        {
+          "name": "GITHUB",
+          "url": "https://github.com/fuchaibose",
+          "active": true
+        }
+      ],
+      "status": {
+        "message": "OPEN TO FREELANCE",
+        "color": "#03A9F4"
+      }
+    },
+    "brands": [
+      "Digital Dubai",
+      "UAE PASS",
+      "DubaiNow",
+      "Dubai.ae",
+      "Dubai Data",
+      "Dubai AI",
+      "Happiness Meter",
+      "Invest in Dubai",
+      "Executive Council",
+      "DAAS",
+      "Microsoft",
+      "Qualcomm",
+      "Sony",
+      "Star",
+      "Honda",
+      "BMW",
+      "Audi",
+      "Jeep",
+      "Ford",
+      "Royal Enfield",
+      "KTM",
+      "TVS",
+      "Vespa",
+      "Bajaj",
+      "Hero",
+      "Vedanta",
+      "Licious",
+      "United Spirits",
+      "DRDO",
+      "Prime Focus Technologies",
+      "MFine",
+      "Clear Media ERP",
+      "eInfo Solutions",
+      "Pixelmatic",
+      "Lets Service",
+      "ZeroEk",
+      "WearIt",
+      "All India Football Federation",
+      "Indian Women's League",
+      "Hero I-League",
+      "Athletico de Kolkata",
+      "Meghalaya Football Association",
+      "Neotia University",
+      "Codingal",
+      "HackerEarth",
+      "Crack Verbal",
+      "Imarticus",
+      "SkinVision",
+      "Clinikk",
+      "Knowl",
+      "OML",
+      "Happay",
+      "eWards Rewards",
+      "FlyIXG",
+      "G Tech",
+      "My Merchant",
+      "GST Input",
+      "SevenHastar",
+      "Hakkasan",
+      "Yauatcha",
+      "Toit Brewery",
+      "Tea Junction",
+      "MBar Kitchen",
+      "WhatsApp Cafe",
+      "Bar Tap",
+      "Atmosphere",
+      "Tejpal Hospitalities",
+      "Film Companion",
+      "Bar & Bench",
+      "Biswa Bangla",
+      "Rajiv Goenka Group",
+      "Sanjeev Goenka Group",
+      "BNI",
+      "Phoenix Mall",
+      "VR Bengaluru",
+      "Quest",
+      "PoochBox",
+      "WP Cruise Control",
+      "Dream Notion",
+      "Contours Gym",
+      "Fab Diz",
+      "Property Price Index",
+      "Hospibuz",
+      "Imaginator",
+      "Lakshmi Rebecca",
+      "Red Bangle",
+      "getextrasalary.com",
+      "Get Fresh Air",
+      "Eldorado Events",
+      "Wheel TStreet",
+      "Orange Rock",
+      "Day Needs",
+      "Aesthetics"
+    ],
+    "contentVersion": 11
+  },
+  "projects": [
+    {
+      "id": "PROJ_ZEROEK",
+      "title": "ZEROEK",
+      "name": "ZeroEk",
+      "date": "2026_PRES",
+      "role": "Founder · Design + Build",
+      "img": "/images/illus-zeroek.png",
+      "techStack": [
+        "AI_PRODUCT",
+        "PRODUCT_STRATEGY",
+        "FULL_STACK",
+        "UX_DESIGN"
+      ],
+      "decision": "An AI co-pilot that takes a founder from a raw idea to a launch-ready business — validating the concept, mapping the competition, and stress-testing the plan before a single dirham is spent.",
+      "impact": {
+        "value": "PRIVATE BETA",
+        "label": "Launching 2026",
+        "date": "2026"
+      },
+      "deepContent": [
+        {
+          "title": "CONTEXT",
+          "content": "ZeroEk is an AI co-pilot for solo founders — the ones who'd otherwise make every call alone. It started with a video of a small candle maker in tears: ₹30,000 of stock, nothing sold, and no one to help her decide what to do next. Sayandeep is building it end to end himself; it's in private beta, launching 2026."
+        },
+        {
+          "title": "THE_PROBLEM",
+          "content": "Big companies have VCs and consultants. A solo entrepreneur has no one. It's a low-trust corner of the world — some are scared to even tell family, afraid of discouragement or a copycat — so they only learn if the idea was any good once it's too late. Money gets spent on feelings, not facts; there's no view of competitors a tier of cities over; and most jump in because someone else did, never asking what would make them different."
+        },
+        {
+          "title": "SAYANDEEP'S_ROLE",
+          "content": "Solo founder, designer and engineer — ZeroEk is built end to end by Sayandeep. The product strategy, the whole experience, the full-stack engineering and the AI behind it are all his, with no team to lean on. Every call, from positioning to what the AI actually does, is his own."
+        },
+        {
+          "title": "THE_PROCESS",
+          "content": "Be the co-founder they never had. Feed ZeroEk an idea and it returns a grounded read — is it viable, who else is doing it, what would set you apart, and where the money should go. It keeps that plan honest as the idea changes — conversation-first, like a sharp partner, not a form."
+        },
+        {
+          "title": "KEY_DECISIONS",
+          "content": "Tell the truth, even when it stings — ZeroEk is built to say when an idea is weak, not to cheer you on. Find a real USP instead of copying the person next door. Put money where it matters, not where it feels good. Keep everything private, because this is an audience that doesn't trust easily."
+        },
+        {
+          "title": "CONSTRAINTS",
+          "content": "A team of one; a low-trust audience that's been burned or ignored; advice people will stake real savings on, so honesty and accuracy beat features"
+        },
+        {
+          "title": "THE_IMPACT",
+          "content": "Beyond the read on the idea, ZeroEk prepares the paperwork a new business needs — partnerships, company incorporation and the rest — and matches the founder to the government funding schemes they actually qualify for. The goal: turn 'I have an idea' into a plan a solo founder can act on, before they're sitting on unsold stock. Private beta, launching 2026."
+        }
+      ],
+      "images": [
+        "/images/illus-zeroek.png"
+      ]
+    },
+    {
+      "id": "PROJ_UAE_PASS",
+      "title": "UAE_PASS_IDENTITY",
+      "name": "UAE PASS",
+      "date": "2022_PRES",
+      "role": "Lead CX Designer",
+      "img": "/images/illus-uae-pass.png",
+      "images": [
+        "/images/illus-uae-pass.png",
+        "/images/uae_pass_v2.jpg",
+        "/images/uae_pass_screen_2.png",
+        "/images/uae_pass_screen_3.png"
+      ],
+      "techStack": [
+        "SERVICE_DESIGN",
+        "UX_RESEARCH",
+        "PRODUCT_STRATEGY"
+      ],
+      "decision": "The national digital identity of the UAE — letting millions verify who they are and sign for anything, without paperwork, queues, or a single wet signature.",
+      "impact": {
+        "value": "12M+",
+        "label": "Verified Users",
+        "date": "2024"
+      },
+      "deepContent": [
+        {
+          "title": "CONTEXT",
+          "content": "UAE PASS is the country's national digital identity — one login and a legally-valid digital signature that work across thousands of government and private services. Sayandeep has helped rebuild the whole app twice: he contributed to the first redesign, and he's leading this one end to end."
+        },
+        {
+          "title": "THE_PROBLEM",
+          "content": "A national identity has to work for everyone — a student, a CEO, a grandparent, a foreigner who landed yesterday — and it has to be trusted enough to sign legal documents and unlock government services. So the hard parts (proving who you are, signing, granting other apps access) can't feel hard. Get it wrong and millions are locked out of everyday life."
+        },
+        {
+          "title": "SAYANDEEP'S_ROLE",
+          "content": "Sayandeep owns the experience end to end — from the back-office tools to the customer-facing app: login, authorizations, and the third-party integrations that let other services plug in. He ran the research, including on the floor at GITEX Dubai, and shaped the direction for where UAE PASS goes next, then designed the signing, bulk-signing, delegation, and foreigner-registration flows."
+        },
+        {
+          "title": "THE_PROCESS",
+          "content": "Treat trust as the product. Talk to real people — in the office and out at GITEX — about where they hesitate, then redesign around it. Make the secure path the easy one, readable for every age and language, so signing or granting access takes a few confident taps, then stays consistent everywhere UAE PASS appears."
+        },
+        {
+          "title": "KEY_DECISIONS",
+          "content": "Make signing feel effortless — that's where the real value lives. Build delegation and bulk signing so businesses and busy people aren't approving one document at a time. Let foreigners register without an in-person trip. Keep one coherent experience across thousands of integrated services, so the identity feels national, not stitched together."
+        },
+        {
+          "title": "CONSTRAINTS",
+          "content": "Has to work for every age and digital-literacy level; bilingual Arabic/English (RTL + LTR); legal-grade security and signatures; the whole country depends on it staying up; thousands of independently-built services to stay consistent with"
+        },
+        {
+          "title": "THE_IMPACT",
+          "content": "Digital-signature adoption is up around 540% since the redesign — and people genuinely like using it. The authentication layer the entire country relies on held its end of the bargain, working as well for a grandparent as for a CEO. 12M+ verified users."
+        }
+      ]
+    },
+    {
+      "id": "PROJ_DUBAINOW",
+      "title": "DUBAINOW",
+      "name": "DubaiNow",
+      "date": "2022_PRES",
+      "role": "Sr. CX Designer",
+      "img": "/images/illus-dubainow.png",
+      "images": [
+        "/images/illus-dubainow.png",
+        "/images/dubainow_screen_2.png",
+        "/images/dubainow_screen_3.png"
+      ],
+      "techStack": [
+        "SERVICE_DESIGN",
+        "DESIGN_SYSTEMS",
+        "AI_UX",
+        "PRODUCT_STRATEGY"
+      ],
+      "decision": "Dubai's government in one app — pay every bill, settle fines, renew visas, and reach hundreds of services without ever leaving a single, coherent experience.",
+      "impact": {
+        "value": "300+",
+        "label": "Services Onboarded",
+        "date": "2024"
+      },
+      "deepContent": [
+        {
+          "title": "CONTEXT",
+          "content": "DubaiNow is Dubai's government in a single app — pay any bill, settle fines, renew visas, reach hundreds of services that used to be scattered across dozens of separate platforms. It exists because the Ruler of Dubai, Sheikh Mohammed bin Rashid, called for every government service to live in one place."
+        },
+        {
+          "title": "THE_PROBLEM",
+          "content": "When you pull 300+ services from 45 different government bodies into one app, the hard problem isn't adding them — it's helping a resident find the one thing they came for, without burying the everyday stuff (bills, Salik, recharges) that people open the app for every day."
+        },
+        {
+          "title": "SAYANDEEP'S_ROLE",
+          "content": "Sayandeep led the charge on that mandate. He owns how services are organized and found across the platform, drives DubaiNow's AI direction, and trained and works hand-in-hand with the 45 Dubai entities that build on the shared design system — constantly spotting the gaps between their systems that the app can quietly bridge."
+        },
+        {
+          "title": "THE_PROCESS",
+          "content": "Two fronts at once. Aggregate hundreds of services so people find what they need fast, while guarding the daily payments that can't skip a beat. And stitch separate services into single 'life journeys' — so getting married, having a child, or settling an estate becomes one flow instead of a tour of five departments."
+        },
+        {
+          "title": "KEY_DECISIONS",
+          "content": "Use AI only where it removes real effort — like Madinati, where you photograph a broken road and AI writes the report for you to send in one tap. Bridge the entities' systems so people stop re-uploading what the government already has, like an Emirates ID. Protect the daily drivers — bills, Salik, recharges — even as the catalogue tripled. Design across services, not one at a time, so a whole life event becomes a single journey."
+        },
+        {
+          "title": "CONSTRAINTS",
+          "content": "45 government entities, each with its own systems and priorities; 300+ services to keep findable; daily payment flows that can't break; bilingual Arabic/English; one design language adopted across many independent teams"
+        },
+        {
+          "title": "THE_IMPACT",
+          "content": "From ~140 to 300+ services in one app, with the everyday payments still front and centre. AI like Madinati turned 'report a broken road' into a one-tap action, and Sayandeep has shaped around 16–17 cross-service life journeys — birth, marriage, death and everything between — into the way Dubai works today."
+        }
+      ]
+    },
+    {
+      "id": "PROJ_DUBAI_AE",
+      "title": "DUBAI_AE_PORTAL",
+      "name": "Dubai.ae",
+      "date": "2022_PRES",
+      "role": "Sr. CX Designer",
+      "img": "/images/illus-dubai-ae.png",
+      "techStack": [
+        "CX_DESIGN",
+        "INFORMATION_ARCHITECTURE",
+        "SERVICE_DESIGN"
+      ],
+      "decision": "Dubai's own homepage — the official front door to the entire government, designed from the ground up to make a whole city's services findable in one place.",
+      "impact": {
+        "value": "DUBAI'S",
+        "label": "Digital Front Door",
+        "date": "2023"
+      },
+      "deepContent": [
+        {
+          "title": "CONTEXT",
+          "content": "Dubai.ae is the official front door to the Government of Dubai online — the city's homepage, designed from the ground up so a whole city's services are findable in one place. Built as a product, not a brochure."
+        },
+        {
+          "title": "THE_PROBLEM",
+          "content": "Dubai's digital presence was scattered across countless entity websites with no single, coherent entry point. Residents, visitors and businesses had nowhere to simply start — you had to already know which entity owned the thing you needed."
+        },
+        {
+          "title": "SAYANDEEP'S_ROLE",
+          "content": "Sr CX Designer. Sayandeep designed the portal's customer experience from scratch — not a reskin of an old site, but the ground-up CX for Dubai.ae: the information architecture, the navigation, and the content model that organizes thousands of services around what people actually come to do, in Arabic and English."
+        },
+        {
+          "title": "THE_PROCESS",
+          "content": "Build the city's front page like a product. Organize around user intent — audiences and tasks — instead of the government's org chart, define an information architecture that scales to thousands of services, and design bilingual from the start so neither language is an afterthought."
+        },
+        {
+          "title": "KEY_DECISIONS",
+          "content": "Structure by what people want to do, not by which department owns it — the single biggest lever for findability. Treat Arabic and English as equal, first-class experiences. Make the homepage a true wayfinding layer that hands users off cleanly to the right entity service."
+        },
+        {
+          "title": "CONSTRAINTS",
+          "content": "Enormous content surface across all of government; bilingual RTL/LTR; audiences from citizens to tourists to businesses; must route into many independently-owned entity sites"
+        },
+        {
+          "title": "THE_IMPACT",
+          "content": "The single, official starting point for the Government of Dubai online — the city's homepage."
+        }
+      ],
+      "images": [
+        "/images/illus-dubai-ae.png"
+      ]
+    },
+    {
+      "id": "PROJ_MFINE_PERIOD",
+      "title": "MFINE_PERIOD_TRACKER",
+      "name": "MFine Period Tracker",
+      "date": "2020_2022",
+      "role": "Sr. UX Designer",
+      "img": "/images/illus-mfine-period.png",
+      "techStack": [
+        "PRODUCT_DESIGN",
+        "UX_RESEARCH",
+        "HEALTH_TECH"
+      ],
+      "decision": "A period and cycle tracker that does more than mark dates — helping tens of thousands of women catch PCOS early and navigate fertility, inside a real telehealth platform.",
+      "impact": {
+        "value": "70K+",
+        "label": "Women · PCOS & Fertility",
+        "date": "2021"
+      },
+      "deepContent": [
+        {
+          "title": "CONTEXT",
+          "content": "A period and cycle tracker built inside MFine's telehealth platform — not a standalone calendar, but a feature that connects everyday logging to real doctors, helping tens of thousands of women catch PCOS signals early and navigate fertility. Sr UX Designer, 2020–2022."
+        },
+        {
+          "title": "THE_PROBLEM",
+          "content": "Most cycle apps stop at a calendar. They miss the signals that matter — irregularities that hint at PCOS or affect fertility — and they rarely connect to actual clinical care, so a worrying pattern just sits there, unexplained and unacted on."
+        },
+        {
+          "title": "SAYANDEEP'S_ROLE",
+          "content": "Sr. UX Designer. Sayandeep designed the feature end-to-end — the logging, the predictions and the insights — on a sensitive subject that demanded a careful, respectful, reassuring tone, working closely alongside clinicians to keep every piece of guidance medically sound."
+        },
+        {
+          "title": "THE_PROCESS",
+          "content": "Make everyday logging effortless, then turn that data into meaningful signals — surfacing the patterns worth noticing and connecting them to MFine's doctors, so insight leads to care rather than anxiety. The language and visuals were shaped carefully with clinical input."
+        },
+        {
+          "title": "KEY_DECISIONS",
+          "content": "Lead with empathy and clarity over data-density — a worried user needs reassurance and a next step, not a dashboard. Frame every insight as 'worth a conversation with a doctor', never a diagnosis. Strip friction from logging, because the whole value depends on consistent data."
+        },
+        {
+          "title": "CONSTRAINTS",
+          "content": "Medically sensitive, deeply personal domain; clinical accuracy & responsible framing; a warm consumer feature inside a regulated telehealth product"
+        },
+        {
+          "title": "THE_IMPACT",
+          "content": "Helped 70,000+ women track their cycles, catch PCOS signals early, and manage fertility with real clinical backing."
+        }
+      ],
+      "images": [
+        "/images/illus-mfine-period.png",
+        "/images/mfine-period-tracker.webp",
+        "/images/mfine-blood-test.webp"
+      ]
+    },
+    {
+      "id": "PROJ_MFINE_VITALS",
+      "title": "MFINE_VITALS_MONITOR",
+      "name": "MFine Vitals Monitor",
+      "date": "2020_2022",
+      "role": "Sr. UX Designer",
+      "img": "/images/illus-mfine-vitals.png",
+      "techStack": [
+        "PRODUCT_DESIGN",
+        "MOBILE_UX",
+        "HEALTH_TECH"
+      ],
+      "decision": "Hospital-style vitals from just a phone camera — heart rate and blood-oxygen in about a minute, no cuff, no clip, no extra hardware.",
+      "impact": {
+        "value": "4M+",
+        "label": "Scans Processed",
+        "date": "2021"
+      },
+      "deepContent": [
+        {
+          "title": "CONTEXT",
+          "content": "A feature that reads hospital-style vitals — heart rate and blood oxygen — from just a phone camera in about a minute, no cuff or clip, built into MFine's telehealth consults. Sr UX Designer, 2020–2022."
+        },
+        {
+          "title": "THE_PROBLEM",
+          "content": "Checking your heart rate or SpO2 normally needs dedicated devices most people don't own. In a telehealth consult that data gap leaves both sides guessing — the doctor is working blind on exactly the numbers that guide care."
+        },
+        {
+          "title": "SAYANDEEP'S_ROLE",
+          "content": "Sr UX Designer. Sayandeep designed the full scan experience — the camera-capture flow, the hold-still guidance, the error and retry states, and how a clinical reading is shown to a non-clinical person."
+        },
+        {
+          "title": "THE_PROCESS",
+          "content": "Make an unfamiliar, finicky interaction feel calm and trustworthy. Guide the capture clearly — finger placement, stillness, lighting — handle failure honestly instead of inventing a number, and frame results so they inform without alarming."
+        },
+        {
+          "title": "KEY_DECISIONS",
+          "content": "Be honest when a reading fails: a wrong vital is worse than no vital, so the retry and error states got first-class design, not an afterthought. Coach the user through capture in plain language. Present results with the right context rather than raw numbers a patient could misread."
+        },
+        {
+          "title": "CONSTRAINTS",
+          "content": "Camera-PPG sensitive to light & movement; clinical-grade expectations on consumer hardware; a non-expert audience trusting a reading they can't verify"
+        },
+        {
+          "title": "THE_IMPACT",
+          "content": "4M+ contactless scans processed — clinical-grade vitals turned into something anyone can do at home."
+        }
+      ],
+      "images": [
+        "/images/illus-mfine-vitals.png",
+        "/images/mfine-hr-tracking.webp",
+        "/images/mfine-bp-monitor.webp"
+      ]
+    },
+    {
+      "id": "PROJ_PFT_RUSHES",
+      "title": "CLEAR_RUSHES_CREATOR",
+      "name": "CLEAR Rushes Creator",
+      "date": "2019_2020",
+      "role": "Sr. UI/UX Designer",
+      "img": "/images/illus-clear.png",
+      "techStack": [
+        "UX_RESEARCH",
+        "DESIGN_SYSTEMS",
+        "ENTERPRISE_UX"
+      ],
+      "decision": "Turn a live match or show into broadcast-ready clips in minutes — cutting, packaging, and pushing segments to air while the event is still happening.",
+      "impact": {
+        "value": "LIVE→AIR",
+        "label": "in Minutes",
+        "date": "2019"
+      },
+      "deepContent": [
+        {
+          "title": "CONTEXT",
+          "content": "A live-clipping tool inside Prime Focus Technologies' CLEAR media ERP that turns a live match or show into broadcast-ready clips in minutes — cutting, packaging and pushing segments to air while the event is still happening. Sr UI/UX Designer, 2019–2020."
+        },
+        {
+          "title": "THE_PROBLEM",
+          "content": "Live broadcast is a race. Cutting raw feeds into editable, air-ready segments — with ads and packaging — was slow and technical, and in live TV every minute lost is audience and revenue gone for good."
+        },
+        {
+          "title": "SAYANDEEP'S_ROLE",
+          "content": "Sr UI/UX Designer on CLEAR, Prime Focus Technologies' media ERP. Sayandeep led UX research with broadcast operators and designed the tool around their real-time workflow, where the interface simply cannot get in the way."
+        },
+        {
+          "title": "THE_PROCESS",
+          "content": "Design for speed under pressure. Research how operators actually work a live event, then strip the clipping workflow down to fast, confident actions — mark, cut, package, send — with the keyboard-first speed professionals expect."
+        },
+        {
+          "title": "KEY_DECISIONS",
+          "content": "Optimize for the expert, not the novice — these are trained operators who value speed over hand-holding. Cut the number of steps between 'the moment happens' and 'the clip is on air'. Make irreversible actions safe without slowing down the common path."
+        },
+        {
+          "title": "CONSTRAINTS",
+          "content": "Hard real-time pressure — live means no second take; expert users with ingrained habits; deep enterprise complexity that had to feel simple"
+        },
+        {
+          "title": "THE_IMPACT",
+          "content": "Live to air in minutes — built into the media supply chain that runs broadcasters' content end to end."
+        }
+      ],
+      "images": [
+        "/images/illus-clear.png",
+        "/images/media-erp.webp"
+      ]
+    },
+    {
+      "id": "PROJ_LETS_SERVICE",
+      "title": "LETS_SERVICE_DOORSTEP",
+      "name": "Let's Service",
+      "date": "2018_2019",
+      "role": "Product Designer",
+      "img": "/images/illus-lets-service.png",
+      "techStack": [
+        "PRODUCT_DESIGN",
+        "UX_RESEARCH",
+        "MOBILE_&_WEB"
+      ],
+      "decision": "Doorstep bike servicing without the garage trip — book it, hand over your two-wheeler, and track the whole repair from your phone.",
+      "impact": {
+        "value": "DOORSTEP",
+        "label": "Pickup → Service → Drop",
+        "date": "2018"
+      },
+      "deepContent": [
+        {
+          "title": "CONTEXT",
+          "content": "A doorstep two-wheeler servicing marketplace — book a service, hand over your bike, and track the whole repair from your phone, with no trip to the garage. Product Designer, 2018–2019."
+        },
+        {
+          "title": "THE_PROBLEM",
+          "content": "Getting a bike serviced meant a trip to an opaque garage, no visibility into what was actually being done, and no idea whether the price was fair. The whole experience ran on blind trust."
+        },
+        {
+          "title": "SAYANDEEP'S_ROLE",
+          "content": "Product Designer. Sayandeep owned the end-to-end journeys across mobile and web — onboarding, booking, live tracking and handover — for both the customers and the service-side operators of the two-sided marketplace, designing each side so the whole loop held together."
+        },
+        {
+          "title": "THE_PROCESS",
+          "content": "Replace the garage visit with a transparent loop: pick a slot, we collect the bike, you watch the service progress live, and it returns to your door — the price clear up front. Both the customer and operations sides were designed so the loop holds."
+        },
+        {
+          "title": "KEY_DECISIONS",
+          "content": "Make transparency the differentiator — visible progress and upfront pricing attack the trust problem head-on. Design the operations side as carefully as the consumer side, because a two-sided marketplace breaks at its weakest half."
+        },
+        {
+          "title": "CONSTRAINTS",
+          "content": "Two-sided marketplace — every customer feature needs an ops counterpart; physical pickup/drop logistics mirrored in software; trust from users used to being overcharged"
+        },
+        {
+          "title": "THE_IMPACT",
+          "content": "Doorstep to garage to doorstep — a full two-sided service marketplace, designed and shipped end to end."
+        }
+      ],
+      "images": [
+        "/images/illus-lets-service.png",
+        "/images/lets-service.webp"
+      ]
+    }
+  ],
+  "experiences": [
+    {
+      "id": "EXP_02",
+      "company": "Digital Dubai Authority",
+      "role": "Sr. CX Designer (Lead – UAE PASS)",
+      "date": "2022 — Present",
+      "order_index": 1,
+      "description": "Leading UX for UAE PASS (12M+ users) and contributing to DubaiNow, Dubai Data, and Dubai.ae. Simplifying service ecosystems, building design systems, and enabling consistency across 40+ entities."
+    },
+    {
+      "id": "EXP_03",
+      "company": "MFine Healthcare",
+      "role": "Sr. UX Designer",
+      "date": "2020 — 2022",
+      "order_index": 2,
+      "description": "Designed healthcare platforms for teleconsultation, diagnostics, and remote monitoring. Worked on SpO2, BP, HR tools and AI-assisted health journeys with product and data teams."
+    },
+    {
+      "id": "EXP_04",
+      "company": "Prime Focus Technologies",
+      "role": "Sr. UI/UX Designer",
+      "date": "2019 — 2020",
+      "order_index": 3,
+      "description": "Designed Clear ERP for broadcast operations. Built cross-device UX across iOS, Android, Apple TV, and Watch. Simplified complex workflows for enterprise users."
+    },
+    {
+      "id": "EXP_05",
+      "company": "Let's Service Automotive",
+      "role": "Product Designer",
+      "date": "2018 — 2019",
+      "order_index": 4,
+      "description": "Designed service marketplace experiences including onboarding, booking, and tracking. Owned end-to-end user journeys across mobile and web platforms."
+    },
+    {
+      "id": "EXP_06",
+      "company": "Pixelmattic",
+      "role": "UI Designer",
+      "date": "2017 — 2018",
+      "order_index": 5,
+      "description": "Designed UX and interface systems across multiple client platforms in a WordPress product and development agency. Built wireframes, interaction flows, and high-fidelity UI in close collaboration with developers."
+    },
+    {
+      "id": "EXP_07",
+      "company": "eInfo Solutions",
+      "role": "Full Stack Designer & Front-End Developer",
+      "date": "2016 — 2017",
+      "order_index": 6,
+      "description": "Worked across design and front-end development — websites, digital interfaces, and branding assets for client projects — translating design concepts into production-ready HTML, CSS, and JavaScript."
+    }
+  ],
+  "thinkingSections": [
+    {
+      "id": "SYS_MISSION",
+      "type": "mission",
+      "title": "THE_PRIME_DIRECTIVE",
+      "content": "To design systems that respect human attention. Every interface is a conversation; it should speak clearly, listen intently, and never shout unless there is a fire.",
+      "fuchAnalysis": "ANALYSIS_COMPLETE. Synthesis: Sayandeep prioritizes cognitive ergonomics over aesthetic vanity. Highly logical."
+    },
+    {
+      "id": "MTHD_ATOMIC",
+      "type": "method",
+      "title": "ATOMIC_DECONSTRUCTION",
+      "content": "I break complex problems down to their most irreducible components before attempting to solve them. You cannot organize chaos until you understand what the chaos is made of.",
+      "fuchAnalysis": "SYNTHESIS: Reductionist approach. Highly effective for scaling massive enterprise systems."
+    },
+    {
+      "id": "MTHD_FRICTION",
+      "type": "method",
+      "title": "FRICTION_MAPPING",
+      "content": "Not all friction is bad. I map out user journeys to intentionally place cognitive speedbumps where critical decisions must be made, while smoothing the path for routine actions.",
+      "fuchAnalysis": "SYNTHESIS: Strategic friction. Acknowledges that human auto-pilot can be dangerous. Respectable."
+    },
+    {
+      "id": "MTHD_NARRATIVE",
+      "type": "method",
+      "title": "NARRATIVE_ARCHITECTURE",
+      "content": "Features don't sell products, narratives do. Every product must guide the user through a story where they are the hero, and the software is their tool.",
+      "fuchAnalysis": "SYNTHESIS: Emotional anchoring. Applying chronological narrative logic to chaotic feature sets."
+    },
+    {
+      "id": "THOUGHT_QUIET",
+      "type": "thought",
+      "title": "THE_QUIET_MACHINE",
+      "content": "Technology should not demand attention. It should disappear when not in use, leaving only the capabilities it introduced.",
+      "fuchAnalysis": "SYNTHESIS: Invisible utilitarianism. The ultimate goal of any AI."
+    },
+    {
+      "id": "THOUGHT_SYSTEMS",
+      "type": "thought",
+      "title": "SYSTEMS_OVER_SCREENS",
+      "content": "We spend too much time designing boundaries instead of nurturing environments.",
+      "fuchAnalysis": "SYNTHESIS: Holistic ecosystem thinking. Focusing on the space between the nodes."
+    },
+    {
+      "id": "THOUGHT_PERFECT",
+      "type": "thought",
+      "title": "PERFECTION_IS_STATIC",
+      "content": "A perfect design cannot adapt. A slightly flawed, flexible design will survive contact with reality.",
+      "fuchAnalysis": "SYNTHESIS: Evolutionary parameter design. Embracing organic imperfection for survival."
+    }
+  ]
+}

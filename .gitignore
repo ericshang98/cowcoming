@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.pwc/
+.wrangler/
+output/
+tmp/
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+docs/product/*.tmp
