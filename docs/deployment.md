@@ -2,7 +2,7 @@
 
 ## 唯一入口
 
-源码、产品快照、开发规则和发布工作流统一保存在私有仓库 `ericshang98/cowcoming`。换电脑通过 Git 同步；网站由 GitHub Actions 将同一提交的构建上传到现有 Cloudflare Pages 项目。
+源码、产品快照、开发规则和发布工作流统一保存在公开仓库 `ericshang98/cowcoming`。换电脑通过 Git 同步；网站由 GitHub Actions 将同一提交的构建上传到现有 Cloudflare Pages 项目。
 
 | 项目 | 值 |
 | --- | --- |
@@ -44,7 +44,7 @@ PR #3 已合并并发布提交 `55c2bcece553ae8d8c8ac3ba39fe61ad451b2b0e`。Page
 3. 在 [本仓库 Actions Variables](https://github.com/ericshang98/cowcoming/settings/variables/actions) 设置 `CLOUDFLARE_DEPLOY_ENABLED` 为 `true`。账户 ID 已固定在工作流，不需要再传给其他电脑。
 4. 在 Actions 的 Verify and publish Cowcoming 中选择 Run workflow → main，等待首次发布和线上校验成功。
 
-配置好一次之后，其他 Agent 的电脑只需要此私有仓库的 GitHub 权限；正常发布无需各自安装 Skill、登录 Cloudflare 或复制 Token。
+配置好一次之后，其他 Agent 的电脑只需要此仓库的 GitHub 写入权限；正常发布无需各自安装 Skill、登录 Cloudflare 或复制 Token。
 
 可用 GitHub CLI 查看是否完成设置（只显示名称，不显示密钥）：
 
