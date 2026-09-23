@@ -153,6 +153,7 @@ export default function useLiveDevice(controller, active) {
             if (m.type === "snapshot") {
               snapshotRef.current = m;
               setSnapshot(m);
+              if (!m.deviceOnline) conversationCommands.current.clear();
               for (const [commandId, context] of conversationCommands.current) {
                 const completion = completedEvolutionTurn(m, commandId, context);
                 if (completion.terminal) conversationCommands.current.delete(commandId);
@@ -188,6 +189,7 @@ export default function useLiveDevice(controller, active) {
           ws.onclose = (event) => {
             if (generation.current !== gen) return;
             clearInterval(heartbeat.current);
+            conversationCommands.current.clear();
             setClientId(null);
             current.current.controller.queue.clear();
             if (event.code === 4003) {
@@ -234,6 +236,10 @@ export default function useLiveDevice(controller, active) {
   const command = useCallback(
     (data) => {
       setError("");
+      if (!snapshotRef.current?.deviceOnline || socket.current?.readyState !== WebSocket.OPEN) {
+        setError("Device offline. Connect your computer first.");
+        return false;
+      }
       const commandId = crypto.randomUUID();
       const profile = snapshotRef.current?.profile;
       const context = current.current.controller.evolution?.context();

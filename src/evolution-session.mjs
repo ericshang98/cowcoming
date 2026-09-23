@@ -39,7 +39,11 @@ export function evolutionReducer(state, event) {
     case 'select':
       if (!forms[event.form]) return state;
       return invalidate(state, { form: event.form, path: [...state.path, event.form], settings: { ...state.settings, mode: 'manual' } });
-    case 'reset': return { ...createEvolutionSession(event.sessionId, state.settings), generation: state.generation + 1 };
+    case 'reset': return { ...createEvolutionSession(event.sessionId, state.settings), roomId: state.roomId, generation: state.generation + 1 };
+    case 'bind':
+      if (!forms[event.form] || !event.roomId) return state;
+      return { ...createEvolutionSession(event.sessionId, state.settings), roomId: event.roomId, form: event.form, path: [event.form], generation: state.generation + 1 };
+    case 'suspend': return { ...state, generation: state.generation + 1, pending: null, status: state.pending ? 'error' : state.status, reason: state.pending ? 'device_disconnected' : state.reason };
     case 'turn': {
       const turn = event.turn;
       if (!turn || turn.sessionId !== state.sessionId || turn.generation !== state.generation || turn.formId !== state.form || turn.source !== 'live' || turn.status !== 'completed' || typeof turn.id !== 'string' || !turn.id || state.turns.some(item => item.id === turn.id) || typeof turn.userText !== 'string' || !turn.userText.trim() || !(typeof turn.replyText === 'string' && turn.replyText.trim() || turn.actionCompleted === true)) return state;
