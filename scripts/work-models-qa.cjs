@@ -95,7 +95,7 @@ async function startRelay() {
   device=new WebSocket(relay.replace('http:','ws:')+'/v1/socket/'+ticket.roomId+'?ticket='+ticket.ticket);
   device.addEventListener('message',e=>{const m=JSON.parse(e.data);if(m.type==='profile')device.send(JSON.stringify({type:'profile.applied',eventId:crypto.randomUUID(),revision:m.profile.revision}));});
   await new Promise((resolve,reject)=>{device.onopen=resolve;device.onerror=reject});
-  device.send(JSON.stringify({type:'device.status',eventId:crypto.randomUUID(),simulation:true,name:'Model QA simulation'}));
+  device.send(JSON.stringify({type:'device.status',eventId:crypto.randomUUID(),simulation:true,name:'Model QA simulation',actionContractVersion:2,supportedActions:[],hardware:'offline'}));
   heartbeat=setInterval(()=>{if(device.readyState===1)device.send(JSON.stringify({type:'ping'}))},10000);
   return {relay,keys,close};
  }catch(e){await close();throw e}

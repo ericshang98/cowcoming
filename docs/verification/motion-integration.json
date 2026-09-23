@@ -184,7 +184,7 @@
   "errors": [],
   "stop": true,
   "missingAssetDisabled": true,
-  "nodeTests": 66,
+  "nodeTests": 75,
   "pythonTests": 6,
   "gltf": {
     "models": 5,
@@ -193,5 +193,6 @@
   },
   "sampledNewFrames": 8605,
   "productionDeployed": false,
-  "hardware": "Friend to implement the real driver; all end-to-end device tests used simulation."
+  "hardware": "Friend to implement the real driver; all end-to-end device tests used simulation.",
+  "upstreamBaseline": "aca83bd"
 }

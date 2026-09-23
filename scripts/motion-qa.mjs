@@ -36,5 +36,5 @@ try{
  await page.locator('.evolution-routes button').first().click();await page.locator('.evolution-node').filter({hasText:'骚牛'}).click();
  await page.waitForTimeout(1200);assert.equal(await page.locator('[data-motion="NOD"]').isDisabled(),true);
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'tmp/motion-integration/mobile-website.png',fullPage:true});
- assert.deepEqual(errors,[]);fs.writeFileSync('tmp/motion-integration/browser-verification.json',JSON.stringify({results,errors,stop:true,missingAssetDisabled:true},null,2));console.log('PASS 25 actual browser clips, stop, missing asset, no page errors');
+ assert.deepEqual(errors,[]);fs.writeFileSync('tmp/motion-integration/browser-verification.json',JSON.stringify({results,errors,stop:true,missingAssetDisabled:true},null,2));console.log('PASS 25 actual browser clips, five relay/Python responses, stop, missing asset, no page errors');
 }finally{await browser.close();}
