@@ -173,3 +173,11 @@ test("unavailable requests are retryable and do not consume event IDs",async()=>
   const result=f.player.play({eventId:"retry",formId:"calf",actionId:"NOD"});
   f.advance(); assert.equal((await result).status,"completed");
 });
+test('WAIT stays behind an already playing action',async()=>{
+ const f=fixture();let done=false;
+ const motion=f.player.play({eventId:'movement',formId:'calf',actionId:'NOD'});
+ const waiting=f.player.play({eventId:'waiting',formId:'calf',actionId:'WAIT'}).then(r=>{done=true;return r;});
+ await Promise.resolve();assert.equal(done,false);
+ f.advance();assert.equal((await motion).status,'completed');
+ assert.equal((await waiting).status,'completed');f.player.dispose();
+});

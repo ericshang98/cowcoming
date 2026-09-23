@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { completedEvolutionTurn, localInteractionContext } from "./evolution-turn.mjs";
-import { ACTION_CONTRACT_VERSION } from "../../shared/action-catalog.mjs";
+import { ACTION_CONTRACT_VERSION, availableDeviceActions } from "../../shared/action-catalog.mjs";
 import { parseKey } from "../../shared/live-protocol.mjs";
 
 export function normalizeRelay(value) {
@@ -189,7 +189,9 @@ export default function useLiveDevice(controller, active) {
                 const player=current.current.controller.responsePlayer;
                 const promise=player && current.current.controller.responseForm===profile.formId
                   ?player.play({eventId:decisionKey,formId:profile.formId,actionId:decision.actionId})
-                  :Promise.resolve({status:'unavailable',reason:'model-not-loaded'});
+                  :decision.actionId==='WAIT'
+                    ?Promise.resolve({status:'completed',clip:'idle',formId:profile.formId,eventId:decisionKey})
+                    :Promise.resolve({status:'unavailable',reason:'model-not-loaded'});
                 setLastAnimation({actionId:decision.actionId,decisionId:decision.decisionId,status:'playing',clip:null});
                 promise.then(result=>{
                   if(generation.current!==gen)return;
@@ -277,7 +279,7 @@ export default function useLiveDevice(controller, active) {
       }
       const commandId = crypto.randomUUID();
       const profile = snapshotRef.current?.profile;
-      if(data.command!=='stop' && (!current.current.active || current.current.controller.responseForm!==profile?.formId)){
+      if(data.command!=='stop' && (!current.current.active || (current.current.controller.responseForm!==profile?.formId && data.actionId!=='WAIT' && availableDeviceActions(snapshotRef.current).some(action=>action!=='WAIT')))){
         setError('Current form animation is not ready. Select a form with loaded assets.');return;
       }
       const context = current.current.controller.evolution?.context();

@@ -46,3 +46,11 @@ test('local evaluator accepts only its loopback URL; room key never goes to a re
  await requestEvolutionEvaluation('https://gateway.example/evaluate',payload,{fetcher,localKey:'private'});
  assert.equal(sent.headers.Authorization,undefined);
 });
+test('WAIT text responses count without an animation asset, while real movement still requires playback',()=>{
+ const snapshot={profile:{revision:1,actionContractVersion:2},device:{simulation:false},messages:[{role:'assistant',commandId:'c',status:'complete',text:'别拿我的点头去官宣。'}],events:[{type:'decision',commandId:'c',decisionId:'d',actionId:'WAIT'},{type:'action',decisionId:'d',status:'completed'},{type:'command.result',commandId:'c',status:'completed'}]};
+ const context={profileRevision:1,formId:'playful',userText:'你好'};
+ assert.ok(completedEvolutionTurn(snapshot,'c',context,{status:'completed',clip:'idle'}).turn);
+ assert.equal(completedEvolutionTurn(snapshot,'c',context).turn,undefined);
+ snapshot.events[0].actionId='NOD';
+ assert.equal(completedEvolutionTurn(snapshot,'c',context).turn,undefined);
+});
