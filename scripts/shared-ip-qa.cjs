@@ -47,11 +47,13 @@ const out = 'output/shared-ip-qa'; fs.mkdirSync(out, {recursive:true});
     await nav('contact'); await waitIp('fengge'); await perform('fengge');
     await select('nailong'); await nav('home'); await waitIp('nailong'); await brand();
     assert.deepEqual(await page.evaluate(() => window.__replica.controller.evolution.context()), evolution);
-    await nav('contact'); await page.reload(); await waitIp('nailong');
+    await nav('contact'); await page.reload(); await waitIp('niulai');
+    await select('nailong');
     await page.waitForFunction(() => window.__replica.getState().bootDone);
     await brand(); await page.waitForTimeout(500); await page.screenshot({path:`${out}/support-desktop.png`});
-    checks.push('Support shares selection both ways with Home and restores its actual selected model on direct reload');
-    await nav('about'); await page.reload(); await waitIp('nailong');
+    checks.push('Support shares selection both ways with Home and resets to Niulai on direct reload');
+    await nav('about'); await page.reload(); await waitIp('niulai');
+    await select('nailong');
     await page.waitForFunction(() => !document.querySelector('.cowcoming-model-controls button').disabled);
     await perform('nailong'); await nav('contact');
     assert.equal((await state()).ipVoice.status, 'idle');
@@ -60,13 +62,14 @@ const out = 'output/shared-ip-qa'; fs.mkdirSync(out, {recursive:true});
     assert.ok(await page.locator('.navigation button[aria-controls=ip-switcher]').isDisabled());
     await nav('home'); await waitIp('nailong');
     assert.deepEqual(await page.evaluate(() => window.__replica.controller.evolution.context()), restoredEvolution);
-    checks.push('About restores selection on reload; navigation stops voice; WORK binding and evolution stay isolated');
+    checks.push('About resets to Niulai on reload; navigation stops voice; WORK binding and evolution stay isolated');
     await page.setViewportSize({width:390,height:844});
     await page.locator('.mobile-actions .language-toggle').click();
     for (const mode of ['about','contact','home']) {
       await nav(mode); await select(mode === 'contact' ? 'toothless' : 'fengge');
       if (mode === 'contact') {
-        await page.reload(); await waitIp('toothless');
+        await page.reload(); await waitIp('niulai');
+        await select('toothless');
         await page.waitForFunction(() => window.__replica.getState().bootDone);
         await perform('toothless');
       }

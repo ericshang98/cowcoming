@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-import { ipCatalog, savedIp } from '../src/ip-catalog.mjs';
+import { ipCatalog } from '../src/ip-catalog.mjs';
 
 test('every selectable IP ships a self-contained GLB with the required real animation clips', () => {
   assert.equal(new Set(ipCatalog.map(ip => ip.id)).size, 5);
@@ -27,9 +27,4 @@ test('new character model bytes match the user archive receipts', () => {
     assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'), model.sha256);
     assert.equal(bytes.length, model.bytes);
   }
-});
-test('saved selection allows known available IPs only, and tolerates blocked storage', () => {
-  assert.equal(savedIp({ getItem: () => 'nailong' }), 'nailong');
-  assert.equal(savedIp({ getItem: () => 'unknown' }), 'niulai');
-  assert.equal(savedIp({ getItem: () => { throw Error('blocked'); } }), 'niulai');
 });
