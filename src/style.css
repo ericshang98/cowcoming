@@ -389,7 +389,7 @@ kbd {
 .hero-wordmark {
   position: absolute;
   z-index: 2;
-  left: 50%;
+  left: 53%;
   top: 27.7%;
   transform: translateX(-50%);
   font-size: clamp(92px, 14vw, 300px);
