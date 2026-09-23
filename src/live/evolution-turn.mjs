@@ -10,7 +10,7 @@ export function completedEvolutionTurn(snapshot, commandId, context, software) {
   }
   const replies = snapshot.messages.filter(message => message.commandId === commandId && message.role === 'assistant');
   const completed = snapshot.events.some(e => e.type === 'action' && e.decisionId === decision?.decisionId && e.status === 'completed');
-  if (result.status !== 'completed' || snapshot.device.simulation || snapshot.profile.revision !== context.profileRevision || !completed || (!replies.length && context.replyMode !== "silent") || !replies.every(reply => reply.status === 'complete')) return { terminal: true };
+  if (result.status !== 'completed' || (decision?.simulation ?? snapshot.device.simulation) || snapshot.profile.revision !== context.profileRevision || !completed || (!replies.length && context.replyMode !== "silent") || !replies.every(reply => reply.status === 'complete')) return { terminal: true };
   return { terminal: true, turn: { ...context, id: commandId, source: 'live', status: 'completed', replyText: replies.map(reply => reply.text).join('\n'), actionCompleted: true } };
 }
 
