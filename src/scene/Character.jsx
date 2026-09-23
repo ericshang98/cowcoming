@@ -418,6 +418,7 @@ export default function Character({
         ? { scale: 1.45, x: 0, y: 0.02 }
         : { scale: 1.22, x: -0.12, y: 0.02 };
     if (overlay) return { scale: 0.24, x: 0.37, y: -0.3, ground: false };
+    if (mode === "home" && characterId === "fengge") return { scale: mobile ? 1.28 : 1.4, x: 0, y: mobile ? 0 : -.02 };
     if (mobile && mode === "home" && characterId !== "niulai") return { scale: 1.2, x: 0, y: -.06 };
     if (mobile)
       return mode === "home"

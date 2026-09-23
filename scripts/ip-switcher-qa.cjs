@@ -51,7 +51,7 @@ const base = process.env.QA_BASE_URL || 'http://127.0.0.1:42910/';
 
     for (const [id, tap, signature] of [['fengge','nod','reflect'],['nailong','tilt','wave'],['toothless','tilt','wing_flap'],['spiderman','wave','bow']]) {
       if ((await state()).activeIp !== id) {await open(); await page.locator(`[data-ip=${id}]`).click(); await waitIp(id);}
-      await page.waitForFunction(() => Math.abs(window.__replica.controller.rig.scale-1.25) < .01);
+      await page.waitForFunction(scale => Math.abs(window.__replica.controller.rig.scale-scale) < .01, id === 'fengge' ? 1.4 : 1.25);
       await page.mouse.move(10,500); await page.waitForTimeout(300);
       // Click real rendered mesh; sculptural holes can make the exact center miss.
       let hit = false;
