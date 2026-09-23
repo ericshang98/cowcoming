@@ -1,0 +1,62 @@
+{
+  "reimported": true,
+  "bones": 27,
+  "vertices": 47574,
+  "allVerticesWeighted": true,
+  "maxInfluences": 4,
+  "clips": {
+    "bow": {
+      "durationSeconds": 2.19999993344148,
+      "samples": 7,
+      "maxVertexMovement": 0.17571645975112915
+    },
+    "idle": {
+      "durationSeconds": 4.000000124176343,
+      "samples": 7,
+      "maxVertexMovement": 0.013254222460091114
+    },
+    "look": {
+      "durationSeconds": 1.999999965230624,
+      "samples": 7,
+      "maxVertexMovement": 0.15120744705200195
+    },
+    "nod": {
+      "durationSeconds": 2.19999993344148,
+      "samples": 7,
+      "maxVertexMovement": 0.0956411212682724
+    },
+    "reflect": {
+      "durationSeconds": 3.600000187754631,
+      "samples": 7,
+      "maxVertexMovement": 0.09439355134963989
+    },
+    "tilt": {
+      "durationSeconds": 2.4999999652306237,
+      "samples": 7,
+      "maxVertexMovement": 0.14113575220108032
+    },
+    "wave": {
+      "durationSeconds": 2.4000000605980554,
+      "samples": 7,
+      "maxVertexMovement": 0.10985705256462097
+    }
+  },
+  "headTests": {
+    "yaw-left": {
+      "maxDisplacement": 0.35122445225715637,
+      "feetDisplacement": 0.0
+    },
+    "yaw-right": {
+      "maxDisplacement": 0.35122451186180115,
+      "feetDisplacement": 0.0
+    },
+    "pitch-up": {
+      "maxDisplacement": 0.29227006435394287,
+      "feetDisplacement": 0.0
+    },
+    "pitch-down": {
+      "maxDisplacement": 0.29227009415626526,
+      "feetDisplacement": 0.0
+    }
+  }
+}
