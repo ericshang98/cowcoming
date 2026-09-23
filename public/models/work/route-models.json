@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "scope": "work",
+  "kind": "route-model-asset-catalog",
+  "integrationStatus": "Assets ready; current production WORK source must consume this catalog",
+  "models": [
+    {
+      "id": "xianniu",
+      "name": "仙牛",
+      "targetRouteLabel": "仙牛路线",
+      "targetNodeLabel": "仙牛",
+      "asset": "/models/work/xianniu-web.glb",
+      "mouth": false,
+      "walking": false,
+      "bones": 20,
+      "animations": ["idle", "look", "bow", "nod", "tilt", "reflect", "wave"],
+      "sha256": "af2521e418ad066942c0767b7d5e4e557e2e285a9d3a3d0c7ddca9f896ab3d44"
+    },
+    {
+      "id": "dark-niulai",
+      "name": "暗黑牛",
+      "targetRouteLabel": "暗黑牛路线",
+      "targetNodeLabel": "暗黑牛",
+      "asset": "/models/work/dark-niulai-web.glb",
+      "mouth": false,
+      "walking": false,
+      "bones": 27,
+      "animations": ["idle", "look", "bow", "nod", "tilt", "reflect", "wave"],
+      "sha256": "29c5be47b3a93ee9689a03abaab45a90ecf2c7e7cb25d478b3b35a10089952a7"
+    }
+  ]
+}

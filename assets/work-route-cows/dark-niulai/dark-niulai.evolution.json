@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "initialForm": "dark-niulai",
+  "forms": [
+    {
+      "id": "dark-niulai",
+      "name": "暗黑牛",
+      "model": "dark-niulai-web.glb",
+      "actions": [
+        "look",
+        "bow",
+        "nod",
+        "tilt",
+        "reflect"
+      ]
+    }
+  ],
+  "edges": []
+}
