@@ -50,7 +50,7 @@ World 的 27 星光与 mama 彩蛋继续独立保存，不作为形态进化条�
 
 原工作站的 `perfect-web-clone-v4/showcase/products/fuch` 只作为迁移来源；后续以 cowcoming 的提交为准，不继续从旧目录或 /tmp 产物覆盖 main。个人授权文件、Cookie、Token、node_modules、dist 和 QA 截图不入库。
 
-生产站点仍为 https://cowcoming.world/ ，Cloudflare Pages 项目 `niulai-preview-20260922`，旧域名 `niulai.nexting.design` 指向同一项目。GitHub Actions 已提供 main 测试后发布与线上版本验证；是否完成首次凭据启用见 [部署说明](deployment.md)。
+生产站点仍为 https://cowcoming.world/ ，Cloudflare Pages 项目 `niulai-preview-20260922`，旧域名 `niulai.nexting.design` 已按 Eric 要求移除 Pages 绑定，后续只使用主域名；DNS 清理状态见部署说明。GitHub Actions 已提供 main 测试后发布与线上版本验证；是否完成首次凭据启用见 [部署说明](deployment.md)。
 
 ## 验证与后续记录
 
@@ -105,3 +105,7 @@ Eric 本轮要求用黑客松开发接口替代打包 Mac App：服务器发密�
 Eric 要求替换导航第二个旧简历图标为 IP 选择入口，并已提供全部四个新角色 GLB 包。首页现可切换牛来、峰哥、蜘蛛侠、奶龙、小黑龙；模型与八段音频随当前构建提供，左键/L 映射到各模型实际已有动画。先加载/核验目标模型和声音再提交切换，失败保留原角色；选择可跨刷新保存，牛来进化会话不受影响。WORK、World、About 保留专属牛来逻辑，其他页面选择 IP 会进入首页。
 
 59 项单元检查与生产构建通过；11 组真实 Chrome 检查覆盖五角色、实际人物点击、八段声音、L/中止、失败重试、成长会话保留、中英文和手机布局，零 pageerror。桌面五角色与手机画面已检查。模型无嘴型/步行，蜘蛛侠仅现有蹲姿小幅动作，小黑龙保留坐姿；没有声称实现倒挂或飞行。实现与来源见 [IP 角色说明](ip-characters.md)，机器验收见 [浏览器报告](verification/ip-switcher-2026-09-24.json)。尚未发布到正式站点或公开上传新素材。
+
+## WORK 先绑定再体验
+
+按 Eric 最新要求，未绑定或电脑离线时，WORK 替换为绑定/等待页，形态树、进化设置/重置、相机和语言面板不挂载；手机直接呈现绑定入口。设备上线才开放整页，模拟连接继续明确标注模拟。断线取消在途评估、拒收新回合并清理待关联指令；换绑房间清空培养历史并采用该房间当前形态，保留用户设置。绑定不自动打开相机。Key 只通过本机私密文件交付，未发送给朋友、未进入公开仓库。
