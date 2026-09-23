@@ -94,11 +94,11 @@ export default function Contact() {
     .join("\n");
   return (
     <Localized><section className="contact-page page" data-pwc-critical="contact">
-      <PageLead number="04" title="VOTE US">
+      <PageLead number="03" title="VOTE US">
         牛来参加 EvoTavern 进化酒馆，期待你的一票。
       </PageLead>
-      {mobile && <div className="contact-character cowcoming-about-stage">
-        <Character controller={controller} mode="about" mobile boot
+      {mobile && <div className="contact-character">
+        <Character controller={controller} mode="contained" mobile boot
           ready={modelReady} overlay={worldBlocked}
           modelAsset={activeIp.model} characterId={activeIp.id}
           onReady={() => setModelReady(true)}
