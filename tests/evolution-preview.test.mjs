@@ -44,7 +44,7 @@ test('a supplied model changes only its own preview node', () => {
 });
 
 
-test('unrevealed forms cannot be selected or exposed by previewing or supplying a model', () => {
+test('the progression resolver still guards unrevealed forms; the atlas browses independently', () => {
   for (const id of ['playful', 'tough', 'celestial', 'dark']) {
     assert.equal(selectEvolutionForm('celestial', id).form, 'calf');
     assert.equal(resolvePreview(forms[id].branch, id).form.id, 'calf');
@@ -67,4 +67,16 @@ test('a temporarily missing model remains an honest placeholder', () => {
     const preview = resolvePreview('celestial', 'playful', allRevealed);
     assert.equal(preview.placeholder, true); assert.equal(preview.model, NIULAI_ASSET);
   } finally { forms.playful.model = previous; }
+});
+
+test('all six atlas thumbnails are actual nonempty PNG assets for the shipped model version', async () => {
+  const { readFile } = await import('node:fs/promises');
+  for (const form of Object.values(forms)) {
+    const png = await readFile(new URL('../public' + form.thumbnail, import.meta.url));
+    assert.equal(png.subarray(1, 4).toString(), 'PNG');
+    assert.equal(png.readUInt32BE(16), 512);
+    assert.equal(png.readUInt32BE(20), 512);
+    assert.ok(png.length > 10000, form.id);
+    assert.ok(form.thumbnail.includes(form.model.split('-').at(-1).replace('.glb', '')));
+  }
 });

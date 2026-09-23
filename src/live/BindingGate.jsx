@@ -3,7 +3,7 @@ import { Localized, useLanguage } from '../i18n/Language';
 import { PageLead } from '../pages/Portfolio';
 import ConnectionBar from './ConnectionBar';
 
-export default function BindingGate({ live }) {
+export default function BindingGate({ live, onOpenAtlas }) {
   const { language } = useLanguage();
   const t = (zh, en) => language === 'zh' ? zh : en;
   const waiting = live.status === 'connected' && live.snapshot;
@@ -14,6 +14,7 @@ export default function BindingGate({ live }) {
       <LockKeyhole size={20} strokeWidth={1.3} />
       <h2>{t('进化从连接开始', 'Evolution starts with a connection')}</h2>
       <p>{t('绑定并连接电脑后，进化形态、相机画面与回应都会属于同一只牛来。', 'Once your computer is bound and online, evolution, camera and responses belong to the same Niulai.')}</p>
+      <button className="binding-atlas-link" onClick={onOpenAtlas} aria-haspopup="dialog">{t('先看看全部形态 ↗', 'Explore all forms ↗')}</button>
       <small>{t('当前角色仅作预览 · 尚未开放进化操作', 'Character preview only · evolution is locked')}</small>
     </aside>
     <aside className="work-list evolution-technology binding-panel" aria-label={t('绑定设备', 'Device binding')}>

@@ -33,7 +33,7 @@ version = {'commit': commit, 'branch': git('branch', '--show-current').decode().
            'releaseStatus': 'local-preview-not-deployed', 'productSnapshotRevision': 212,
            'actionContractVersion': 2, 'formCount': 6, 'actionCount': 30,
            'configuration': 'defaults-only; Eric final tuning JSON not included',
-           'hardware': 'simulator-only; real adapter pending'}
+           'hardware': 'bundled kit is simulation; see docs/benben-handoff.md for separately integrated hardware limits'}
 for target in [stage/'VERSION.json', source/'SOURCE_VERSION.json']:
     target.write_text(json.dumps(version, ensure_ascii=False, indent=2)+'\n')
 (stage/'configuration').mkdir()

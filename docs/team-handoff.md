@@ -1,12 +1,14 @@
 # 牛来动作与设备接入：团队交接
 
-本次交付分支 `codex/motion-self-tuning`，关联 [PR #23](https://github.com/ericshang98/cowcoming/pull/23)。压缩包根目录 `VERSION.json` 记录固定提交；代码位于 `source/`。当前是本地调试交付，尚未合并、上线或完成实机验收。产品依据是飞书修订 212 与 Eric 后续确认，见 [项目现状](project-context.md)。
+本次交付分支 `codex/motion-self-tuning`，关联 [PR #23](https://github.com/ericshang98/cowcoming/pull/23)。压缩包根目录 `VERSION.json` 记录固定提交；代码位于 `source/`。本次图鉴/调参属于本地候选版本，发布状态见项目现状。设备历史验收与本轮网页验证分别记录。产品依据是飞书修订 212 与 Eric 后续确认，见 [项目现状](project-context.md)。
 
 ## 先跑起来
 
 已验证环境：macOS、Node 24、Python 3、Blender 5.2（仅编辑模型时需要）。Windows 原生启动器尚未验收。首次安装依赖需要网络。
 
-在交接包的 `source/` 目录运行：
+只看模型和调动作：在交接包的 `source/` 目录执行 `npm ci`、`npm run dev`，进入 WORK 左下角“调试模式”。未绑定设备、未进化的形态均可预览。
+
+需要包含模拟设备联调时，在 `source/` 目录运行：
 
 ```sh
 npm ci
@@ -35,7 +37,7 @@ npm run motion:lab
 | Eric / 动作验收 | [自助调参](motion-self-tuning.md) | 六形态试播，导出最终 JSON 并注明日期 |
 | 网站开发 | `src/live/`、`src/components/MotionPreview.jsx` | 使用同版本模型导入最终 JSON，验证设备事件与手动试播一致 |
 | 模型动画 | 包内 `editable-models/`、`assets/evolution-source/` | 改 Blender / 制作脚本，重新验证模型并同步 SHA 与参数版本 |
-| 硬件开发 | [硬件交接](hardware-handoff.md)、`examples/device/hardware_adapter.py` | 接真实驱动，标定方向和行程，实现开始/完成/失败/停止回执 |
+| 硬件开发 | [硬件交接](hardware-handoff.md)、`examples/device/hardware_adapter.py`、[已有接线](benben-handoff.md) | 复用已接通范围，标定其余动作，补齐实际完成/失败/停止回执 |
 | JEV / 对话 / 进化 | [设备 API](live-device.md)、[进化运行合同](evolution-runtime.md) | 实现真实推理与评估网关，以真实完整会话验证进化 |
 
 ## 参数与模型怎么交
@@ -54,7 +56,7 @@ npm run motion:lab
 4. 朋友完成驱动后，以真实设备分别验证动作方向、完成、失败、断线、重复事件和停止；观察网页与设备各自回执。
 5. 接入真实 JEV、角色 LLM 和评估网关后，再验收完整会话与分支进化。
 
-此前验证包含 92 项 Node 测试、六形态 30 动作真实浏览器播放、桌面/手机画面及软件模拟同步；硬件没有接入实机。当前交接新增的归档构建检查以交接包根目录验证记录为准。
+此前验证包含 92 项 Node 测试、六形态 30 动作真实浏览器播放、桌面/手机画面及软件模拟同步；本次独立图鉴未驱动实机。主分支另有实际接线与点头 sent 回执记录，见 [统一联调交接](benben-handoff.md)；sent 不代表实物到位。当前交接新增的归档构建检查以交接包根目录验证记录为准。
 
 ## 权限与开源边界
 

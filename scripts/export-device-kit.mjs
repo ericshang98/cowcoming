@@ -42,7 +42,7 @@ try {
     resolve("docs/live-device.md"),
     join(output, "device-protocol.md"),
   );
-  for (const file of ["hardware-handoff.md", "evolution-runtime.md", "local-camera.md", "benben-handoff.md", "motion-self-tuning.md"]) {
+  for (const file of ["hardware-handoff.md", "evolution-runtime.md", "local-camera.md", "motion-self-tuning.md", "benben-handoff.md"]) {
     await copyFile(resolve("docs", file), join(kit, file));
     await copyFile(resolve("docs", file), join(output, file));
   }

@@ -46,7 +46,7 @@ export function createResponsePlayer({
     if (current || disposed) return;
     const job = queue.shift();
     if (!job) return;
-    const { request, variant, resolve, tuning } = job;
+    const { request, variant, tuning, resolve } = job;
     if (request.actionId === "WAIT") {
       resolve({status: "completed", clip: "idle", eventId: request.eventId, formId: manifest.formId});
       drain();
@@ -97,15 +97,17 @@ export function createResponsePlayer({
           status: "unavailable",
           reason: "animation-not-loaded",
         });
-      let tuning;
-      try { tuning = validateTuning(getTuning(request.actionId)); }
-      catch { return Promise.resolve({status: "unavailable", reason: "invalid-tuning"}); }
+      let tuning = DEFAULT_TUNING;
+      if (request.actionId !== "WAIT") {
+        try { tuning = validateTuning(getTuning(request.actionId)); }
+        catch { return Promise.resolve({status: "unavailable", reason: "invalid-tuning"}); }
+      }
       if (queue.length >= 32)
         return Promise.resolve({status: "unavailable", reason: "animation-queue-full"});
       seen.set(request.eventId, true);
       if (seen.size > 1000) seen.delete(seen.keys().next().value);
       return new Promise(resolve => {
-        queue.push({request, variant, resolve, tuning});
+        queue.push({request, variant, tuning, resolve});
         drain();
       });
     },
