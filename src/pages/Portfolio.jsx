@@ -66,7 +66,7 @@ export function Home() {
   const isNiulai = activeIp.id === 'niulai';
   const feedback = voiceState.error || interactionNotice ||
     (voiceState.status === "loading" ? "One moment—getting ready to speak…"
-      : voiceState.status === "playing" ? (language === 'zh' ? voiceState.track?.text || voiceState.track?.textEn : voiceState.track?.textEn) : "");
+      : voiceState.status === "playing" ? (language === 'zh' ? voiceState.track?.text || voiceState.track?.textEn : voiceState.track?.textEn) : "Press L to interact.");
   return (
     <Localized><section className="home-page" data-pwc-critical="home">
       <h1 className="hero-wordmark">COW COMING</h1>
@@ -83,9 +83,9 @@ export function Home() {
       </div>
       <div className="greeting home-product">
         <span className="eyebrow">POWERED BY JEV</span>
-        <h2>A new kind of<br />desktop companion.</h2>
+        <h2>基于 JEV 决策模型的<br />可进化 AI 宠物。</h2>
         <p className="home-product-description">
-          A robot built on the JEV model, connecting perception, decisions and actions
+          An evolving AI pet built on the JEV decision model, connecting perception, decisions and actions
           to bring companionship into everyday life.
         </p>
         <button className="home-product-link" onClick={() => navigate("about")}>

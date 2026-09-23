@@ -7,7 +7,7 @@ import "./niulai-voice.css";
 
 export default function NiulaiVoice() {
   const { voiceOpen, setVoiceOpen, muted, setMuted, paused, setPaused,
-    voiceState: state, playVoice, stopVoice, collection } = useApp();
+    voiceState: state, playVoice, stopVoice, collection, mode } = useApp();
   const closeButton = useRef(null);
   const wasOpen = useRef(voiceOpen);
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function NiulaiVoice() {
           <div className="voice-list">
             {voices.map((track) => {
               const active = busy && state.track?.id === track.id;
-              const locked = track.id === "mama" && !collection.unlocked;
+              const locked = mode !== "home" && track.id === "mama" && !collection.unlocked;
               return (
                 <button key={track.id} className={active ? "is-active" : ""}
                   aria-label={`${active ? "Stop" : "Play"}: ${track.textEn}`}
