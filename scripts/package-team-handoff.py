@@ -66,6 +66,6 @@ with zipfile.ZipFile(archive_path,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as a
         if p.is_file(): archive.write(p,p.relative_to(out))
 with zipfile.ZipFile(archive_path) as archive:
     assert archive.testzip() is None
-print(json.dumps({'archive':str(archive_path),'bytes':archive_path.stat().st_size(),
+print(json.dumps({'archive':str(archive_path),'bytes':archive_path.stat().st_size,
                   'sha256':hashlib.sha256(archive_path.read_bytes()).hexdigest(),
                   'files':len(files)+1},indent=2))
