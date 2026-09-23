@@ -30,7 +30,7 @@ export default function Evolution({ controller, live, preview, onSelectRoute, on
   }, [live?.online]);
   const atlas = treeOpen && <EvolutionTree selected={form} onSelect={onSelectForm} canSelect={Boolean(live?.online)} initialView={atlasView} returnFocus={atlasOpener.current} onClose={closeAtlas} />;
   const debugButton = <button className="evolution-debug-toggle glass" aria-haspopup="dialog" onClick={event => openAtlas('model', event.currentTarget)}><SlidersHorizontal size={13} />{t('调试模式', 'Debug mode')}</button>;
-  if (!live?.online) return <><BindingGate live={live} onOpenAtlas={event => openAtlas('tree', event.currentTarget)} />{debugButton}{atlas}</>;
+  if (!live?.online) return <><BindingGate live={live} onOpenAtlas={event => openAtlas('tree', event.currentTarget)} formId={form.id} onSelectForm={onSelectForm} controller={controller} ready={modelStatus === 'ready' && !placeholder} />{debugButton}{atlas}</>;
   return (
     <Localized><>
     <section className="work-page evolution-page page" data-pwc-critical="work">

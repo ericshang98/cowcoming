@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ancestry, evolutionEdges, evolutionRoutes, forms, resolvePreview, selectEvolutionForm } from '../src/evolution.mjs';
+import { shownEvolutionForm } from '../src/live/guest-preview.mjs';
 import { NIULAI_ASSET } from '../src/scene/niulai.mjs';
 const allRevealed = Object.keys(forms);
 
@@ -79,6 +80,14 @@ test('all six atlas thumbnails are actual nonempty PNG assets for the shipped mo
     assert.ok(png.length > 10000, form.id);
     assert.ok(form.thumbnail.includes(form.model.split('-').at(-1).replace('.glb', '')));
   }
+});
+
+test('an unbound visitor can preview another form without changing the saved evolution', () => {
+  const known = Object.keys(forms);
+  assert.equal(shownEvolutionForm(false, 'calf', 'playful', known), 'playful');
+  assert.equal(shownEvolutionForm(false, 'calf', null, known), 'calf');
+  assert.equal(shownEvolutionForm(false, 'calf', 'missing', known), 'calf');
+  assert.equal(shownEvolutionForm(true, 'tough', 'playful', known), 'tough');
 });
 
 test('the lower-left debug button accepts clicks above the full-screen model', async () => {

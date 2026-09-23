@@ -28,6 +28,7 @@ import { useEvolutionDeviceSync } from "./live/useEvolutionDeviceSync";
 import { useEvolutionSession } from "./useEvolutionSession";
 import { NIULAI_ASSET } from "./scene/niulai.mjs";
 import { resolvePreview, forms } from "./evolution.mjs";
+import { shownEvolutionForm } from "./live/guest-preview.mjs";
 import { Header, Ambient, Boot } from "./components/Chrome";
 import {
   Home,
@@ -109,7 +110,10 @@ export default function App() {
     return () => { delete controller.evolution; };
   }, [controller, evolutionSession.context, evolutionSession.recordTurn, deviceFormReady]);
   const [previewModelState, setPreviewModelState] = useState({ model: null, status: 'loading' });
-  const evolutionPreview = resolvePreview(forms[evolutionSession.state.form].branch || evolutionRoute, evolutionSession.state.form, Object.keys(forms));
+  const [guestPreviewForm, setGuestPreviewForm] = useState(null);
+  useEffect(() => { if (live.online) setGuestPreviewForm(null); }, [live.online]);
+  const shownForm = shownEvolutionForm(live.online, evolutionSession.state.form, guestPreviewForm, Object.keys(forms));
+  const evolutionPreview = resolvePreview(forms[shownForm].branch || evolutionRoute, shownForm, Object.keys(forms));
   const activeModel = canSwitchIp ? selectedIp.model : mode === 'work' ? evolutionPreview.model : NIULAI_ASSET;
   const evolutionPage = <Evolution
     live={live}
@@ -123,7 +127,7 @@ export default function App() {
     } }}
     browseRoute={evolutionRoute}
     onSelectRoute={setEvolutionRoute}
-    onSelectForm={form => { if (live.online) evolutionSession.dispatch({ type: 'select', form }); }}
+    onSelectForm={form => { if (live.online) evolutionSession.dispatch({ type: 'select', form }); else setGuestPreviewForm(form); }}
   />;
   const change = useCallback(
     (next) => {
