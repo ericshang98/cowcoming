@@ -417,8 +417,14 @@ export class DeviceRoom extends DurableObject {
     }
   }
   async webSocketClose(ws, code) {
-    ws.close(code === 1005 ? 1000 : code);
     await this.closed(ws);
+    // 1006 is an abnormal-close indication, never a valid outgoing close code.
+    // Reconcile presence before replying: a disconnected socket can throw.
+    try {
+      ws.close(code >= 3000 && code <= 4999 ? code : 1000);
+    } catch {
+      /* Offline state and browser notifications have already been saved. */
+    }
   }
   async webSocketError(ws) {
     await this.closed(ws);
