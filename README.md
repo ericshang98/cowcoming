@@ -5,7 +5,7 @@
 - 线上网站：https://cowcoming.world/
 - 产品真源：[飞书产品文档](https://uxl9fceo481.feishu.cn/wiki/Ehc9w5bs1ic2gEkwZjCc8Eo1nmb)
 - **给 AI / 新会话：先读 [AGENTS.md](AGENTS.md)。** Claude 的入口为 [CLAUDE.md](CLAUDE.md)。其他工具也请明确让它先读 AGENTS.md。
-- [产品快照与更新](docs/product/README.md) · [项目现状](docs/project-context.md) · [部署说明](docs/deployment.md)
+- [产品快照与更新](docs/product/README.md) · [项目现状](docs/project-context.md) · [模型资源](docs/model-assets.md) · [部署说明](docs/deployment.md)
 
 ## 在另一台 Mac 开发
 
