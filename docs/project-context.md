@@ -48,4 +48,6 @@
 
 `npm run qa:about` 验证 About 交互；World QA 可使用 `QA_BASE_URL=http://127.0.0.1:<port>/ npm run qa:world-niulai`。部分继承的旧模板 QA 已过时，不能不加核对地作为发布门禁。
 
+2026-09-23 同步验收：34 项单元测试通过；About 11 项浏览器检查（含 6 个视口）通过；World 7 项收集、循环语音、暂停及存档检查通过；观察面板示例、语言持久化与四个主要页面无运行错误。GitHub 工作分支检查通过：[run 35881853007](https://github.com/ericshang98/cowcoming/actions/runs/35881853007)。这些结果不代表 Cloudflare 自动发布已启用。
+
 完成后续任务时，记录实际验证、未完成边界和对应提交。飞书原文只能通过同步脚本更新，不能手改快照冒充上游。
