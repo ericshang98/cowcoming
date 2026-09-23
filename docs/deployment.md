@@ -27,6 +27,12 @@
 
 下述 Actions 工作流只发布 Pages；修改实时服务时，还需按 [Worker 部署步骤](live-device.md#部署到现有网站) 单独部署 Worker。Pages/Edit Token 不具有 Workers 部署权限。生产连接密钥仅保存在私密交接文件中，不进入 Git、构建产物或文档。
 
+## 进化控制发布（2026-09-23）
+
+PR #3 已合并并发布提交 `55c2bcece553ae8d8c8ac3ba39fe61ad451b2b0e`。Pages 发布回执为 `https://6a6493da.niulai-preview-20260922.pages.dev`；主域名提交 SHA、干净构建状态与入口 JS/CSS 哈希匹配。生产浏览器验证默认 5 轮设置、手动切形态、重置回小牛，无运行异常。此前 `9a3e362` 是上一版发布。
+
+实时 Worker 同步发布版本 `0d7264ea-92a6-4c43-8839-e4868ffd320f`，保留原房间、授权和 WebRTC 接口，新增语言 commandId 关联及形态变更来源。56 项 Node 测试、4 项 Python 测试、独立 Worker 集成和桌面／手机浏览器检查通过。真实评估 LLM 与网关仍待配置；页面未配置时不伪造自动进化，模拟数据不计轮。GitHub 自动发布仍未启用，本次使用已授权的本机 OAuth。
+
 ## GitHub 自动发布的首次配置
 
 发布工作流已加入仓库；**在配置下面的 Secret 和启用变量之前，main 只完成检查和保存构建，deploy 作业跳过，不会声称网站已更新。** 旧 pinclaw-dev 仓库中的 Secret 不能从 GitHub 读取或自动迁移。
