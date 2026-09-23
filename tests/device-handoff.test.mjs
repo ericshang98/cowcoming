@@ -54,3 +54,16 @@ test('WAIT text responses count without an animation asset, while real movement 
  snapshot.events[0].actionId='NOD';
  assert.equal(completedEvolutionTurn(snapshot,'c',context).turn,undefined);
 });
+test('switching device mode cannot turn an earlier simulated round into a real cultivation turn',()=>{
+ let state=initialRoom('test','test');let n=0;
+ const emit=(type,data)=>state=applyDeviceEvent(state,{type,eventId:`mode_${++n}`,...data});
+ emit('device.status',{hardware:'ready',simulation:true,actionContractVersion:2,supportedActions:['NOD']});
+ emit('profile.applied',{revision:1});
+ emit('interaction.start',{commandId:'preview',profileRevision:1,userText:'hello',replyMode:'silent'});
+ emit('decision',{decisionId:'preview_d',commandId:'preview',profileRevision:1,actionId:'NOD'});
+ emit('action',{decisionId:'preview_d',status:'completed'});
+ emit('command.result',{commandId:'preview',status:'completed'});
+ emit('device.status',{simulation:false});
+ assert.equal(state.events.find(e=>e.type==='decision').simulation,true);
+ assert.equal(completedEvolutionTurn(state,'preview',{profileRevision:1,replyMode:'silent'},{status:'completed'}).turn,undefined);
+});

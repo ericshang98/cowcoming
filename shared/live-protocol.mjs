@@ -221,6 +221,7 @@ export function applyDeviceEvent(state, raw) {
       );
       check(!state.events.some(x=>x.type==='decision' && x.decisionId===raw.decisionId), 'Duplicate decision ID');
       e.formId = state.profile.formId;
+      e.simulation = state.device.simulation;
       e.decisionId = id(raw.decisionId);
       e.actionId = raw.actionId;
       e.summary = text(raw.summary || "", 2000, true);
