@@ -1,5 +1,13 @@
 # 代码同步与网站发布
 
+## 2026-09-24 发布核对与断线修复
+
+本次实读生产状态：主域名发布提交为 `1a66bcce3d0e2c964310c669868367f8b4e5cb5c`，Worker 版本为 `dc4b0970-18ac-429e-958f-207d9e70adec`，已包含五动作协议、设备能力声明、六形态人格和 `interaction.start`。这些结果取代本文较早的待发布判断。GitHub `CLOUDFLARE_DEPLOY_ENABLED` 变量仍未配置，不能把合并等同于自动发布。
+
+本次补修仅改变 Worker 异常关闭后的离线通知；网页保留当前主分支的动画完整播放规则，无需用旧联调构建覆盖生产页面。使用项目方提供的账户 API Token，经 `CLOUDFLARE_API_TOKEN` 和 `CLOUDFLARE_ACCOUNT_ID` 传给 Wrangler；这是 API 认证，不是网页登录。Token 不进入仓库、网页构建或 GitHub Secret，保留已有 `ADMIN_KEY` 和 Durable Object 房间。
+
+发布前检查：Node 24 的 98 项测试、生产构建、独立 Worker 集成回归通过。发布后应核对 Cloudflare 当前版本、Worker 下载代码和健康接口，并确认主域名构建版本保持预期。原设备房间与真实硬件验收另行记录，不用临时房间或合成测试代替。
+
 ## 唯一入口
 
 源码、产品快照、开发规则和发布工作流统一保存在公开仓库 `ericshang98/cowcoming`。换电脑通过 Git 同步；网站由 GitHub Actions 将同一提交的构建上传到现有 Cloudflare Pages 项目。
