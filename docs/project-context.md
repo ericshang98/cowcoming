@@ -1,3 +1,7 @@
+# Final integration entry (2026-09-24)
+
+Current checks, release boundaries and on-site acceptance: [submission checklist](submission-checklist.md). JEV parallel scheduling is a local controller option; Worker protocol remains unchanged.
+
 # 项目现状与交接
 
 ## 2026-09-24：本机五回应同步

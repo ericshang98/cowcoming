@@ -28,7 +28,9 @@
     "prebuild": "node scripts/export-device-kit.mjs",
     "predev": "node scripts/export-device-kit.mjs",
     "qa:work-models": "node scripts/work-models-qa.cjs",
-    "motion:lab": "node scripts/motion-lab.mjs"
+    "motion:lab": "node scripts/motion-lab.mjs",
+    "qa:release": "node scripts/final-release-check.mjs",
+    "qa:six-models": "node scripts/model-loading-qa.cjs"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",

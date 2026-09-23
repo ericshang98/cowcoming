@@ -1,0 +1,527 @@
+{
+  "schedule": "after_reply",
+  "synthetic": true,
+  "checks": [
+    "Same local JEV turn produces exactly one NOD and actual normal GLB animation; timed end is sent, never physical completed.",
+    "Duplicate local request does not replay animation or execute another turn.",
+    "Local stop updates hardware receipt while the accepted software clip completes, preserving current main behavior.",
+    "Web stop reaches the existing local controller and returns its stop acknowledgement.",
+    "Device disconnect marks offline; accepted clip completes and reconnect skips the in-flight/old turn.",
+    "A new turn after reconnect works normally.",
+    "Unsupported web interaction is explicitly rejected instead of invoking a second JEV.",
+    "All six forms acknowledge the same persona version; all 30 local-motion/real-GLB combinations pass, including distinct single/double nod and left/right tilt. No real motors."
+  ],
+  "matrix": [
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.1,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "calf",
+      "motionId": "nod",
+      "actionId": "NOD",
+      "clip": "calf_nod_confirm",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.3,
+        "jev_started_ms": 0.3,
+        "audio_started_ms": 0.6,
+        "motion_dispatched_ms": 0.6,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "calf",
+      "motionId": "shake_head",
+      "actionId": "SHAKE",
+      "clip": "calf_head_shake",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "calf",
+      "motionId": "nod_double",
+      "actionId": "NOD_DOUBLE",
+      "clip": "calf_nod_proud",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.1,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "calf",
+      "motionId": "tilt_left",
+      "actionId": "TILT_LEFT",
+      "clip": "calf_tilt_curious_left",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "calf",
+      "motionId": "tilt_right",
+      "actionId": "TILT_RIGHT",
+      "clip": "calf_tilt_curious_right",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.1,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "normal",
+      "motionId": "nod",
+      "actionId": "NOD",
+      "clip": "normal_nod_confirm",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "normal",
+      "motionId": "shake_head",
+      "actionId": "SHAKE",
+      "clip": "normal_head_shake",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.1,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "normal",
+      "motionId": "nod_double",
+      "actionId": "NOD_DOUBLE",
+      "clip": "normal_nod_proud",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.1,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "normal",
+      "motionId": "tilt_left",
+      "actionId": "TILT_LEFT",
+      "clip": "normal_tilt_curious_left",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "normal",
+      "motionId": "tilt_right",
+      "actionId": "TILT_RIGHT",
+      "clip": "normal_tilt_curious_right",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.1,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "playful",
+      "motionId": "nod",
+      "actionId": "NOD",
+      "clip": "playful_nod_confirm",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.3,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "playful",
+      "motionId": "shake_head",
+      "actionId": "SHAKE",
+      "clip": "playful_head_shake",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "playful",
+      "motionId": "nod_double",
+      "actionId": "NOD_DOUBLE",
+      "clip": "playful_nod_proud",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.1,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "playful",
+      "motionId": "tilt_left",
+      "actionId": "TILT_LEFT",
+      "clip": "playful_tilt_curious_left",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.1,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "playful",
+      "motionId": "tilt_right",
+      "actionId": "TILT_RIGHT",
+      "clip": "playful_tilt_curious_right",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "tough",
+      "motionId": "nod",
+      "actionId": "NOD",
+      "clip": "tough_nod_confirm",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "tough",
+      "motionId": "shake_head",
+      "actionId": "SHAKE",
+      "clip": "tough_head_shake",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.1,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "tough",
+      "motionId": "nod_double",
+      "actionId": "NOD_DOUBLE",
+      "clip": "tough_nod_proud",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "tough",
+      "motionId": "tilt_left",
+      "actionId": "TILT_LEFT",
+      "clip": "tough_tilt_curious_left",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "tough",
+      "motionId": "tilt_right",
+      "actionId": "TILT_RIGHT",
+      "clip": "tough_tilt_curious_right",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "celestial",
+      "motionId": "nod",
+      "actionId": "NOD",
+      "clip": "celestial_nod_confirm",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.1,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "celestial",
+      "motionId": "shake_head",
+      "actionId": "SHAKE",
+      "clip": "celestial_head_shake",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "celestial",
+      "motionId": "nod_double",
+      "actionId": "NOD_DOUBLE",
+      "clip": "celestial_nod_proud",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.3,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "celestial",
+      "motionId": "tilt_left",
+      "actionId": "TILT_LEFT",
+      "clip": "celestial_tilt_curious_left",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "celestial",
+      "motionId": "tilt_right",
+      "actionId": "TILT_RIGHT",
+      "clip": "celestial_tilt_curious_right",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.3,
+        "motion_dispatched_ms": 0.4,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "dark",
+      "motionId": "nod",
+      "actionId": "NOD",
+      "clip": "dark_nod_confirm",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "dark",
+      "motionId": "shake_head",
+      "actionId": "SHAKE",
+      "clip": "dark_head_shake",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.1,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "dark",
+      "motionId": "nod_double",
+      "actionId": "NOD_DOUBLE",
+      "clip": "dark_nod_proud",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.2,
+        "motion_after_audio_ms": 0
+      },
+      "formId": "dark",
+      "motionId": "tilt_left",
+      "actionId": "TILT_LEFT",
+      "clip": "dark_tilt_curious_left",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    },
+    {
+      "schedule": "after_reply",
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 0.1,
+        "jev_started_ms": 0.1,
+        "audio_started_ms": 0.2,
+        "motion_dispatched_ms": 0.3,
+        "motion_after_audio_ms": 0.1
+      },
+      "formId": "dark",
+      "motionId": "tilt_right",
+      "actionId": "TILT_RIGHT",
+      "clip": "dark_tilt_curious_right",
+      "software": "completed",
+      "hardware": "synthetic-timed-sent"
+    }
+  ],
+  "pageErrors": []
+}
