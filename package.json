@@ -28,7 +28,8 @@
     "test:relay:running": "node scripts/live-relay-check.mjs",
     "prebuild": "node scripts/export-device-kit.mjs",
     "predev": "node scripts/export-device-kit.mjs",
-    "qa:work-models": "node scripts/work-models-qa.cjs"
+    "qa:work-models": "node scripts/work-models-qa.cjs",
+    "motion:lab": "node scripts/motion-lab.mjs"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",

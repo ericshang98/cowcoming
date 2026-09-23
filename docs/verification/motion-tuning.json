@@ -1,0 +1,220 @@
+{
+  "results": [
+    {
+      "formId": "calf",
+      "actionId": "NOD",
+      "clip": "calf_nod_confirm",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "calf",
+      "actionId": "SHAKE",
+      "clip": "calf_head_shake",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "calf",
+      "actionId": "NOD_DOUBLE",
+      "clip": "calf_nod_proud",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "calf",
+      "actionId": "TILT_LEFT",
+      "clip": "calf_tilt_curious_left",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "calf",
+      "actionId": "TILT_RIGHT",
+      "clip": "calf_tilt_curious_right",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "normal",
+      "actionId": "NOD",
+      "clip": "normal_nod_confirm",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "normal",
+      "actionId": "SHAKE",
+      "clip": "normal_head_shake",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "normal",
+      "actionId": "NOD_DOUBLE",
+      "clip": "normal_nod_proud",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "normal",
+      "actionId": "TILT_LEFT",
+      "clip": "normal_tilt_curious_left",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "normal",
+      "actionId": "TILT_RIGHT",
+      "clip": "normal_tilt_curious_right",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "tough",
+      "actionId": "NOD",
+      "clip": "tough_nod_confirm",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "tough",
+      "actionId": "SHAKE",
+      "clip": "tough_head_shake",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "tough",
+      "actionId": "NOD_DOUBLE",
+      "clip": "tough_nod_proud",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "tough",
+      "actionId": "TILT_LEFT",
+      "clip": "tough_tilt_curious_left",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "tough",
+      "actionId": "TILT_RIGHT",
+      "clip": "tough_tilt_curious_right",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "celestial",
+      "actionId": "NOD",
+      "clip": "celestial_nod_confirm",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "celestial",
+      "actionId": "SHAKE",
+      "clip": "celestial_head_shake",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "celestial",
+      "actionId": "NOD_DOUBLE",
+      "clip": "celestial_nod_proud",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "celestial",
+      "actionId": "TILT_LEFT",
+      "clip": "celestial_tilt_curious_left",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "celestial",
+      "actionId": "TILT_RIGHT",
+      "clip": "celestial_tilt_curious_right",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "dark",
+      "actionId": "NOD",
+      "clip": "dark_nod_confirm",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "dark",
+      "actionId": "SHAKE",
+      "clip": "dark_head_shake",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "dark",
+      "actionId": "NOD_DOUBLE",
+      "clip": "dark_nod_proud",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "dark",
+      "actionId": "TILT_LEFT",
+      "clip": "dark_tilt_curious_left",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "dark",
+      "actionId": "TILT_RIGHT",
+      "clip": "dark_tilt_curious_right",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    }
+  ],
+  "liveResult": {
+    "status": "completed",
+    "tuning": {
+      "speed": 1.5,
+      "amplitude": 1.25
+    },
+    "clip": "dark_nod_confirm",
+    "eventId": "0e868022-c44f-4f3d-bf17-f6494efc59e4:17ef0d64-a485-4e84-b1bb-10f6be7163ba",
+    "formId": "dark"
+  },
+  "errors": [],
+  "persistence": true,
+  "importExport": true,
+  "invalidImportUnchanged": true,
+  "stop": true,
+  "mobileNoOverflow": true
+}

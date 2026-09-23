@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, useGLTF } from "@react-three/drei";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
 import * as THREE from "three";
+import { DEFAULT_TUNING, browserTuningStorage, loadTuning } from '../live/motion-tuning.mjs';
 import { createResponsePlayer } from '../live/response-player.mjs';
 import { evolutionAssets } from '../evolution-assets.mjs';
 import { PROCEDURAL_CLIPS, proceduralPose } from "../live/animation.mjs";
@@ -142,7 +143,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
   useEffect(() => {
     if(!responseManifest)return;
     const names=new Set();model.traverse(o=>{if(o.isBone){names.add(o.name);if(o.userData.name)names.add(o.userData.name);}});
-    const player=createResponsePlayer({mixer,actions,manifest:responseManifest,bones:names,onStart:()=>{
+    const player=createResponsePlayer({mixer,actions,manifest:responseManifest,bones:names,getTuning:(id)=>(controller.motionTuning || loadTuning(browserTuningStorage()).document).forms[responseManifest.formId]?.actions[id] || DEFAULT_TUNING,onStart:()=>{
       const st=state.current;st.started=true;st.active=null;st.liveMotion=null;st.head=0;st.pitch=0;st.roll=0;controller.queue.clear();
     }});
     responsePlayer.current=player;

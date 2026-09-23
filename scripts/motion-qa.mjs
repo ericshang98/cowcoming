@@ -18,7 +18,7 @@ try{
    await page.waitForFunction(()=>window.__replica.controller.responsePlayer.busy);
    const clip=await page.evaluate(()=>window.__replica.controller.responsePlayer.clip);
    await page.waitForFunction(()=>!window.__replica.controller.responsePlayer.busy,null,{timeout:12000});
-   assert.match(await page.locator('.motion-preview small').textContent(),/完成|complete/);
+   assert.match(await page.locator('.motion-play-status').textContent(),/完成|complete/);
    results.push({form,actionId,clip,status:'completed'});
   }
   await page.locator('.live-lab-button').click();
@@ -31,7 +31,7 @@ try{
   results.push({form,source:'real-relay-python-simulation',clip:liveClip,status:'completed'});
   await page.screenshot({path:`tmp/motion-integration/${form}-website.png`});
  }
- await page.locator('[data-motion="NOD"]').click();await page.locator('.motion-preview > button').click();
+ await page.locator('[data-motion="NOD"]').click();await page.locator('[data-motion-stop]').click();
  assert.equal(await page.evaluate(()=>window.__replica.controller.responsePlayer.busy),false);
  await page.locator('.evolution-routes button').first().click();await page.locator('.evolution-node').filter({hasText:'骚牛'}).click();
  await page.waitForTimeout(1200);assert.equal(await page.locator('[data-motion="NOD"]').isDisabled(),true);

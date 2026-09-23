@@ -1,7 +1,8 @@
-import { mkdir, copyFile, mkdtemp, rm } from "node:fs/promises";
+import { mkdir, copyFile, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { resolve, join } from "node:path";
+import { defaultTuningDocument } from "../src/live/motion-tuning.mjs";
 const output = resolve("public/downloads");
 const temp = await mkdtemp(join(tmpdir(), "cowcoming-kit-"));
 try {
@@ -32,10 +33,18 @@ try {
     resolve("docs/live-device.md"),
     join(output, "device-protocol.md"),
   );
-  for (const file of ["hardware-handoff.md", "evolution-runtime.md", "local-camera.md"]) {
+  for (const file of [
+    "hardware-handoff.md",
+    "evolution-runtime.md",
+    "local-camera.md",
+    "motion-self-tuning.md",
+  ]) {
     await copyFile(resolve("docs", file), join(kit, file));
     await copyFile(resolve("docs", file), join(output, file));
   }
+  const defaults = JSON.stringify(defaultTuningDocument(), null, 2) + "\n";
+  await writeFile(join(kit, "motion-tuning-defaults.json"), defaults);
+  await writeFile(join(output, "motion-tuning-defaults.json"), defaults);
   execFileSync("tar", [
     "-czf",
     join(output, "cowcoming-device.tar.gz"),

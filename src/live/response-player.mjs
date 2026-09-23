@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { DEFAULT_TUNING, validateTuning } from "./motion-tuning.mjs";
+import { tuneClip } from "./tuned-clip.mjs";
 import { ACTION_CATALOG } from "../../shared/action-catalog.mjs";
 
 /** Plays only a registered, loaded clip and resolves after its actual finish + recovery. */
@@ -8,6 +10,7 @@ export function createResponsePlayer({
   manifest,
   bones,
   onStart = () => {},
+  getTuning = () => DEFAULT_TUNING,
 }) {
   const seen = new Map();
   let current = null,
@@ -23,8 +26,10 @@ export function createResponsePlayer({
     const done = current;
     current = null;
     recovery = null;
+    if (done.tunedClip) mixer.uncacheClip(done.tunedClip);
     done.resolve({
       status,
+      tuning: done.tuning,
       clip: done.clip,
       eventId: done.eventId,
       formId: manifest.formId,
@@ -84,14 +89,29 @@ export function createResponsePlayer({
           status: "unavailable",
           reason: "animation-busy",
         });
+      let tuning;
+      try {
+        tuning = validateTuning(getTuning(request.actionId));
+      } catch {
+        return Promise.resolve({
+          status: "unavailable",
+          reason: "invalid-tuning",
+        });
+      }
       onStart();
       mixer.stopAllAction();
       const incoming = idle();
-      const action = actions[variant.clip];
+      const tunedClip =
+        tuning.amplitude === 1
+          ? null
+          : tuneClip(actions[variant.clip].getClip(), tuning.amplitude);
+      const action = tunedClip
+        ? mixer.clipAction(tunedClip)
+        : actions[variant.clip];
       action
         .reset()
         .setEffectiveWeight(1)
-        .setEffectiveTimeScale(1)
+        .setEffectiveTimeScale(tuning.speed)
         .setLoop(THREE.LoopOnce, 1);
       action.clampWhenFinished = true;
       action.play();
@@ -99,6 +119,8 @@ export function createResponsePlayer({
       return new Promise((resolve) => {
         current = {
           action,
+          tunedClip,
+          tuning,
           resolve,
           clip: variant.clip,
           eventId: request.eventId,
