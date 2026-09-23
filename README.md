@@ -9,7 +9,7 @@
 
 ## 在另一台 Mac 开发
 
-使用有此私有仓库权限的 GitHub 账号登录，准备 Node 24 和 Git：
+仓库已公开，可直接 clone；准备 Node 24 和 Git：
 
 ```sh
 git clone https://github.com/ericshang98/cowcoming.git
@@ -50,3 +50,7 @@ npm run docs:sync # 可选：通过已授权 lark-cli 更新产品快照
 GitHub Actions 自动测试和构建。开发分支和 PR 只检查；配置发布密钥并启用后，`main` 通过检查会自动更新 `cowcoming.world`。Actions 也支持在 main 手动重新发布。首次启用步骤和当前状态见 [部署说明](docs/deployment.md)。线上版本可通过 `/build-info.json` 与 GitHub 提交核对。
 
 其他电脑上的 Agent 统一使用本仓库：先 pull，创建 `codex/` 分支开发、测试并提交，再通过 PR 合并 main。不要在旧的原型目录继续维护另一份源码。原型中仍有旧模板内容，不能当成正式产品要求。
+
+## Live device development
+
+See [the complete hardware connection and API guide](docs/live-device.md). WORK now supports a keyed device room, editable form prompts, JEV action-to-animation mapping, direct WebRTC video/CV and local-process LLM streams. Manual selection, reset and configurable evaluation cadence are implemented; automatic evolution needs a configured evaluation model and gateway. Read the [hardware developer handoff](docs/hardware-handoff.md) for the corrected five-action product contract and the remaining differences in the current protocol. The Python kit is generated into `public/downloads` by `npm run dev` / `npm run build`. Run `npm run test:relay` for an isolated Worker integration check.

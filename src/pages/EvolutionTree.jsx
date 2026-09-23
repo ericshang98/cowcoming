@@ -2,7 +2,7 @@ import { Localized } from "../i18n/Language";
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowUpRight, Box, LockKeyhole, X } from 'lucide-react';
-import { ancestry, evolutionEdges, forms, isFormRevealed } from '../evolution.mjs';
+import { ancestry, evolutionEdges, forms, isFormRevealed, revealedForms } from '../evolution.mjs';
 
 const connections = {
   normal: 'M400 134V166',
@@ -13,7 +13,7 @@ const connections = {
 };
 const stages = ['ORIGIN', 'SHARED FORM', 'BRANCH', 'NEXT FORM'];
 
-export default function EvolutionTree({ selected, onSelect, onClose }) {
+export default function EvolutionTree({ selected, onSelect, onClose, revealed = revealedForms }) {
   const dialogRef = useRef(null);
   const path = ancestry(selected.id);
   useEffect(() => {
@@ -40,17 +40,17 @@ export default function EvolutionTree({ selected, onSelect, onClose }) {
       <header className="atlas-header">
         <div>
           <span className="eyebrow">牛来 / EVOLUTION ATLAS</span>
-          <h1 id="evolution-atlas-title">A future to discover.</h1>
-          <p id="evolution-atlas-description">Preview the forms you know. The rest is still hidden.</p>
+          <h1 id="evolution-atlas-title">Choose your next form.</h1>
+          <p id="evolution-atlas-description">Select any form to switch to manual evolution.</p>
         </div>
         <button className="atlas-close glass" aria-label="Close evolution tree" onClick={onClose} autoFocus><X size={20} /></button>
       </header>
       <div className="atlas-scroll">
-        <div className="atlas-tree" role="group" aria-label="小牛 to 普通牛来. Future forms are undiscovered.">
+        <div className="atlas-tree" role="group" aria-label="Evolution paths">
           <svg className="atlas-connections" viewBox="0 0 800 632" preserveAspectRatio="none" aria-hidden="true">
-            {evolutionEdges.map(edge => <path key={edge.to} d={connections[edge.to]} className={!isFormRevealed(edge.to) ? 'undiscovered' : path.includes(edge.to) ? 'on-path' : ''} />)}
+            {evolutionEdges.map(edge => <path key={edge.to} d={connections[edge.to]} className={!isFormRevealed(edge.to, revealed) ? 'undiscovered' : path.includes(edge.to) ? 'on-path' : ''} />)}
           </svg>
-          {Object.values(forms).map(form => !isFormRevealed(form.id) ? (
+          {Object.values(forms).map(form => !isFormRevealed(form.id, revealed) ? (
             <div key={form.id} className="atlas-node glass atlas-undiscovered" aria-hidden="true"
               style={{ gridRow: form.depth + 1, gridColumn: form.branch === 'celestial' ? '1' : '2' }}>
               <span className="atlas-model-slot"><Box size={29} strokeWidth={1} /></span>
@@ -61,7 +61,7 @@ export default function EvolutionTree({ selected, onSelect, onClose }) {
               key={form.id}
               className={`atlas-node glass ${path.includes(form.id) ? 'on-path' : ''}`}
               style={{ gridRow: form.depth + 1, gridColumn: form.branch ? form.branch === 'celestial' ? '1' : '2' : '1 / -1' }}
-              aria-label={`Preview ${form.name}`}
+              aria-label={`${form.name}`}
               aria-pressed={selected.id === form.id}
               onClick={() => onSelect(form.id)}
             >
@@ -73,7 +73,7 @@ export default function EvolutionTree({ selected, onSelect, onClose }) {
               <span className="atlas-model-label">{form.model ? 'Model available' : 'Model pending'}</span>
             </button>
           ))}
-          {Object.values(forms).filter(form => form.depth >= 2).every(form => !isFormRevealed(form.id)) && <div className="atlas-mist">
+          {Object.values(forms).filter(form => form.depth >= 2).every(form => !isFormRevealed(form.id, revealed)) && <div className="atlas-mist">
             <div><LockKeyhole size={22} strokeWidth={1.2} /><h2>Still undiscovered</h2><p>Your story is still unfolding.</p></div>
           </div>}
         </div>
@@ -86,7 +86,7 @@ export default function EvolutionTree({ selected, onSelect, onClose }) {
         </div>
         <div className="atlas-footer-actions">
           <span>{selected.model ? 'Ready to preview' : 'Model placeholder · Asset to come'}</span>
-          <button className="atlas-preview glass" onClick={onClose}>Preview on stage <ArrowUpRight size={15} /></button>
+          <button className="atlas-preview glass" onClick={onClose}>Return to stage <ArrowUpRight size={15} /></button>
         </div>
       </footer>
     </dialog></Localized>,

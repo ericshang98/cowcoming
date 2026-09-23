@@ -2,7 +2,7 @@
 
 ## 唯一入口
 
-源码、产品快照、开发规则和发布工作流统一保存在私有仓库 `ericshang98/cowcoming`。换电脑通过 Git 同步；网站由 GitHub Actions 将同一提交的构建上传到现有 Cloudflare Pages 项目。
+源码、产品快照、开发规则和发布工作流统一保存在公开仓库 `ericshang98/cowcoming`。换电脑通过 Git 同步；网站由 GitHub Actions 将同一提交的构建上传到现有 Cloudflare Pages 项目。
 
 | 项目 | 值 |
 | --- | --- |
@@ -19,9 +19,23 @@
 
 当前 Cloudflare 项目是 Direct Upload，不能原地改为 Cloudflare 原生 Git integration。通过 GitHub Actions 直接上传即可连接 Git 与网站，不需要迁移项目或改 DNS。官方依据：[Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/)、[Direct Upload with CI](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/)。
 
-## 首次启用状态（2026-09-23）
+## 当前发布状态（2026-09-23）
 
-发布工作流已加入仓库；**在配置下面的 Secret 和启用变量之前，main 只完成检查和保存构建，deploy 作业跳过，不会声称网站已更新。** 本次检查时 cowcoming 仓库还没有 Cloudflare Secret，本机 Wrangler 也未登录。旧 pinclaw-dev 仓库中的 Secret 不能从 GitHub 读取或自动迁移。
+硬件接入 PR #2 已合并。经 Eric 授权，本机完成 Cloudflare OAuth，已把 `9a3e362` 发布到原 Pages 项目，并核对主域名提交 SHA 与入口 JS/CSS 哈希。实时 Worker 已单独发布到 https://cowcoming-live.shangyiyong98.workers.dev ，服务端 ADMIN_KEY 已配置；生产环境已通过鉴权、提示词确认、动作/文本同步、信令、重连、密钥撤销及浏览器直连合成视频/CV 验证。真实硬件接入仍见 [接口说明](live-device.md)。当前线上版本始终以 [build-info.json](https://cowcoming.world/build-info.json) 为准。
+
+**这次是本机授权发布，GitHub 自动发布仍未启用。** 仓库已设置公开变量 `COWCOMING_RELAY_URL`，但没有 `CLOUDFLARE_API_TOKEN` Secret 或 `CLOUDFLARE_DEPLOY_ENABLED=true`。本机 OAuth 不会自动变成 GitHub Actions 凭据。不要把“合并 main”直接写成“网站已更新”。
+
+下述 Actions 工作流只发布 Pages；修改实时服务时，还需按 [Worker 部署步骤](live-device.md#部署到现有网站) 单独部署 Worker。Pages/Edit Token 不具有 Workers 部署权限。生产连接密钥仅保存在私密交接文件中，不进入 Git、构建产物或文档。
+
+## 进化控制发布（2026-09-23）
+
+PR #3 已合并并发布提交 `55c2bcece553ae8d8c8ac3ba39fe61ad451b2b0e`。Pages 发布回执为 `https://6a6493da.niulai-preview-20260922.pages.dev`；主域名提交 SHA、干净构建状态与入口 JS/CSS 哈希匹配。生产浏览器验证默认 5 轮设置、手动切形态、重置回小牛，无运行异常。此前 `9a3e362` 是上一版发布。
+
+实时 Worker 同步发布版本 `0d7264ea-92a6-4c43-8839-e4868ffd320f`，保留原房间、授权和 WebRTC 接口，新增语言 commandId 关联及形态变更来源。56 项 Node 测试、4 项 Python 测试、独立 Worker 集成和桌面／手机浏览器检查通过。真实评估 LLM 与网关仍待配置；页面未配置时不伪造自动进化，模拟数据不计轮。GitHub 自动发布仍未启用，本次使用已授权的本机 OAuth。
+
+## GitHub 自动发布的首次配置
+
+发布工作流已加入仓库；**在配置下面的 Secret 和启用变量之前，main 只完成检查和保存构建，deploy 作业跳过，不会声称网站已更新。** 旧 pinclaw-dev 仓库中的 Secret 不能从 GitHub 读取或自动迁移。
 
 一次性配置：
 
@@ -30,7 +44,7 @@
 3. 在 [本仓库 Actions Variables](https://github.com/ericshang98/cowcoming/settings/variables/actions) 设置 `CLOUDFLARE_DEPLOY_ENABLED` 为 `true`。账户 ID 已固定在工作流，不需要再传给其他电脑。
 4. 在 Actions 的 Verify and publish Cowcoming 中选择 Run workflow → main，等待首次发布和线上校验成功。
 
-配置好一次之后，其他 Agent 的电脑只需要此私有仓库的 GitHub 权限；正常发布无需各自安装 Skill、登录 Cloudflare 或复制 Token。
+配置好一次之后，其他 Agent 的电脑只需要此仓库的 GitHub 写入权限；正常发布无需各自安装 Skill、登录 Cloudflare 或复制 Token。
 
 可用 GitHub CLI 查看是否完成设置（只显示名称，不显示密钥）：
 
