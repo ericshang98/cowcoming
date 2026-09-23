@@ -19,8 +19,8 @@ export function normalizeCollected(value) {
 export function mamaUnlocked(collected) {
   return normalizeCollected(collected).length === STARS.length;
 }
-export function canPlayTrack(id, collected) {
-  return id !== "mama" || mamaUnlocked(collected);
+export function canPlayTrack(id, collected, mode) {
+  return mode === "home" || id !== "mama" || mamaUnlocked(collected);
 }
 export function collectStar(collected, id, position, active) {
   const star = STARS.find((s) => s.id === id);

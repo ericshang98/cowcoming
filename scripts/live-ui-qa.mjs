@@ -263,6 +263,9 @@ try {
       window.__replica?.controller.rig?.animation,
     ),
   );
+  await page.getByRole("button", { name: "Edit camera window" }).click();
+  await page.getByLabel("Source type").selectOption("peer");
+  await page.getByRole("button", { name: "Save settings", exact: true }).click();
   await page.getByRole("button", { name: "Start video" }).click();
   await page.locator(".live-camera.is-live").waitFor({ timeout: 25000 });
   await page.locator(".live-cv-box").waitFor();

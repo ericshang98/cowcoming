@@ -12,6 +12,8 @@ try {
     "adapter.py",
     "action_contract.py",
     "hardware_adapter.py",
+    "local_preview.py",
+    "test_local_preview.py",
     "client.py",
     "camera.py",
     "run.py",
@@ -30,7 +32,7 @@ try {
     resolve("docs/live-device.md"),
     join(output, "device-protocol.md"),
   );
-  for (const file of ["hardware-handoff.md", "evolution-runtime.md"]) {
+  for (const file of ["hardware-handoff.md", "evolution-runtime.md", "local-camera.md"]) {
     await copyFile(resolve("docs", file), join(kit, file));
     await copyFile(resolve("docs", file), join(output, file));
   }

@@ -23,9 +23,7 @@ export function LanguageToggle({className=''}) {
   const label=language==='zh'?'Switch to English':'切换为中文';
   return <button type="button" translate="no" className={`language-toggle ${className}`} data-language={language}
     aria-label={label} title={label} onClick={()=>setLanguage(language==='zh'?'en':'zh')}>
-    <span className="language-thumb" aria-hidden="true"/>
-    <span className={language==='zh'?'active':''} lang="zh-CN">中</span>
-    <span className={language==='en'?'active':''} lang="en">EN</span>
+    <span lang={language==='zh'?'zh-CN':'en'}>{language==='zh'?'中':'EN'}</span>
   </button>;
 }
 export {translateText};

@@ -50,8 +50,8 @@ export function useNiulaiVoice({
     (track, gesture, { loop = false } = {}) => {
       if (!enabled) return;
       setNotice("");
-      if (!track || !canPlayTrack(track.id, collected)) {
-        setNotice("Collect all 27 stars in WORLD to hear me say Mama.");
+      if (!track || !canPlayTrack(track.id, collected, mode)) {
+        setNotice("Press L to interact.");
         return;
       }
       if (paused) {
@@ -70,7 +70,7 @@ export function useNiulaiVoice({
         },
       });
     },
-    [enabled, muted, paused, controller, player, collected],
+    [enabled, muted, paused, controller, player, collected, mode],
   );
   const callMama = useCallback(
     ({ loop = false } = {}) => playVoice(voices.find((v) => v.id === "mama"), undefined, { loop }),

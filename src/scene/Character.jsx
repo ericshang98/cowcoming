@@ -375,7 +375,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
       <group scale={metrics.s} position={metrics.pos}>
         <primitive object={model} onClick={event => {
           event.stopPropagation();
-          if (visible && event.button === 0 && event.delta < 6 && !controller.lastPointerWasDrag)
+          if (visible && event.button === 0 && event.delta < 8 && !controller.lastPointerWasDrag)
             (onTap || controller.onCharacterTap)?.();
         }} />
         {characterId === "spiderman" && <IpWeb model={model} controller={controller} />}
@@ -433,6 +433,7 @@ export default function Character({
         ? { scale: 1.45, x: 0, y: 0.02 }
         : { scale: 1.22, x: -0.12, y: 0.02 };
     if (overlay) return { scale: 0.24, x: 0.37, y: -0.3, ground: false };
+    if (mode === "home" && characterId === "fengge") return { scale: mobile ? 1.28 : 1.4, x: 0, y: mobile ? 0 : -.02 };
     if (mobile && mode === "home" && characterId !== "niulai") return { scale: 1.2, x: 0, y: -.06 };
     if (mobile)
       return mode === "home"
@@ -456,13 +457,21 @@ export default function Character({
         // desktop preview). Follow mice and pens, not touch scrolling.
         active: e.pointerType !== "touch",
       };
-      if (drag) {
-        controller.dragYaw += (e.clientX - drag.last) * 0.009;
-        drag.last = e.clientX;
+      if (drag && e.pointerId === drag.pointerId) {
         drag.distance = Math.max(
           drag.distance,
           Math.hypot(e.clientX - drag.x, e.clientY - drag.y),
         );
+        // A press is a possible tap. Rotate only after deliberate movement.
+        if (!controller.dragging && drag.distance >= 8) {
+          controller.dragging = true;
+          controller.dragYaw = controller.bodyYaw;
+          controller.queue.clear();
+        }
+        if (controller.dragging) {
+          controller.dragYaw += (e.clientX - drag.last) * 0.009;
+          drag.last = e.clientX;
+        }
       }
     };
     const hover = (e) => {
@@ -480,32 +489,34 @@ export default function Character({
     };
     const down = (e) => {
       if (
-        blocked || e.button !== 0 || !e.isPrimary ||
+        blocked || drag || e.button !== 0 || !e.isPrimary ||
         !e.target.closest?.(".character-stage") ||
         e.target.closest?.("button")
       )
         return;
       controller.lastPointerWasDrag = false;
       drag = {
+        pointerId: e.pointerId,
         x: e.clientX,
         y: e.clientY,
         last: e.clientX,
-        time: performance.now(),
         distance: 0,
       };
-      controller.dragging = true;
-      controller.dragYaw = controller.bodyYaw;
-      controller.queue.clear();
+      controller.dragging = false;
     };
-    const up = () => {
-      controller.lastPointerWasDrag = !drag || drag.distance >= 6 || performance.now() - drag.time >= 500;
+    const up = (e) => {
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      controller.lastPointerWasDrag = drag.distance >= 8 ||
+        Math.hypot(e.clientX - drag.x, e.clientY - drag.y) >= 8;
       if (!controller.lastPointerWasDrag && !controller.onCharacterTap && !onTap)
         controller.gesture("perk");
       drag = null;
       controller.dragging = false;
     };
-    const cancel = () => {
+    const cancel = (e) => {
+      if (drag && e?.pointerId !== undefined && e.pointerId !== drag.pointerId) return;
       drag = null;
+      controller.lastPointerWasDrag = true;
       controller.dragging = false;
       controller.gaze = null;
       controller.mouse.active = false;
