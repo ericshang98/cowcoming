@@ -1,0 +1,88 @@
+{
+  "tested_commit": "8f27c51ecf379d27db851fbb3dfa03a195eed770",
+  "worker_version": "97165e27-4c59-4047-970f-66b55727adc1",
+  "worker_deployment": "f02c6717-91f9-48ef-ba9e-0099cfd966c0",
+  "worker_traffic_percent": 100,
+  "website_published": false,
+  "website_test_mode": "Candidate dist served only inside isolated test browser; public Pages unchanged",
+  "persona_version": "niulai-six-v1-6194348364b6",
+  "forms": [
+    {
+      "form": "calf",
+      "revision": 5,
+      "personaVersion": "niulai-six-v1-6194348364b6",
+      "applied": true
+    },
+    {
+      "form": "normal",
+      "revision": 6,
+      "personaVersion": "niulai-six-v1-6194348364b6",
+      "applied": true
+    },
+    {
+      "form": "playful",
+      "revision": 7,
+      "personaVersion": "niulai-six-v1-6194348364b6",
+      "applied": true
+    },
+    {
+      "form": "celestial",
+      "revision": 8,
+      "personaVersion": "niulai-six-v1-6194348364b6",
+      "applied": true
+    },
+    {
+      "form": "tough",
+      "revision": 9,
+      "personaVersion": "niulai-six-v1-6194348364b6",
+      "applied": true
+    },
+    {
+      "form": "dark",
+      "revision": 10,
+      "personaVersion": "niulai-six-v1-6194348364b6",
+      "applied": true
+    },
+    {
+      "form": "normal",
+      "revision": 11,
+      "personaVersion": "niulai-six-v1-6194348364b6",
+      "applied": true
+    }
+  ],
+  "real_turn": {
+    "input": "请点一下头。",
+    "reply": "别看我小，我吹过的牛已经成年了。",
+    "phase": "completed",
+    "hardware_executed": true,
+    "position_verified": false,
+    "completion_basis": "timed_commands",
+    "qwen_ms": 41638.2,
+    "jev_ms": 1462.7,
+    "software_animation_count": 1,
+    "software_clip": "normal_nod_confirm",
+    "software_status": "completed",
+    "hardware_receipts": [
+      "started",
+      "sent"
+    ]
+  },
+  "normal_finish": {
+    "observed_seconds": 15,
+    "holding_axes": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "fault": null,
+    "live_session": null
+  },
+  "browser_errors": [],
+  "pending": [
+    "Cloudflare Pages/Edit Token file and production webpage publish/verification",
+    "User-present microphone end-to-end acceptance",
+    "Qwen response latency and persona style tuning"
+  ]
+}
