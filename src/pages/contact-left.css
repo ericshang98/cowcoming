@@ -91,3 +91,7 @@
 @media (max-width: 380px) {
   .contact-page .conversation .vote-team-name { font-size: 56px; }
 }
+
+@media (max-width: 768px) {
+  .contact-page .contact-character { height: 300px; margin: 0 0 20px; }
+}
