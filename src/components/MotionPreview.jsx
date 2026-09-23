@@ -10,7 +10,7 @@ import {
 } from "../live/motion-tuning.mjs";
 import { ACTION_CATALOG } from "../../shared/action-catalog.mjs";
 import { useLanguage } from "../i18n/Language";
-export default function MotionPreview({ controller, formId, ready }) {
+export default function MotionPreview({ controller, formId, ready, defaultOpen = false }) {
   const { language } = useLanguage(),
     zh = language === "zh";
   const [status, setStatus] = useState(""),
@@ -39,10 +39,20 @@ export default function MotionPreview({ controller, formId, ready }) {
   useEffect(() => {
     controller.motionTuning = document;
   }, [controller, document]);
+  useEffect(() => {
+    const sync = () => {
+      const latest = loadTuning(browserTuningStorage());
+      if (!latest.error) { controller.motionTuning = latest.document; setDocument(latest.document); setSaved(true); }
+    };
+    window.addEventListener('cowcoming-motion-tuning-updated', sync);
+    return () => window.removeEventListener('cowcoming-motion-tuning-updated', sync);
+  }, [controller]);
   function commit(next) {
     controller.motionTuning = next;
     setDocument(next);
-    setSaved(saveTuning(browserTuningStorage(), next));
+    const persisted = saveTuning(browserTuningStorage(), next);
+    setSaved(persisted);
+    if (persisted) window.dispatchEvent(new Event('cowcoming-motion-tuning-updated'));
   }
   function update(value) {
     if (!document.forms[formId]) return;
@@ -130,7 +140,7 @@ export default function MotionPreview({ controller, formId, ready }) {
     <details
       className="motion-preview"
       open={
-        new URLSearchParams(window.location.search).get("motionLab") === "1"
+        defaultOpen || new URLSearchParams(window.location.search).get("motionLab") === "1"
           ? true
           : undefined
       }

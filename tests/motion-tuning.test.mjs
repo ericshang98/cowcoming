@@ -138,3 +138,24 @@ test("legacy five-form settings gain playful defaults without losing any existin
   assert.deepEqual(next.forms.playful, defaultTuningDocument().forms.playful);
   assert.equal(loadTuning({ getItem: () => JSON.stringify(old) }).error, false);
 });
+
+test('queued responses capture their own tuning and release cloned clips after draining', async () => {
+  const root = new THREE.Group(), head = new THREE.Bone();
+  head.name = 'Head'; root.add(head);
+  const mixer = new THREE.AnimationMixer(root);
+  const actions = { nod: mixer.clipAction(clip()) };
+  let settings = { speed: .5, amplitude: .5 };
+  const player = createResponsePlayer({ mixer, actions, bones: new Set(['Head']),
+    manifest: { formId: 'calf', variants: [{logicalId:'nod_confirm',clip:'nod',requiredBones:['Head']}] },
+    getTuning: () => settings });
+  const baseline = mixer.stats.actions.total;
+  const first = player.play({formId:'calf',actionId:'NOD',eventId:'queued-a'});
+  settings = { speed: 1.5, amplitude: 1.25 };
+  const second = player.play({formId:'calf',actionId:'NOD',eventId:'queued-b'});
+  settings = { speed: .8, amplitude: .9 };
+  for (let i=0; i<600; i++) { mixer.update(.01); player.update(.01); }
+  assert.deepEqual((await first).tuning, {speed:.5,amplitude:.5});
+  assert.deepEqual((await second).tuning, {speed:1.5,amplitude:1.25});
+  assert.equal(mixer.stats.actions.total, baseline);
+  player.dispose();
+});

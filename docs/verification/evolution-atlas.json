@@ -1,0 +1,23 @@
+{
+  "testedAt": "2026-09-23",
+  "tool": "CUA in-app browser",
+  "origins": ["http://127.0.0.1:4340", "http://127.0.0.1:4341"],
+  "viewports": [[1280,720],[390,844]],
+  "languages": ["zh","en"],
+  "forms": ["calf","normal","playful","tough","celestial","dark"],
+  "actionsPerForm": ["NOD","SHAKE","NOD_DOUBLE","TILT_LEFT","TILT_RIGHT"],
+  "completedPlays": 30,
+  "speed": 1.5,
+  "amplitude": 1.25,
+  "stoppedAndReplayedEachAction": true,
+  "actualFormStayedCalf": true,
+  "availableWithoutBinding": true,
+  "modelFailure": {"form":"dark","httpStatus":503,"retryRestoredModelAndCompletedNod":true},
+  "closeRestoresTriggerFocus": true,
+  "thumbnailCount": 6,
+  "nodeTests": 112,
+  "pythonTests": 14,
+  "isolatedWorkerIntegration": "passed",
+  "realHardwareExercised": false,
+  "cloudRelease": "pending Pages authentication"
+}

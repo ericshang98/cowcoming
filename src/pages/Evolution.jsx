@@ -1,5 +1,5 @@
 import { Localized, useLanguage } from "../i18n/Language";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ObservationPanel from '../components/ObservationPanel';
 import { Controls } from '../components/Chrome';
 import { PageLead } from './Portfolio';
@@ -7,6 +7,7 @@ import { evolutionRoutes, forms } from '../evolution.mjs';
 import EvolutionTree from './EvolutionTree';
 import MotionPreview from '../components/MotionPreview';
 import EvolutionSettings from '../components/EvolutionSettings';
+import { browserTuningStorage, loadTuning } from '../live/motion-tuning.mjs';
 import { SlidersHorizontal } from 'lucide-react';
 import BindingGate from '../live/BindingGate';
 import { evolutionStatus } from '../evolution-session.mjs';
@@ -16,14 +17,20 @@ export default function Evolution({ controller, live, preview, onSelectRoute, on
   const motionLab = new URLSearchParams(window.location.search).get("motionLab") === "1";
   const route = evolutionRoutes.find(item => item.id === browseRoute) || preview.route;
   const [treeOpen, setTreeOpen] = useState(false);
+  const atlasOpener = useRef(null);
+  const [atlasView, setAtlasView] = useState('tree');
+  const openAtlas = (view = 'tree', opener = document.activeElement) => { atlasOpener.current = opener; setAtlasView(view); setTreeOpen(true); };
+  const closeAtlas = () => { setTreeOpen(false); controller.motionTuning = loadTuning(browserTuningStorage()).document; };
   const [settingsOpen, setSettingsOpen] = useState(false);
   const { language } = useLanguage();
   const t = (zh, en) => language === 'zh' ? zh : en;
   const status = evolutionStatus(session.state);
   useEffect(() => {
-    if (!live?.online) { setTreeOpen(false); setSettingsOpen(false); }
+    if (!live?.online) setSettingsOpen(false);
   }, [live?.online]);
-  if (!live?.online) return <BindingGate live={live} />;
+  const atlas = treeOpen && <EvolutionTree selected={form} onSelect={onSelectForm} canSelect={Boolean(live?.online)} initialView={atlasView} returnFocus={atlasOpener.current} onClose={closeAtlas} />;
+  const debugButton = <button className="evolution-debug-toggle glass" aria-haspopup="dialog" onClick={event => openAtlas('model', event.currentTarget)}><SlidersHorizontal size={13} />{t('调试模式', 'Debug mode')}</button>;
+  if (!live?.online) return <><BindingGate live={live} onOpenAtlas={event => openAtlas('tree', event.currentTarget)} />{debugButton}{atlas}</>;
   return (
     <Localized><>
     <section className="work-page evolution-page page" data-pwc-critical="work">
@@ -32,7 +39,7 @@ export default function Evolution({ controller, live, preview, onSelectRoute, on
       </PageLead>
 
       <aside className="career evolution-timeline" aria-label="Evolution paths">
-        <div className="small-heading"><span>EVOLUTION PATH</span><button className="open-atlas" onClick={() => setTreeOpen(true)} aria-haspopup="dialog">VIEW TREE ↗</button></div>
+        <div className="small-heading"><span>EVOLUTION PATH</span><button className="open-atlas" onClick={event => openAtlas('tree', event.currentTarget)} aria-haspopup="dialog">VIEW TREE ↗</button></div>
         {!motionLab && <div className="evolution-routes" role="group" aria-label="Switch evolution paths">
           {evolutionRoutes.map(item => (
             <button key={item.id} aria-pressed={route.id === item.id} onClick={() => onSelectRoute(item.id)}>{item.name}</button>
@@ -68,9 +75,9 @@ export default function Evolution({ controller, live, preview, onSelectRoute, on
       </aside>
 
       <ObservationPanel live={live} />
-      <footer className="evolution-footer"><Controls music={false} onExpand={() => setTreeOpen(true)} onReset={session.reset} /><button className="evolution-settings-trigger" aria-label={t('进化设置', 'Evolution settings')} title={t('进化设置', 'Evolution settings')} aria-haspopup="dialog" onClick={() => setSettingsOpen(true)}><SlidersHorizontal size={15} /><i className={status === 'error' || status === 'unconfigured' ? 'needs-setup' : ''} /></button><span role="status">{status === 'manual' ? t('手动形态', 'Manual form') : status === 'terminal' ? t('已到终点 · 重置可返璞归真', 'Final form · reset to begin again') : status === 'unconfigured' ? t('自动进化待配置', 'Automatic evolution needs setup') : status === 'error' ? t('评估未完成 · 在设置中重试', 'Evaluation failed · retry in settings') : t('自动进化', 'Automatic evolution')}</span></footer>
+      <footer className="evolution-footer"><Controls music={false} onExpand={event => openAtlas('tree', event.currentTarget)} onReset={session.reset} /><button className="evolution-settings-trigger" aria-label={t('进化设置', 'Evolution settings')} title={t('进化设置', 'Evolution settings')} aria-haspopup="dialog" onClick={() => setSettingsOpen(true)}><SlidersHorizontal size={15} /><i className={status === 'error' || status === 'unconfigured' ? 'needs-setup' : ''} /></button><span role="status">{status === 'manual' ? t('手动形态', 'Manual form') : status === 'terminal' ? t('已到终点 · 重置可返璞归真', 'Final form · reset to begin again') : status === 'unconfigured' ? t('自动进化待配置', 'Automatic evolution needs setup') : status === 'error' ? t('评估未完成 · 在设置中重试', 'Evaluation failed · retry in settings') : t('自动进化', 'Automatic evolution')}</span></footer>
     </section>
-    {treeOpen && <EvolutionTree revealed={Object.keys(forms)} selected={form} onSelect={onSelectForm} onClose={() => setTreeOpen(false)} />}
+    {debugButton}{atlas}
     {settingsOpen && <EvolutionSettings session={session} onClose={() => setSettingsOpen(false)} />}
     </></Localized>
   );

@@ -11,6 +11,10 @@ export const forms = {
   dark: { id: 'dark', name: '暗黑牛', parent: 'tough', depth: 3, branch: 'dark', description: 'The next evolution of 硬牛.', model: evolutionAssets.dark.model },
 };
 
+for (const form of Object.values(forms)) {
+  form.thumbnail = `/models/evolution/thumbnails/${form.id}-${evolutionAssets[form.id].sha256.slice(0, 12)}.png`;
+}
+
 export const evolutionRoutes = [
   { id: 'celestial', name: '仙牛 path', nodes: ['calf', 'normal', 'playful', 'celestial'] },
   { id: 'dark', name: '暗黑牛 path', nodes: ['calf', 'normal', 'tough', 'dark'] },
