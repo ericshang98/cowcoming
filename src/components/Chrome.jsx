@@ -6,7 +6,6 @@ import {
   House,
   FolderGit2,
   Sparkles,
-  User,
   Send,
   Volume2,
   VolumeX,
@@ -24,7 +23,6 @@ export const routes = [
   ["home", "HOME", House],
   ["work", "WORK", FolderGit2],
   ["blog", "WORLD", Sparkles],
-  ["about", "ABOUT", User],
   ["contact", "VOTE US", Send],
 ];
 export function Controls({ music = true, onExpand, onReset }) {
@@ -100,7 +98,7 @@ export function Header() {
   } = useApp();
   const { language } = useLanguage();
   const name = canSwitchIp ? (language === 'en' ? activeIp.nameEn : activeIp.name) : '牛来';
-  const switchLabel = language === 'en' ? (canSwitchIp ? 'Switch IP' : 'Switch IP (Home, About and Support only)') : (canSwitchIp ? '切换 IP' : '切换 IP（首页、关于和支持我们可用）');
+  const switchLabel = language === 'en' ? (canSwitchIp ? 'Switch IP' : 'Switch IP (Home and Support only)') : (canSwitchIp ? '切换 IP' : '切换 IP（首页和支持我们可用）');
   return (
     <Localized><>
       <header className="identity">
@@ -108,11 +106,11 @@ export function Header() {
           Cowcoming
         </button>
         <div className="identity-desktop">
-          {mode === "about" ? "基于 JEV 决策模型的可进化 AI 宠物" : canSwitchIp ? `${name} IP · Powered by Cowcoming` : "牛来 IP · Powered by Cowcoming"}
+          {canSwitchIp ? `${name} IP · Powered by Cowcoming` : "牛来 IP · Powered by Cowcoming"}
         </div>
         <div className="identity-mobile">
           <i />
-          {mode === "about" ? "可进化 AI 宠物" : mode === "work" ? "Explore how 牛来 evolves" : canSwitchIp && activeIp.id !== 'niulai' ? (language === 'en' ? `Tap ${activeIp.nameEn} for a reply` : `点点${activeIp.name}，听听回应`) : "点点牛来，听它说话"}
+          {mode === "work" ? "Explore how 牛来 evolves" : canSwitchIp && activeIp.id !== 'niulai' ? (language === 'en' ? `Tap ${activeIp.nameEn} for a reply` : `点点${activeIp.name}，听听回应`) : "点点牛来，听它说话"}
         </div>
       </header>
       <div className="mobile-actions">

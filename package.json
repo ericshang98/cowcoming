@@ -16,7 +16,6 @@
     "qa:mouth": "node scripts/mouth-qa.cjs",
     "qa:models": "node scripts/ip-switcher-qa.cjs",
     "docs:sync": "node scripts/sync-product-doc.mjs",
-    "qa:about": "node scripts/about-qa.cjs",
     "verify:deployment": "node scripts/verify-deployment.mjs",
     "relay:dev": "wrangler dev --config server/wrangler.jsonc --port 8794 --ip 127.0.0.1",
     "relay:deploy": "wrangler deploy --config server/wrangler.jsonc",
