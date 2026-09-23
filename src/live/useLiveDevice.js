@@ -187,11 +187,11 @@ export default function useLiveDevice(controller, active) {
                 if(decisions.current.size>1000)decisions.current.delete(decisions.current.values().next().value);
                 const ctx=current.current.controller.evolution?.context();
                 const player=current.current.controller.responsePlayer;
-                const promise=decision.actionId==='WAIT'
-                  ?Promise.resolve({status:'completed',clip:'idle',formId:profile.formId,eventId:decisionKey})
-                  :player && current.current.controller.responseForm===profile.formId
+                const promise=player && current.current.controller.responseForm===profile.formId
                   ?player.play({eventId:decisionKey,formId:profile.formId,actionId:decision.actionId})
-                  :Promise.resolve({status:'unavailable',reason:'model-not-loaded'});
+                  :decision.actionId==='WAIT'
+                    ?Promise.resolve({status:'completed',clip:'idle',formId:profile.formId,eventId:decisionKey})
+                    :Promise.resolve({status:'unavailable',reason:'model-not-loaded'});
                 setLastAnimation({actionId:decision.actionId,decisionId:decision.decisionId,status:'playing',clip:null});
                 promise.then(result=>{
                   if(generation.current!==gen)return;

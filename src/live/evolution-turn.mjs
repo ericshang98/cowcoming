@@ -4,7 +4,7 @@ export function completedEvolutionTurn(snapshot, commandId, context, software) {
   if (!result) return { terminal: false };
   const decision = snapshot.events.find(e => e.type === 'decision' && e.commandId === commandId);
 
-  if(snapshot.profile.actionContractVersion===2 && result.status==='completed' && decision?.actionId!=='WAIT'){
+  if(snapshot.profile.actionContractVersion===2 && result.status==='completed'){
     if(!software)return {terminal:false};
     if(software.status!=='completed')return {terminal:true};
   }
