@@ -4,7 +4,7 @@ import { useLanguage } from "../i18n/Language";
 import ConnectionBar from "./ConnectionBar";
 import DeviceDebug from "./DeviceDebug";
 import CameraView from "./CameraView";
-import usePeerCamera from "./usePeerCamera";
+import useLocalCamera from "./useLocalCamera";
 export default function LiveObservationPanel({ live }) {
   const { language } = useLanguage(),
     t = (zh, en) => (language === "zh" ? zh : en);
@@ -14,7 +14,7 @@ export default function LiveObservationPanel({ live }) {
   const messages = useRef(null),
     follow = useRef(true),
     tabRefs = useRef([]);
-  const camera = usePeerCamera(live),
+  const camera = useLocalCamera(live),
     s = live.snapshot;
   const decision = s.events.findLast((e) => e.type === "decision");
   const action = s.events.findLast(
@@ -260,8 +260,8 @@ export default function LiveObservationPanel({ live }) {
                 "Device offline. Showing the last known state.",
               )
             : t(
-                "形态与文本经云端同步；画面与检测框通过直连传输。",
-                "Forms and text sync through the cloud; video and detections travel directly.",
+                "形态与文本经云端同步；画面与识别标注留在本机。",
+                "Forms and text sync through the cloud; local video and detections stay on this computer.",
               )}
         </p>
       </div>
