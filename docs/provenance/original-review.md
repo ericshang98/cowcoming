@@ -1,5 +1,7 @@
 # FUCH 复刻交付记录
 
+> 历史记录：文中 `niulai.nexting.design` 已于 2026-09-23 移除 Pages 绑定，当前网站为 https://cowcoming.world/ 。请勿据旧验收记录恢复旧域名。
+
 参考：[fuch.ai](https://www.fuch.ai/)；采集日期：2026-09-22。
 
 预览：http://127.0.0.1:4178/
