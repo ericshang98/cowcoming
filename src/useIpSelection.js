@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
-import { getIp, savedIp } from './ip-catalog.mjs';
+import { getIp } from './ip-catalog.mjs';
 
 export function useIpSelection(onUserSelected) {
   const [active, setActive] = useState('niulai');
@@ -19,7 +19,6 @@ export function useIpSelection(onUserSelected) {
   const complete = useCallback(() => {
     if (!pending || token.current !== pending.request) return;
     activeRef.current = pending.ip.id; setActive(pending.ip.id); setPending(null);
-    try { localStorage.setItem('cowcoming-ip', pending.ip.id); } catch { /* Optional preference. */ }
     if (pending.user) onSelected.current();
   }, [pending]);
   const fail = useCallback(() => {
@@ -32,9 +31,9 @@ export function useIpSelection(onUserSelected) {
     return () => clearTimeout(timer);
   }, [pending, fail]);
   useEffect(() => {
-    let id; try { id = savedIp(localStorage); } catch { id = 'niulai'; }
-    if (id !== 'niulai') select(id, false);
+    // Only the current mounted app remembers an IP; a reload starts as Niulai.
+    try { localStorage.removeItem('cowcoming-ip'); } catch { /* Storage is optional. */ }
     return () => { token.current++; };
-  }, [select]);
+  }, []);
   return { active, pending, error, select, cancel, complete, fail };
 }

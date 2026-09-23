@@ -4193,3 +4193,19 @@ kbd {
 .mouth-preview-panel button { flex: 1; padding: 9px 5px; border-radius: 8px; border: 1px solid #d5e1de; font-size: 12px; background: #fff; }
 .mouth-preview-panel button[aria-pressed="true"] { background: #08796e; border-color: #08796e; color: white; }
 .mouth-preview-panel small { display: block; margin-top: 10px; font-size: 10px; color: #657570; }
+
+/* Fengge's contact shadow follows the projected floor in the rig. */
+.character-stage[data-character="fengge"] .ground-shadow {
+  width: 200px;
+  height: 24px;
+  filter: blur(6px);
+  background:
+    radial-gradient(ellipse 26% 45% at 18% 50%, #26384190, transparent),
+    radial-gradient(ellipse 26% 45% at 82% 50%, #26384190, transparent),
+    radial-gradient(ellipse, #26384128, transparent 75%);
+  opacity: .8;
+  transition: opacity .4s;
+}
+@media (max-width: 768px) {
+  .character-stage[data-character="fengge"] .ground-shadow { opacity: .8 !important; }
+}

@@ -51,7 +51,7 @@ const base = process.env.QA_BASE_URL || 'http://127.0.0.1:42910/';
 
     for (const [id, tap, signature] of [['fengge','nod','reflect'],['nailong','tilt','wave'],['toothless','tilt','wing_flap'],['spiderman','wave','bow']]) {
       if ((await state()).activeIp !== id) {await open(); await page.locator(`[data-ip=${id}]`).click(); await waitIp(id);}
-      await page.waitForFunction(scale => Math.abs(window.__replica.controller.rig.scale-scale) < .01, id === 'fengge' ? 1.4 : 1.25);
+      await page.waitForFunction(scale => Math.abs(window.__replica.controller.rig.scale-scale) < .01, id === 'fengge' ? 1.6 : 1.25);
       await page.mouse.move(10,500); await page.waitForTimeout(300);
       // Click real rendered mesh; sculptural holes can make the exact center miss.
       let hit = false;
@@ -68,9 +68,10 @@ const base = process.env.QA_BASE_URL || 'http://127.0.0.1:42910/';
     await page.keyboard.press('l'); await gesture('bow','/characters/spiderman/v1/signature.mp3');
     await open(); assert.equal((await state()).ipVoice.status, 'idle');
     await page.locator('[data-ip=nailong]').click(); await waitIp('nailong');
-    await page.reload(); await waitIp('nailong');
+    await page.reload(); await waitIp('niulai');
     await page.waitForFunction(() => window.__replica.getState().bootDone);
-    checks.push('opening switcher stops prior voice; saved IP restores after reload');
+    checks.push('opening switcher stops prior voice; reload starts as Niulai');
+    await open(); await page.locator('[data-ip=nailong]').click(); await waitIp('nailong');
 
     await page.locator('.scene-controls button').nth(1).click();
     await page.keyboard.press('l'); await gesture('wave','/characters/nailong/v1/signature.mp3');

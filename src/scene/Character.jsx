@@ -28,7 +28,7 @@ const gestures = {
   spin: "bow",
   curious: "bow",
 };
-function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, visible, onReady, entrance, onTap }) {
+function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, visible, onReady, entrance, onTap, shadowRef }) {
   const gltf = useGLTF(human ? HUMAN : modelAsset),
     { camera, gl } = useThree(),
     root = useRef(),
@@ -103,6 +103,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     nextIdle: 18,
     prevVisible: false,
     foot: new THREE.Vector3(),
+    shadow: new THREE.Vector3(),
     headScreen: new THREE.Vector3(),
     parentQ: new THREE.Quaternion(),
     deltaQ: new THREE.Quaternion(),
@@ -276,6 +277,14 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
       bones.hips.position.z = bones.hipBase.z;
     }
     const floor = -1.5 - placement.y * 2 * half;
+    if (characterId === 'fengge' && shadowRef.current) {
+      // Project the same floor used by the soles into this canvas, including
+      // About's contained stage. CSS percentages otherwise leave a visible gap.
+      st.shadow.set(group.position.x, floor, 0).project(camera);
+      shadowRef.current.style.left = `${(st.shadow.x + 1) * 50}%`;
+      shadowRef.current.style.top = `${(1 - st.shadow.y) * 50}%`;
+      shadowRef.current.style.transform = `translate(-50%, -50%) scale(${group.scale.x})`;
+    }
     if (placement.ground !== false && !human) {
       // Niulai has a fixed root and no ToeBase bones. Anchor the bind-pose
       // sole to the floor, preserving the vertical motion in its clips.
@@ -420,11 +429,12 @@ export default function Character({
   characterId = 'niulai',
 }) {
   // About contains the shared selected IP in its own model stage.
-  const stageRef = useRef();
+  const stageRef = useRef(), shadowRef = useRef();
   const placement = useMemo(() => {
     // Loading has its own full-body framing. The mobile homepage deliberately
     // crops the legs, which would hide the walking animation during boot.
     if (!boot && mobile) return { scale: 0.95, x: 0, y: -0.18 };
+    if (mode === "about" && characterId === "fengge") return { scale: mobile ? 1.45 : 1.55, x: 0, y: .065 };
     if (mode === "about") return { scale: mobile ? 1.3 : 1.4, x: 0, y: 0.02 };
     // WORK is Niulai's main stage, including on narrow screens. Supporting
     // content scrolls below it instead of turning the model into a thumbnail.
@@ -433,12 +443,13 @@ export default function Character({
         ? { scale: 1.45, x: 0, y: 0.02 }
         : { scale: 1.22, x: -0.12, y: 0.02 };
     if (overlay) return { scale: 0.24, x: 0.37, y: -0.3, ground: false };
-    if (mode === "home" && characterId === "fengge") return { scale: mobile ? 1.28 : 1.4, x: 0, y: mobile ? 0 : -.02 };
+    if (mode === "home" && characterId === "fengge") return { scale: mobile ? 1.45 : 1.6, x: 0, y: .055 };
     if (mobile && mode === "home" && characterId !== "niulai") return { scale: 1.2, x: 0, y: -.06 };
     if (mobile)
       return mode === "home"
         ? { scale: 1.4, x: 0, y: 0.16 }
         : { scale: 0.38, x: 0.3, y: -0.13, ground: false };
+    if (mode === "contact" && characterId === "fengge") return { scale: 1.5, x: 0, y: .065 };
     if (mode === "contact") return { scale: 1.22, x: 0, y: 0.04 };
     return { scale: 1.25, x: 0, y: -0.02 };
   }, [mode, mobile, overlay, boot, characterId]);
@@ -551,8 +562,10 @@ export default function Character({
       aria-disabled={mode === "about" && overlay ? true : undefined}
     >
       <div
+        ref={shadowRef}
         className="ground-shadow"
         style={{
+          top: characterId === 'fengge' ? '88%' : undefined,
           left: `${50 + placement.x * 100}%`,
           opacity: placement.ground === false ? 0 : 1,
           transform: `translateX(-50%) scale(${placement.scale})`,
@@ -586,6 +599,7 @@ export default function Character({
               human={false}
               onTap={onTap}
               controller={controller}
+              shadowRef={shadowRef}
               placement={placement}
               visible
               entrance={!boot}

@@ -17,7 +17,3 @@ export const ipCatalog = [
     actions: { tap: { clip: 'tilt', src: '/characters/toothless/v1/tap.mp3', duration: 2.08, text: '好奇地咕噜一声', textEn: 'A curious chirp' }, signature: { clip: 'wing_flap', src: '/characters/toothless/v1/signature.mp3', duration: 3.85, text: '展开翅膀，扑动两下', textEn: 'Spread and flap' } } },
 ];
 export const getIp = id => ipCatalog.find(ip => ip.id === id);
-export function savedIp(storage) {
-  try { const id = storage?.getItem('cowcoming-ip'); return getIp(id)?.available ? id : 'niulai'; }
-  catch { return 'niulai'; }
-}
