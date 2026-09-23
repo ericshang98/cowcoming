@@ -101,7 +101,8 @@ try {
         type: "device.status",
         eventId: crypto.randomUUID(),
         name: "Browser test adapter",
-        hardware: "unknown",
+        hardware: "ready",
+        actionContractVersion: 2, supportedActions: ["NOD","SHAKE","NOD_DOUBLE","TILT_LEFT","TILT_RIGHT","WAIT"],
         camera: "ready",
         jev: "ready",
         language: "ready",
@@ -252,13 +253,13 @@ try {
     await devicePage.evaluate(() => window.device.profile.prompt),
     "Use a small nod when greeting.",
   );
-  await page.getByRole("button", { name: "NOD", exact: true }).click();
+  await page.getByRole("button", { name: "Confirm nod", exact: true }).click();
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Close", exact: true })
     .click();
   await page.waitForFunction(() =>
-    ["nod-soft", "nod-double"].includes(
+    ["normal_nod_confirm"].includes(
       window.__replica?.controller.rig?.animation,
     ),
   );

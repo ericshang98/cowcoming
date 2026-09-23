@@ -1,18 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLanguage } from "../i18n/Language";
 import { LiveDialog } from "./ConnectionBar";
 import { forms } from "../evolution.mjs";
+import { ACTION_CATALOG, ACTION_CONTRACT_VERSION, availableDeviceActions } from "../../shared/action-catalog.mjs";
 import { ACTION_IDS } from "../../shared/live-protocol.mjs";
 export default function DeviceDebug({ live, onClose }) {
   const { language } = useLanguage(),
     t = (zh, en) => (language === "zh" ? zh : en);
   const profile = live.snapshot.profile;
+  const legacy=profile.actionContractVersion!==ACTION_CONTRACT_VERSION;
+  const available=availableDeviceActions(live.snapshot);
   const [draft, setDraft] = useState(() => ({
     ...profile,
     animationMap: JSON.stringify(profile.animationMap, null, 2),
   }));
   const [error, setError] = useState("");
   const [sentRevision, setSentRevision] = useState(null);
+  useEffect(() => { setDraft({...profile, animationMap:JSON.stringify(profile.animationMap,null,2)}); setSentRevision(null); }, [profile.actionContractVersion]);
   function save(e) {
     e.preventDefault();
     setError("");
@@ -40,7 +44,10 @@ export default function DeviceDebug({ live, onClose }) {
           "Set evolution cadence at the lower left. Edit forms, prompts and actions here; manually changing a form takes control of evolution.",
         )}
       </p>
+      {legacy && <div role="status"><p>{t('当前房间使用旧动作协议，需要升级后由设备重新确认。','This room uses the old action contract. Upgrade and wait for device acknowledgement.')}</p><button onClick={()=>live.updateProfile({migrateActions:true})}>{t('升级到五动作协议','Upgrade to five actions')}</button></div>}
+      {!legacy && live.snapshot.device.actionContractVersion!==ACTION_CONTRACT_VERSION && <p role="status">{t('请让设备运行新版接入套件，并声明已验证的动作能力。','Update the device kit and report its verified action capabilities.')}</p>}
       <form onSubmit={save}>
+      <fieldset disabled={legacy} style={{border:0,padding:0}}>
         <label>
           {t("调试形态", "Debug form")}
           <select
@@ -92,7 +99,7 @@ export default function DeviceDebug({ live, onClose }) {
                     })
                   }
                 />
-                {action}
+                {ACTION_CATALOG[action] ? t(ACTION_CATALOG[action].label,ACTION_CATALOG[action].en) : action}
               </label>
             ))}
           </div>
@@ -166,7 +173,7 @@ export default function DeviceDebug({ live, onClose }) {
             {t("保存并同步", "Save & sync")}
           </button>
         </footer>
-      </form>
+      </fieldset></form>
       <section className="live-debug-actions">
         <h3>{t("动作测试", "Test an action")}</h3>
         <div>
@@ -174,14 +181,14 @@ export default function DeviceDebug({ live, onClose }) {
             <button
               key={action}
               disabled={
-                !live.online ||
+                !live.online || !available.includes(action) ||
                 live.snapshot.appliedRevision !== profile.revision
               }
               onClick={() =>
                 live.command({ command: "action", actionId: action })
               }
             >
-              {action}
+              {ACTION_CATALOG[action] ? t(ACTION_CATALOG[action].label,ACTION_CATALOG[action].en) : action}
             </button>
           ))}
         </div>

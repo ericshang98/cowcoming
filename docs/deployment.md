@@ -111,3 +111,10 @@ npm run verify:deployment -- https://cowcoming.world "$(git rev-parse HEAD)"
 需要停用自动发布时把 `CLOUDFLARE_DEPLOY_ENABLED` 设为 `false`。回退可在 Cloudflare 选择历史生产部署；之后将 Git 中的相应修改 revert 并正常提交，确保下一次 main 发布不会再次覆盖回错误版本。不 force-push main。
 
 旧 `pinclaw-dev` 发布流程曾用于建站，其历史记录可供核对；后续优先用本仓库，不再从旧 Release 的固定 ZIP 部署。不要擅自修改其他仓库、联系或调度其他 Agent。
+
+
+## 五动作集成发布待办（PR #14）
+
+五形态 25 段回应动画、动作合同 2、显式旧房间升级及 Python 设备交付包在 PR #14。已通过本地构建、Node/Python、隔离 Worker 和浏览器联动测试；真实驱动由朋友提供。
+
+本次本机 Wrangler 未认证，发起 OAuth 后等待授权超时，尚未部署 Worker 或 Pages。2026-09-23 核对主域名仍返回 `7f12f2e773dc2e02529d6f75dd5a2fe6932ed64b`；这个值仅记录核对时状态，后续以实时 build-info 为准。GitHub 自动部署未启用。恢复授权后先部署现有 cowcoming-live Worker，再从最新已合并干净提交构建、发布既有 Pages 项目，并核对主域名及五个模型哈希。不要仅凭 PR 合并判断线上升级完成。

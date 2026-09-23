@@ -1,0 +1,133 @@
+{
+  "source": "Reimported final GLB",
+  "bones": 13,
+  "clips": [
+    "bow",
+    "calf_head_shake",
+    "calf_nod_confirm",
+    "calf_nod_proud",
+    "calf_tilt_curious_left",
+    "calf_tilt_curious_right",
+    "idle",
+    "walking",
+    "wave"
+  ],
+  "morphs": [
+    "MouthOpen",
+    "MouthRound",
+    "MouthWide"
+  ],
+  "newClipChecks": [
+    {
+      "clip": "calf_nod_confirm",
+      "frames": 265,
+      "durationSeconds": 2.2,
+      "maxVertexDisplacement": 0.4525875151157379,
+      "maxFootDisplacement": 0,
+      "endpointMaxError": 0.0,
+      "pitchRange": [
+        9.869566121904934e-21,
+        17.199768345274368
+      ],
+      "rollRange": [
+        5.765622589907457e-21,
+        8.344312533846349e-07
+      ],
+      "yawRange": [
+        -1.0445107496906435e-07,
+        1.5166066558187088e-21
+      ]
+    },
+    {
+      "clip": "calf_head_shake",
+      "frames": 361,
+      "durationSeconds": 3.0,
+      "maxVertexDisplacement": 0.32138195633888245,
+      "maxFootDisplacement": 0,
+      "endpointMaxError": 0.0,
+      "pitchRange": [
+        -1.2218560003755106e-13,
+        1.0946884645941513e-13
+      ],
+      "rollRange": [
+        -3.209467959073016e-07,
+        3.215859981733625e-07
+      ],
+      "yawRange": [
+        -19.72497652771295,
+        19.76880679070326
+      ]
+    },
+    {
+      "clip": "calf_nod_proud",
+      "frames": 349,
+      "durationSeconds": 2.9,
+      "maxVertexDisplacement": 0.3297549784183502,
+      "maxFootDisplacement": 0,
+      "endpointMaxError": 0.0,
+      "pitchRange": [
+        -7.467070139212476,
+        13.636231324400734
+      ],
+      "rollRange": [
+        -2.7949737355603095e-07,
+        8.124732158564002e-07
+      ],
+      "yawRange": [
+        -9.901321486503562e-08,
+        1.5166066558187088e-21
+      ]
+    },
+    {
+      "clip": "calf_tilt_curious_left",
+      "frames": 373,
+      "durationSeconds": 3.1,
+      "maxVertexDisplacement": 0.5297464728355408,
+      "maxFootDisplacement": 0,
+      "endpointMaxError": 0.0,
+      "pitchRange": [
+        -1.1214972945636595e-07,
+        4.402189334091006
+      ],
+      "rollRange": [
+        5.765622589907457e-21,
+        18.04308843771392
+      ],
+      "yawRange": [
+        -0.6197489528089647,
+        1.3935000802274943e-08
+      ]
+    },
+    {
+      "clip": "calf_tilt_curious_right",
+      "frames": 373,
+      "durationSeconds": 3.1,
+      "maxVertexDisplacement": 0.529708743095398,
+      "maxFootDisplacement": 0,
+      "endpointMaxError": 0.0,
+      "pitchRange": [
+        9.869566121904934e-21,
+        4.402192575804254
+      ],
+      "rollRange": [
+        -18.043091126899586,
+        3.7940344579738417e-10
+      ],
+      "yawRange": [
+        -1.204871639358741e-09,
+        0.6197503689282469
+      ]
+    }
+  ],
+  "proudNodPitchSamples": [
+    13.595612105387726,
+    -3.700651923841746,
+    9.96653546671994
+  ],
+  "limitations": [
+    "No new hardware control",
+    "No sit/stand clips",
+    "No eyelid or eyebrow animation",
+    "Mesh self-intersection requires visual inspection; finite bounds alone do not prove no intersections"
+  ]
+}

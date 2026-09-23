@@ -1,0 +1,47 @@
+{
+  "method": "Original and final GLB reimported separately; compare every bone matrix at nine times per original clip",
+  "checks": [
+    {
+      "clip": "bow",
+      "durationSeconds": 2.2,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.97536563873291e-06
+    },
+    {
+      "clip": "idle",
+      "durationSeconds": 4.0,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.97536563873291e-06
+    },
+    {
+      "clip": "look",
+      "durationSeconds": 2.0,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.97536563873291e-06
+    },
+    {
+      "clip": "nod",
+      "durationSeconds": 2.2,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.97536563873291e-06
+    },
+    {
+      "clip": "reflect",
+      "durationSeconds": 3.6,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.97536563873291e-06
+    },
+    {
+      "clip": "tilt",
+      "durationSeconds": 2.5,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.97536563873291e-06
+    },
+    {
+      "clip": "wave",
+      "durationSeconds": 2.4,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.97536563873291e-06
+    }
+  ]
+}

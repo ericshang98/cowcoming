@@ -16,7 +16,7 @@ fs.mkdirSync('output/evolution-qa', {recursive:true});
  device=new WebSocket(relay.replace(/^http/,'ws')+'/v1/socket/'+ticket.roomId+'?ticket='+ticket.ticket);
  device.addEventListener('message',e=>{const m=JSON.parse(e.data);if(m.type==='profile')device.send(JSON.stringify({type:'profile.applied',eventId:crypto.randomUUID(),revision:m.profile.revision}));});
  await new Promise((resolve,reject)=>{device.onopen=resolve;device.onerror=reject;});
- device.send(JSON.stringify({type:'device.status',eventId:crypto.randomUUID(),simulation:true,name:'QA only'}));
+ device.send(JSON.stringify({type:'device.status',eventId:crypto.randomUUID(),simulation:true,name:'QA only',actionContractVersion:2,supportedActions:[],hardware:'offline'}));
  heartbeat=setInterval(()=>{if(device.readyState===1)device.send(JSON.stringify({type:'ping'}));},10000);
  const browser = await chromium.launch({headless:true,channel:"chrome"});
  const page = await browser.newPage({viewport:{width:1440,height:900}});

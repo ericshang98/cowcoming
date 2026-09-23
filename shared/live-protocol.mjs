@@ -6,24 +6,8 @@ export const FORM_IDS = [
   "celestial",
   "dark",
 ];
-export const ACTION_IDS = ["NOD", "LOOK", "TILT", "WAVE", "WAIT"];
-export const ANIMATIONS = [
-  "nod-soft",
-  "nod-double",
-  "look-left",
-  "look-right",
-  "tilt-left",
-  "tilt-right",
-  "wave",
-  "idle",
-];
-export const DEFAULT_MAP = {
-  NOD: ["nod-soft", "nod-double"],
-  LOOK: ["look-left", "look-right"],
-  TILT: ["tilt-left", "tilt-right"],
-  WAVE: ["wave"],
-  WAIT: ["idle"],
-};
+import { ACTION_CONTRACT_VERSION, ACTION_IDS, ANIMATIONS, DEFAULT_MAP, animationMatches, availableDeviceActions } from './action-catalog.mjs';
+export { ACTION_CONTRACT_VERSION, ACTION_IDS, ANIMATIONS, DEFAULT_MAP, availableDeviceActions };
 export function check(ok, message) {
   if (!ok) throw new Error(message);
 }
@@ -59,6 +43,7 @@ export function initialRoom(roomId, label) {
     evolutionMode: "manual",
     profile: {
       revision: 1,
+      actionContractVersion: ACTION_CONTRACT_VERSION,
       formId: "calf",
       prompt:
         "你是牛来。根据现场输入，在允许的动作中选择合适的回应。提示词只影响行为选择，不改变机械臂的运动限制。",
@@ -75,6 +60,7 @@ export function initialRoom(roomId, label) {
       jev: "offline",
       language: "offline",
       simulation: false,
+      actionContractVersion: null, supportedActions: [],
     },
     events: [],
     messages: [],
@@ -88,6 +74,8 @@ export function updateProfile(state, patch) {
     patch && patch.expectedRevision === state.profile.revision,
     "Profile revision conflict; refresh first",
   );
+  check(state.profile.actionContractVersion === ACTION_CONTRACT_VERSION || patch.migrateActions === true,
+    'Action contract upgrade required; confirm migration in Device lab');
   const source = patch.source || "manual";
   check(["manual", "automatic", "reset"].includes(source), "Invalid profile source");
   const formProfiles = {
@@ -101,6 +89,11 @@ export function updateProfile(state, patch) {
       ? formProfiles[patch.formId]
       : state.profile,
   );
+  if (patch.migrateActions === true || p.actionContractVersion !== ACTION_CONTRACT_VERSION) {
+    p.actionContractVersion = ACTION_CONTRACT_VERSION;
+    p.allowedActions = [...ACTION_IDS];
+    p.animationMap = structuredClone(DEFAULT_MAP);
+  }
   if (patch.formId !== undefined) {
     check(FORM_IDS.includes(patch.formId), "Unknown form");
     p.formId = patch.formId;
@@ -129,12 +122,13 @@ export function updateProfile(state, patch) {
           Array.isArray(clips) &&
           clips.length > 0 &&
           clips.length <= 8 &&
-          clips.every((c) => ANIMATIONS.includes(c)),
+          clips.every((c) => animationMatches(action,c)),
         "Invalid animation mapping",
       );
       p.animationMap[action] = [...new Set(clips)];
     }
   }
+  check(p.allowedActions.every(a => ACTION_IDS.includes(a) && p.animationMap[a]?.length && p.animationMap[a].every(c=>animationMatches(a,c))), 'Action and animation semantics must match');
   p.revision = state.profile.revision + 1;
   formProfiles[p.formId] = structuredClone(p);
   const now = Date.now();
@@ -179,12 +173,20 @@ export function applyDeviceEvent(state, raw) {
         check(typeof raw.simulation === "boolean", "Invalid simulation flag");
         device.simulation = raw.simulation;
       }
+      if (raw.actionContractVersion !== undefined) {
+        check(raw.actionContractVersion === ACTION_CONTRACT_VERSION, 'Unsupported action contract');
+        device.actionContractVersion = raw.actionContractVersion;
+      }
+      if (raw.supportedActions !== undefined) {
+        check(Array.isArray(raw.supportedActions) && raw.supportedActions.length <= ACTION_IDS.length && raw.supportedActions.every(a=>ACTION_IDS.includes(a)), 'Invalid device action capabilities');
+        device.supportedActions = [...new Set(raw.supportedActions)];
+      }
       Object.assign(e, device);
       break;
     }
     case "profile.applied":
       check(
-        raw.revision === state.profile.revision,
+        raw.revision === state.profile.revision && state.profile.actionContractVersion === ACTION_CONTRACT_VERSION && state.device.actionContractVersion === ACTION_CONTRACT_VERSION,
         "Stale profile acknowledgement",
       );
       appliedRevision = raw.revision;
@@ -197,9 +199,11 @@ export function applyDeviceEvent(state, raw) {
         "Decision uses an unapplied profile",
       );
       check(
-        state.profile.allowedActions.includes(raw.actionId),
+        availableDeviceActions(state).includes(raw.actionId),
         "Action not allowed",
       );
+      check(!state.events.some(x=>x.type==='decision' && x.decisionId===raw.decisionId), 'Duplicate decision ID');
+      e.formId = state.profile.formId;
       e.decisionId = id(raw.decisionId);
       e.actionId = raw.actionId;
       e.summary = text(raw.summary || "", 2000, true);
@@ -334,7 +338,7 @@ export function makeCommand(state, raw, online, now = Date.now()) {
   );
   if (raw.command !== "stop")
     check(
-      state.appliedRevision === state.profile.revision,
+      state.appliedRevision === state.profile.revision && state.profile.actionContractVersion === ACTION_CONTRACT_VERSION && state.device.actionContractVersion === ACTION_CONTRACT_VERSION,
       "Device must apply the current profile first",
     );
   const c = {
@@ -346,18 +350,24 @@ export function makeCommand(state, raw, online, now = Date.now()) {
   };
   if (raw.command === "action") {
     check(
-      state.profile.allowedActions.includes(raw.actionId),
+      availableDeviceActions(state).includes(raw.actionId),
       "Action not allowed",
     );
     c.actionId = raw.actionId;
   }
-  if (raw.command === "interact") c.input = text(raw.input, 2000);
+  if (raw.command === "interact") {
+    check(state.device.jev === 'ready', 'JEV is not ready');
+    c.input = text(raw.input, 2000);
+    c.allowedActions = availableDeviceActions(state);
+    check(c.allowedActions.length > 0, 'No supported actions');
+  }
   return c;
 }
 export function chooseAnimation(action, map, random = Math.random) {
-  const clips = map?.[action]?.filter((c) => ANIMATIONS.includes(c));
+  const u = random();
+  const clips = map?.[action]?.filter((c) => animationMatches(action,c));
   return clips?.length
-    ? clips[Math.min(clips.length - 1, Math.floor(random() * clips.length))]
+    ? clips[Math.min(clips.length - 1, Math.max(0,Math.floor((Number.isFinite(u) ? u : 0) * clips.length)))]
     : null;
 }
 export function validateSignal(raw) {

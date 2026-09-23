@@ -3,6 +3,8 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, useGLTF } from "@react-three/drei";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
 import * as THREE from "three";
+import { createResponsePlayer } from '../live/response-player.mjs';
+import { evolutionAssets } from '../evolution-assets.mjs';
 import { PROCEDURAL_CLIPS, proceduralPose } from "../live/animation.mjs";
 import { damp, gazeTargets, clamp } from "./motion.mjs";
 import { refineIpSkin } from "./ip-skin.mjs";
@@ -86,6 +88,8 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
       ),
     [gltf, mixer, model, characterId],
   );
+  const responseManifest=Object.values(evolutionAssets).find(asset=>asset.model===modelAsset);
+  const responsePlayer=useRef(null);
   const state = useRef({
     time: 0,
     body: 0,
@@ -134,6 +138,16 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
       });
     };
   }, [model, mixer, actions, human, gl, camera]);
+  useEffect(() => {
+    if(!responseManifest)return;
+    const names=new Set();model.traverse(o=>{if(o.isBone){names.add(o.name);if(o.userData.name)names.add(o.userData.name);}});
+    const player=createResponsePlayer({mixer,actions,manifest:responseManifest,bones:names,onStart:()=>{
+      const st=state.current;st.started=true;st.active=null;st.liveMotion=null;st.head=0;st.pitch=0;st.roll=0;controller.queue.clear();
+    }});
+    responsePlayer.current=player;
+    controller.responsePlayer=player;controller.responseForm=responseManifest.formId;
+    return ()=>{player.dispose();if(controller.responsePlayer===player){delete controller.responsePlayer;delete controller.responseForm;}responsePlayer.current=null;};
+  },[responseManifest,model,mixer,actions,controller]);
   function play(name, time, limit) {
     const action = actions[name];
     if (!action) return false;
@@ -209,7 +223,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
         }
       }
       const next = controller.queue.take(
-        controller.dragging || (st.time < 3.6 && entrance),
+        controller.dragging || responsePlayer.current?.busy || (st.time < 3.6 && entrance),
       );
       if (next && PROCEDURAL_CLIPS.includes(next.name)) {
         st.active?.fadeOut(0.18); st.active = null;
@@ -229,12 +243,13 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
         actions.idle?.reset().setEffectiveWeight(1).fadeIn(0.28).play();
         st.active = null;
       }
-      if (st.time > st.nextIdle && !st.active && !controller.dragging) {
+      if (st.time > st.nextIdle && !responsePlayer.current?.busy && !st.active && !controller.dragging) {
         st.nextIdle = st.time + 18;
         const alternate = actions.idle2 || actions.idle;
         alternate?.reset().fadeIn(0.8).play();
         if (alternate !== actions.idle) actions.idle?.fadeOut(0.8);
       }
+      responsePlayer.current?.update(dt);
       mixer.update(dt);
     }
     updateMouth(mouths, controller.mouthPose, dt, controller.voiceActive ? controller.voiceLevel : null);
@@ -288,7 +303,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
       (controller.mouse.active || controller.gaze) &&
       bones.head &&
       !controller.dragging &&
-      !st.active && !st.liveMotion
+      !st.active && !st.liveMotion && !responsePlayer.current?.busy
     ) {
       bones.head.getWorldPosition(st.headScreen).project(camera);
       target = gazeTargets(
@@ -303,8 +318,8 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     if (controller.dragging) target.body = controller.dragYaw;
     if (moving) {
       st.body = damp(st.body, target.body, human ? 3.5 : 2.2, dt);
-      st.head = damp(st.head, target.yaw + controller.tilt.x * 0.26, 9, dt);
-      st.pitch = damp(st.pitch, target.pitch - controller.tilt.y * 0.15, 9, dt);
+      st.head = damp(st.head, responsePlayer.current?.busy ? 0 : target.yaw + controller.tilt.x * 0.26, 9, dt);
+      st.pitch = damp(st.pitch, responsePlayer.current?.busy ? 0 : target.pitch - controller.tilt.y * 0.15, 9, dt);
       st.roll = damp(st.roll, livePose.roll, 9, dt);
     }
     group.rotation.y = st.body;
@@ -338,7 +353,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
       asset: human ? HUMAN : modelAsset,
       characterId,
       animationTime: st.active?.time || 0,
-      animation: st.liveMotion?.name || st.active?.getClip().name || "idle",
+      animation: responsePlayer.current?.clip || st.liveMotion?.name || st.active?.getClip().name || "idle",
       animations: Object.keys(actions),
       mouth: mouths.map(mesh => ({
         shapes: mesh.morphTargetDictionary,

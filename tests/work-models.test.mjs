@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { ipCatalog } from "../src/ip-catalog.mjs";
+import { evolutionAssets } from "../src/evolution-assets.mjs";
 import { forms, resolvePreview } from "../src/evolution.mjs";
 const catalog = JSON.parse(
   readFileSync(
@@ -21,7 +22,8 @@ test("仙牛与暗黑牛属于 WORK 路线，不出现在 HOME 菜单", () => {
   for (const model of catalog.models) {
     assert.ok(!ipCatalog.some((home) => home.id === model.id));
     const preview = resolvePreview(forms[model.formId].branch, model.formId, Object.keys(forms));
-    assert.equal(preview.model, model.asset);
+    assert.equal(preview.model, evolutionAssets[model.formId].model);
+    assert.equal(evolutionAssets[model.formId].sourceSha256, model.sha256);
     assert.equal(preview.placeholder, false);
   }
 });

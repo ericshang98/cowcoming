@@ -11,7 +11,7 @@
 
 ## 给接入者的最新修正
 
-先读 [进化与五种动作交接](hardware-handoff.md)。Eric 最新确认的五种回应为确认点头、摇头、得意双点头、左侧好奇歪头、右侧好奇歪头；不含转头看向。下文记录的是仍在运行的旧协议，动作白名单尚未迁移，不能把目标产品定义当作线上已支持的 ID。新增进化规则与已实现/待配置部分也在交接中区分。
+先读 [进化与五种动作交接](hardware-handoff.md)。Eric 最新确认的五种回应为确认点头、摇头、得意双点头、左侧好奇歪头、右侧好奇歪头；不含转头看向。本交付使用动作合同 `actionContractVersion: 2`，传输协议仍为 v1。旧房间需在设备调试中显式升级，并由新版设备套件重新确认。新增进化规则与已实现/待配置部分也在交接中区分。
 
 ## 体验与职责
 
@@ -25,7 +25,7 @@
 - 本机 JEV 在允许动作集合里选择，报告 `decision`。网页仅从这个动作的动画映射中随机选择表现；完成状态来自独立的 `action` 回执。
 - 右侧 **Vision / Action** 按需建立 WebRTC 连接，显示电脑端相机和本机 CV 检测框；**Large Language Model** 显示本机发送的输入与流式回复。
 - 输入框发出 `interact` 给本机进程，由接入者决定如何调用 JEV 与语言模型；网页没有内置模型 API Key。
-- 形态切换按来源记录 manual／automatic／reset；调试选择不伪称自动成长。每种正式形态模型尚未补齐，中央继续明确使用参考模型；新增的点头、左右看、歪头是参考模型上的程序动画。
+- 形态切换按来源记录 manual／automatic／reset；调试选择不伪称自动成长。小牛、普通牛来、硬牛、仙牛、暗黑牛各有五段正式骨骼动作；骚牛仍为参考模型，动作预览禁用。
 
 ```mermaid
 flowchart LR
@@ -106,19 +106,19 @@ python examples/device/run.py --test-video
 PYTHONPATH=/path/to/your/code python examples/device/run.py --adapter my_adapter:Adapter --camera 0
 ```
 
-接口约定：
+真实驱动从 `hardware_adapter.py` 开始，未实现部分抛错、状态 offline；请勿只把模拟器 simulation 标记改成 False。首次 profile.applied 前先上报版本与能力。接口约定：
 
 | 方法 | 输入 | 返回 / 职责 |
 | --- | --- | --- |
 | `simulation` 属性 | 无 | 实机适配器设为 `False`；示例为 `True` |
-| `async status()` | 无 | `name, hardware, jev, language`，组件状态为 ready/offline/error/unknown |
-| `async apply_profile(profile)` | revision、formId、prompt、allowedActions、animationMap | 真正将提示词应用给本地 JEV 后返回；失败应抛异常，不发送应用成功 |
-| `async decide(user_input, requested_action=None)` | 输入文本；调试按钮可能指定候选动作 | `{actionId, summary}`；真实 JEV 结合 profile.prompt 并在 allowedActions 中选择。summary 是简短决策说明，不要求内部推理过程 |
+| `async status()` | 无 | `name, hardware, jev, language, actionContractVersion:2, supportedActions`，组件状态为 ready/offline/error/unknown |
+| `async apply_profile(profile)` | revision、actionContractVersion、formId、prompt、allowedActions、animationMap | 真正将提示词应用给本地 JEV 后返回；失败应抛异常，不发送应用成功 |
+| `async decide(user_input, requested_action=None, *, allowed_actions=None)` | 输入文本；调试按钮可能指定候选动作 | `{actionId, summary}`；真实 JEV 结合 profile.prompt 并在本轮 allowed_actions（配置与设备能力交集）中选择。summary 是简短决策说明，不要求内部推理过程 |
 | `async execute(action_id)` | 已校验的高层动作 ID | `{status, detail}`；只有真实完成证据才返回 completed，仅写入串口应返回 sent，无回读返回 unknown |
 | `async stop()` | 无 | `{confirmed: bool, detail: str}`；确认控制器停止才返回 True |
 | `async reply(user_input)` | 用户输入 | 异步生成器，逐次 yield 字符串；模型与模型密钥留在本机 |
 
-本机已有其他语言或完整工程也可以直接使用下节协议，无须依赖 Python 示例。JEV 输出的动作 ID 首版固定为 NOD、LOOK、TILT、WAVE、WAIT；新增硬件动作时共同扩展 `shared/live-protocol.mjs` 的白名单及其动画映射。模型不能通过返回未知 ID 扩大能力。
+本机已有其他语言或完整工程也可以直接使用下节协议，无须依赖 Python 示例。JEV 输出只允许 NOD、SHAKE、NOD_DOUBLE、TILT_LEFT、TILT_RIGHT 和控制结果 WAIT；五种动作语义由 `shared/action-catalog.mjs` 定义。模型不能通过返回未知 ID 扩大能力。
 
 ## HTTP API（协议版本 1）
 
@@ -155,7 +155,7 @@ PYTHONPATH=/path/to/your/code python examples/device/run.py --adapter my_adapter
 保存云端配置：
 
 ```json
-{"type":"profile.update","expectedRevision":1,"formId":"normal","prompt":"回应时优先选择轻轻点头。","allowedActions":["NOD","LOOK","WAIT"],"animationMap":{"NOD":["nod-soft","nod-double"],"LOOK":["look-left","look-right"],"WAIT":["idle"]}}
+{"type":"profile.update","expectedRevision":1,"formId":"normal","prompt":"回应时优先选择轻轻点头。","allowedActions":["NOD","SHAKE","NOD_DOUBLE","TILT_LEFT","TILT_RIGHT","WAIT"],"animationMap":{"NOD":["nod-soft"],"SHAKE":["head-shake"],"NOD_DOUBLE":["nod-double"],"TILT_LEFT":["tilt-left"],"TILT_RIGHT":["tilt-right"],"WAIT":["idle"]}}
 ```
 
 新配置存储成功后，设备收到 `{type:"profile",profile:{revision:2,...}}`。设备应用后发送：
@@ -179,7 +179,7 @@ PYTHONPATH=/path/to/your/code python examples/device/run.py --adapter my_adapter
 所有设备事件必须有唯一 `eventId`（建议 UUID）。重复 eventId 不重复更新状态或播放动画；已有 completed/failed/interrupted 的动作不接受倒退状态。
 
 ```json
-{"type":"device.status","eventId":"status-1","name":"Desk computer","hardware":"ready","camera":"ready","jev":"ready","language":"ready","simulation":false}
+{"type":"device.status","eventId":"status-1","name":"Desk computer","hardware":"ready","camera":"ready","jev":"ready","language":"ready","simulation":false,"actionContractVersion":2,"supportedActions":["NOD","SHAKE","NOD_DOUBLE","TILT_LEFT","TILT_RIGHT","WAIT"]}
 {"type":"observation","eventId":"obs-1","text":"检测到一位参与者"}
 {"type":"decision","eventId":"dec-1","decisionId":"decision-1","commandId":"command-1","profileRevision":2,"actionId":"NOD","summary":"对问候做点头回应"}
 {"type":"action","eventId":"act-1","decisionId":"decision-1","status":"started","detail":"控制器开始动作"}

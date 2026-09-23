@@ -10,6 +10,8 @@ try {
   await mkdir(output, { recursive: true });
   for (const file of [
     "adapter.py",
+    "action_contract.py",
+    "hardware_adapter.py",
     "local_preview.py",
     "test_local_preview.py",
     "client.py",

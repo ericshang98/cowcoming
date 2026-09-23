@@ -211,7 +211,7 @@ export default function LiveObservationPanel({ live }) {
           </p>
           <div className="observer-jev-foot">
             <span>
-              {t("动画是动作的视觉表达", "ANIMATION VISUALIZES THE DECISION")}
+              {t("动画是动作的视觉表达", "ANIMATION VISUALIZES THE DECISION")} · {live.lastAnimation?.status || "—"}
             </span>
             <span>{t("实际执行看回执", "HARDWARE REPORTS EXECUTION")}</span>
           </div>

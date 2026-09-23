@@ -2,7 +2,7 @@
   "version": 1,
   "scope": "work",
   "kind": "route-model-asset-catalog",
-  "integrationStatus": "Bound to WORK evolution forms celestial and dark",
+  "integrationStatus": "Preserved source rigs; WORK uses response-clip derivatives listed in /models/evolution/manifest.json",
   "models": [
     {
       "id": "xianniu",

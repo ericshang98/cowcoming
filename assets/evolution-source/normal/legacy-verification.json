@@ -1,0 +1,29 @@
+{
+  "method": "Original and final GLB reimported separately; compare every bone matrix at nine times per original clip",
+  "checks": [
+    {
+      "clip": "bow",
+      "durationSeconds": 2.5,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 8.67880862642778e-06
+    },
+    {
+      "clip": "idle",
+      "durationSeconds": 3.0,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 8.67880862642778e-06
+    },
+    {
+      "clip": "walking",
+      "durationSeconds": 1.5,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 1.0848045349121094e-05
+    },
+    {
+      "clip": "wave",
+      "durationSeconds": 3.0,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 8.67880862642778e-06
+    }
+  ]
+}

@@ -5,8 +5,7 @@ test("procedural clips preserve semantics, bounded movement and return to rest",
   for (const clip of [
     "nod-soft",
     "nod-double",
-    "look-left",
-    "look-right",
+    "head-shake",
     "tilt-left",
     "tilt-right",
   ]) {
@@ -16,8 +15,9 @@ test("procedural clips preserve semantics, bounded movement and return to rest",
       for (const value of Object.values(proceduralPose(clip, t)))
         assert.ok(Math.abs(value) < 0.6);
   }
-  assert.ok(proceduralPose("look-left", 0.8).yaw < 0);
-  assert.ok(proceduralPose("look-right", 0.8).yaw > 0);
+  assert.deepEqual(proceduralPose("look-left", 0.8), {yaw:0,pitch:0,roll:0});
+  const yaws = Array.from({length:40},(_,i)=>proceduralPose("head-shake",i/20).yaw);
+  assert.ok(Math.min(...yaws)<0 && Math.max(...yaws)>0);
   assert.equal(proceduralPose("nod-soft", 0.8).yaw, 0);
   assert.equal(proceduralPose("tilt-left", 0.8).pitch, 0);
 });

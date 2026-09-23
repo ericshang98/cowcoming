@@ -5,6 +5,7 @@ import time
 import uuid
 from urllib.parse import urlparse
 import aiohttp
+from action_contract import ACTION_CONTRACT_VERSION, validate_profile, executable_actions
 
 
 def event_id():
@@ -76,7 +77,11 @@ class DeviceClient:
             await self.emit("command.result", commandId=command_id, status="failed", detail="Device is busy or profile is not ready; retry explicitly")
             return
         revision = self.profile["revision"]
-        allowed = list(self.profile["allowedActions"])
+        status=await self.adapter.status()
+        allowed=executable_actions(self.profile,status)
+        if command.get('actionId') and command['actionId'] not in allowed:
+            await self.emit('command.result',commandId=command_id,status='failed',detail='Action not supported by this device')
+            return
         task = asyncio.create_task(self.interact(command, revision, allowed))
         self.tasks.add(task)
         task.add_done_callback(self.tasks.discard)
@@ -92,7 +97,8 @@ class DeviceClient:
                 mid = event_id()
                 await self.emit("language.start", messageId=mid, commandId=command["commandId"], role="user", text=user_input)
                 await self.emit("language.end", messageId=mid)
-            decision = await self.adapter.decide(user_input, command.get("actionId"))
+            # Pass only current executable candidates to JEV; never ask it to invent a fallback.
+            decision = await self.adapter.decide(user_input, command.get("actionId"), allowed_actions=allowed)
             if self.profile["revision"] != revision or decision["actionId"] not in allowed:
                 raise ValueError("JEV chose an unavailable action or the profile changed")
             decision_id = event_id()
@@ -157,7 +163,17 @@ class DeviceClient:
                                 if not stopped.get("confirmed"):
                                     await self.emit("log", text="Profile not applied: local stop is not confirmed")
                                     continue
-                                await self.adapter.apply_profile(message['profile'])
+                                try:
+                                    validate_profile(message['profile'])
+                                    await self.adapter.apply_profile(message['profile'])
+                                    status=await self.adapter.status()
+                                    if status.get('actionContractVersion') != ACTION_CONTRACT_VERSION:
+                                        raise ValueError('Adapter action contract is not ready')
+                                    executable_actions(message['profile'],status)
+                                    await self.emit('device.status',**status,simulation=bool(self.adapter.simulation))
+                                except Exception as error:
+                                    await self.emit('log',text='Profile not applied: '+type(error).__name__)
+                                    continue
                                 self.profile = message['profile']
                                 await self.emit('profile.applied', revision=self.profile['revision'])
                                 self.ready = True
