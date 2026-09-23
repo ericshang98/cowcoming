@@ -68,8 +68,10 @@ class Contract(unittest.IsolatedAsyncioTestCase):
     async def test_capability_intersection_and_semantics(self):
         from action_contract import validate_profile, executable_actions
         p={'actionContractVersion':2,'formId':'calf','allowedActions':['NOD','TILT_LEFT','WAIT'],'animationMap':{'NOD':['nod-soft'],'TILT_LEFT':['tilt-left'],'WAIT':['idle']}}
-        self.assertEqual(executable_actions(p,{'actionContractVersion':2,'hardware':'ready','supportedActions':['NOD']}),['NOD','WAIT'])
-        self.assertEqual(executable_actions(p,{'actionContractVersion':2,'hardware':'offline','supportedActions':['NOD']}),['WAIT'])
+        for form in ['calf', 'normal', 'playful', 'tough', 'celestial', 'dark']:
+            p['formId'] = form
+            self.assertEqual(executable_actions(p,{'actionContractVersion':2,'hardware':'ready','supportedActions':['NOD']}),['NOD','WAIT'])
+            self.assertEqual(executable_actions(p,{'actionContractVersion':2,'hardware':'offline','supportedActions':['NOD']}),['WAIT'])
         p['animationMap']['NOD']=['nod-double']
         with self.assertRaises(ValueError): validate_profile(p)
 

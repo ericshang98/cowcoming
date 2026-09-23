@@ -8,7 +8,7 @@ page.on('pageerror',e=>errors.push(e.message));
 try{
  if(process.env.QA_BROWSER_KEY)await page.addInitScript(({relay,key})=>sessionStorage.setItem('cowcoming-live',JSON.stringify({relay,key})),{relay:process.env.TEST_RELAY_URL,key:process.env.QA_BROWSER_KEY});
  await page.goto(base+'/?section=work');await page.waitForFunction(()=>window.__replica?.getState().bootDone,null,{timeout:60000});
- for(const [form,label,route] of [['calf','小牛',null],['normal','普通牛来',null],['celestial','仙牛',null],['tough','硬牛','dark'],['dark','暗黑牛','dark']]){
+ for(const [form,label,route] of [['calf','小牛',null],['normal','普通牛来',null],['playful','骚牛',null],['celestial','仙牛',null],['tough','硬牛','dark'],['dark','暗黑牛','dark']]){
   if(route)await page.locator('.evolution-routes button').nth(1).click();
   await page.locator('.evolution-node').filter({hasText:label}).first().click();
   await page.waitForFunction(id=>window.__replica?.controller.responseForm===id,form,{timeout:30000});
@@ -18,11 +18,11 @@ try{
    await page.waitForFunction(()=>window.__replica.controller.responsePlayer.busy);
    const clip=await page.evaluate(()=>window.__replica.controller.responsePlayer.clip);
    await page.waitForFunction(()=>!window.__replica.controller.responsePlayer.busy,null,{timeout:12000});
-   assert.match(await page.locator('.motion-preview small').textContent(),/完成|complete/);
+   assert.match(await page.locator('.motion-play-status').textContent(),/完成|complete/);
    results.push({form,actionId,clip,status:'completed'});
   }
   await page.locator('.live-lab-button').click();
-  const actionLabel={calf:'确认点头',normal:'摇头',celestial:'得意双点头',tough:'左侧好奇歪头',dark:'右侧好奇歪头'}[form];
+  const actionLabel={calf:'确认点头',normal:'摇头',playful:'左侧好奇歪头',celestial:'得意双点头',tough:'左侧好奇歪头',dark:'右侧好奇歪头'}[form];
   await page.locator('.live-debug-actions').getByRole('button',{name:actionLabel,exact:true}).click();
   await page.waitForFunction(()=>window.__replica.controller.responsePlayer.busy);
   const liveClip=await page.evaluate(()=>window.__replica.controller.responsePlayer.clip);
@@ -31,10 +31,10 @@ try{
   results.push({form,source:'real-relay-python-simulation',clip:liveClip,status:'completed'});
   await page.screenshot({path:`tmp/motion-integration/${form}-website.png`});
  }
- await page.locator('[data-motion="NOD"]').click();await page.locator('.motion-preview > button').click();
+ await page.locator('[data-motion="NOD"]').click();await page.locator('[data-motion-stop]').click();
  assert.equal(await page.evaluate(()=>window.__replica.controller.responsePlayer.busy),false);
  await page.locator('.evolution-routes button').first().click();await page.locator('.evolution-node').filter({hasText:'骚牛'}).click();
- await page.waitForTimeout(1200);assert.equal(await page.locator('[data-motion="NOD"]').isDisabled(),true);
+ await page.waitForTimeout(1200);assert.equal(await page.locator('[data-motion="NOD"]').isDisabled(),false);
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'tmp/motion-integration/mobile-website.png',fullPage:true});
- assert.deepEqual(errors,[]);fs.writeFileSync('tmp/motion-integration/browser-verification.json',JSON.stringify({results,errors,stop:true,missingAssetDisabled:true},null,2));console.log('PASS 25 actual browser clips, five relay/Python responses, stop, missing asset, no page errors');
+ assert.deepEqual(errors,[]);fs.writeFileSync('tmp/motion-integration/browser-verification.json',JSON.stringify({results,errors,stop:true,playfulReady:true},null,2));console.log('PASS 30 actual browser clips, six relay/Python responses, stop, playful ready, no page errors');
 }finally{await browser.close();}

@@ -13,6 +13,7 @@ import { evolutionStatus } from '../evolution-session.mjs';
 
 export default function Evolution({ controller, live, preview, onSelectRoute, onSelectForm, modelStatus, session, browseRoute }) {
   const { form, placeholder } = preview;
+  const motionLab = new URLSearchParams(window.location.search).get("motionLab") === "1";
   const route = evolutionRoutes.find(item => item.id === browseRoute) || preview.route;
   const [treeOpen, setTreeOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -32,13 +33,19 @@ export default function Evolution({ controller, live, preview, onSelectRoute, on
 
       <aside className="career evolution-timeline" aria-label="Evolution paths">
         <div className="small-heading"><span>EVOLUTION PATH</span><button className="open-atlas" onClick={() => setTreeOpen(true)} aria-haspopup="dialog">VIEW TREE ↗</button></div>
-        <div className="evolution-routes" role="group" aria-label="Switch evolution paths">
+        {!motionLab && <div className="evolution-routes" role="group" aria-label="Switch evolution paths">
           {evolutionRoutes.map(item => (
             <button key={item.id} aria-pressed={route.id === item.id} onClick={() => onSelectRoute(item.id)}>{item.name}</button>
           ))}
         </div>
-        {live?.snapshot && <div className="live-profile-note"><strong>{t('设备形态', 'Device form')}: {forms[live.snapshot.profile.formId]?.name}</strong><span>{live.snapshot.profile.formId === form.id && live.online && live.snapshot.appliedRevision === live.snapshot.profile.revision ? t('提示词已在电脑端应用', 'Prompt applied on the local computer') : t('等待电脑端同步；当前设备配置尚未确认', 'Waiting for local sync; device configuration is not confirmed')} · v{live.snapshot.profile.revision}</span></div>}
-        <p className="evolution-hint">{t('点击形态，亲自决定它现在是谁。', 'Select a form to take control of its evolution.')}</p>
+        }
+        {!motionLab && live?.snapshot && <div className="live-profile-note"><strong>{t('设备形态', 'Device form')}: {forms[live.snapshot.profile.formId]?.name}</strong><span>{live.snapshot.profile.formId === form.id && live.online && live.snapshot.appliedRevision === live.snapshot.profile.revision ? t('提示词已在电脑端应用', 'Prompt applied on the local computer') : t('等待电脑端同步；当前设备配置尚未确认', 'Waiting for local sync; device configuration is not confirmed')} · v{live.snapshot.profile.revision}</span></div>}
+        {motionLab && <label className="motion-form-select">{t('选择调试形态', 'Choose a form')}
+          <select aria-label={t('选择调试形态', 'Choose a form')} value={form.id} onChange={e => onSelectForm(e.target.value)}>
+            {Object.values(forms).map(item => <option key={item.id} value={item.id} disabled={!item.model}>{item.name}{!item.model ? t(' · 模型待补充', ' · Model pending') : ''}</option>)}
+          </select>
+        </label>}
+        {!motionLab && <><p className="evolution-hint">{t('点击形态，亲自决定它现在是谁。', 'Select a form to take control of its evolution.')}</p>
         <ol>
           {route.nodes.map((id, index) => (
             <li key={id} className={form.id === id ? 'current' : ''}>
@@ -50,11 +57,13 @@ export default function Evolution({ controller, live, preview, onSelectRoute, on
             </li>
           ))}
         </ol>
-        <div className="evolution-selection" aria-live="polite">
+        </>}
+        {!motionLab && <div className="evolution-selection" aria-live="polite">
           <span className="eyebrow">{t('当前形态', 'CURRENT FORM')} · {form.name}</span>
           <p>{form.description}</p>
           <small>{modelStatus === 'error' ? 'Model unavailable. Return to 小牛.' : modelStatus === 'loading' ? 'Loading form…' : placeholder ? 'Model pending. Showing a reference 牛来.' : 'Showing this form’s model.'}</small>
         </div>
+        }
         <MotionPreview controller={controller} formId={form.id} ready={modelStatus==='ready'&&!placeholder} />
       </aside>
 

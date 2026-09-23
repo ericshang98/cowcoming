@@ -1,0 +1,13 @@
+{
+  "commit": "d44d5ce7187327c60c5fcf0ffa2925f0067dcdb4",
+  "branch": "codex/motion-self-tuning",
+  "repository": "https://github.com/ericshang98/cowcoming",
+  "pullRequest": "https://github.com/ericshang98/cowcoming/pull/23",
+  "releaseStatus": "local-preview-not-deployed",
+  "productSnapshotRevision": 212,
+  "actionContractVersion": 2,
+  "formCount": 6,
+  "actionCount": 30,
+  "configuration": "defaults-only; Eric final tuning JSON not included",
+  "hardware": "simulator-only; real adapter pending"
+}
