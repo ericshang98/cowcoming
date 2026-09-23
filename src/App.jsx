@@ -66,7 +66,7 @@ export default function App() {
   const [mobile, setMobile] = useState(innerWidth <= 768),
     [ready, setReady] = useState(false),
     [bootDone, setBootDone] = useState(() =>
-      ["blog", "about"].includes(route().mode),
+      ["blog", "about", "work"].includes(route().mode),
     ),
     [chat, setChat] = useState("closed"),
     [cv, setCv] = useState("closed"),
@@ -81,8 +81,8 @@ export default function App() {
   const controller = useMemo(makeController, []),
     sound = useRef(null),
     viewRef = useRef();
-  const evolutionSession = useEvolutionSession();
   const live = useLiveDevice(controller, mode === "work");
+  const evolutionSession = useEvolutionSession({ enabled: live.online, roomId: live.snapshot?.roomId, form: live.snapshot?.profile.formId });
   const deviceFormReady = useEvolutionDeviceSync(evolutionSession, live);
   const [evolutionRoute, setEvolutionRoute] = useState('celestial');
   useEffect(() => {
@@ -102,12 +102,13 @@ export default function App() {
     preview={evolutionPreview}
     modelStatus={previewModelState.model === evolutionPreview.model ? previewModelState.status : 'loading'}
     session={{ ...evolutionSession, reset: () => {
-      if (live.online) live.command({ command: "stop" });
+      if (!live.online) return;
+      live.command({ command: "stop" });
       evolutionSession.reset();
     } }}
     browseRoute={evolutionRoute}
     onSelectRoute={setEvolutionRoute}
-    onSelectForm={form => evolutionSession.dispatch({ type: 'select', form })}
+    onSelectForm={form => { if (live.online) evolutionSession.dispatch({ type: 'select', form }); }}
   />;
   const change = useCallback(
     (next) => {
@@ -309,12 +310,12 @@ export default function App() {
   return (
     <Localized><AppContext.Provider value={ctx}>
       <div
-        className={`app ${mobile ? "mobile" : "desktop"} route-${mode} ${bootDone ? "boot-complete" : "booting"}`}
+        className={`app ${mobile ? "mobile" : "desktop"} route-${mode} ${mode === "work" && !live.online ? "binding-required" : ""} ${bootDone ? "boot-complete" : "booting"}`}
       >
         <Ambient />
         {mode !== "blog" && mode !== "about" && (
           <Character
-            key={mode === "work" ? `${evolutionSession.state.sessionId}:${evolutionSession.state.form}` : "default-character"}
+            key={mode === "work" ? "work-character" : "default-character"}
             controller={controller}
             mode={mode}
             mobile={mobile}

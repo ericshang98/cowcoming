@@ -1,5 +1,8 @@
 # Cowcoming 进化运行合同
 
+**接入前置条件（Eric 最新修正）：**WORK 必须先用 Browser Key 绑定房间，并等待配套 Device Key 的电脑程序上线。此前只显示绑定/等待步骤，不开放形态、进化设置/重置、摄像头或语言面板，也不播放观察示例。连接后两侧共用同一房间；视频仍需手动开启。断线立即关闭操作与视频、暂停计轮并取消在途评估，迟到结果不生效；恢复同一房间保留已完成培养记录，换房间开启独立培养。设备进程在线不代表机械臂、JEV 或摄像头均已就绪，各组件仍分别标示。
+
+
 产品真源：飞书 §5.2.3。当前实现是电脑端状态机和界面；网页发起的实时交互已按 commandId 接到新增设备接口；真实评估网关部署、六种独立模型和阶段化回复生成仍待接入。预设观察案例不接入轮数。
 
 ## 状态和操作
@@ -71,7 +74,7 @@ controller.evolution.recordTurn({
 
 - `npm test`：包括有效轮去重、5／10 轮阈值、保持与下一次完整历史、合法路径、终点、失败重试、重置与过期输出。
 - `npm run build`。
-- 启动 `npm run dev -- --port 5187` 后运行 `node scripts/evolution-controls-qa.cjs`。使用已安装 Chrome；桌面／手机、设置／手动切换／重置／双语／焦点，以及隔离 React hook + 模拟网关验证。不发送真实模型请求。
+- 启动本地实时服务（提供 `TEST_RELAY_URL` / `TEST_RELAY_ADMIN`，或使用本机私密 `.pwc/live-admin.json`）与 `npm run dev -- --port 5187` 后运行 `node scripts/evolution-controls-qa.cjs`。使用已安装 Chrome；桌面／手机、设置／手动切换／重置／双语／焦点，以及隔离 React hook + 模拟网关验证。不发送真实模型请求。
 
 
 ## 与实时设备接口合流

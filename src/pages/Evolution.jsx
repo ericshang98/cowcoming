@@ -1,5 +1,5 @@
 import { Localized, useLanguage } from "../i18n/Language";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ObservationPanel from '../components/ObservationPanel';
 import { Controls } from '../components/Chrome';
 import { PageLead } from './Portfolio';
@@ -7,6 +7,7 @@ import { evolutionRoutes, forms } from '../evolution.mjs';
 import EvolutionTree from './EvolutionTree';
 import EvolutionSettings from '../components/EvolutionSettings';
 import { SlidersHorizontal } from 'lucide-react';
+import BindingGate from '../live/BindingGate';
 import { evolutionStatus } from '../evolution-session.mjs';
 
 export default function Evolution({ live, preview, onSelectRoute, onSelectForm, modelStatus, session, browseRoute }) {
@@ -17,6 +18,10 @@ export default function Evolution({ live, preview, onSelectRoute, onSelectForm, 
   const { language } = useLanguage();
   const t = (zh, en) => language === 'zh' ? zh : en;
   const status = evolutionStatus(session.state);
+  useEffect(() => {
+    if (!live?.online) { setTreeOpen(false); setSettingsOpen(false); }
+  }, [live?.online]);
+  if (!live?.online) return <BindingGate live={live} />;
   return (
     <Localized><>
     <section className="work-page evolution-page page" data-pwc-critical="work">
