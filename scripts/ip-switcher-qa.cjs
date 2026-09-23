@@ -78,7 +78,8 @@ const base = process.env.QA_BASE_URL || 'http://127.0.0.1:42910/';
     await open(); await page.locator('[data-ip=niulai]').click(); await waitIp('niulai');
     assert.deepEqual(await page.evaluate(() => window.__replica.controller.evolution.context()), evolution);
     await page.locator('.navigation button').filter({hasText:/进化|WORK/}).click();
-    await page.waitForSelector('.evolution-node');
+    await page.waitForSelector('.binding-page');
+    assert.equal(await page.locator('.evolution-node').count(), 0);
     assert.equal(await page.evaluate(() => window.__replica.controller.rig.characterId), 'niulai');
     await open(); await page.locator('[data-ip=toothless]').click(); await waitIp('toothless');
     assert.equal((await state()).mode, 'home');
@@ -110,7 +111,7 @@ const base = process.env.QA_BASE_URL || 'http://127.0.0.1:42910/';
     await fail.waitForFunction(()=>window.__replica.controller.rig.characterId==='fengge');
     await fail.close();checks.push('failed GLB preserves previous IP; retry loads and switches');
     assert.deepEqual(errors,[]);
-    const report={passed:checks.length,checks,pageErrors:errors,productionDeployed:false};
+    const report={passed:checks.length,checks,pageErrors:errors,baseUrl:base};
     fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
     console.log(JSON.stringify(report,null,2));
   } finally {await browser.close();}
