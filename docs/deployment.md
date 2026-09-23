@@ -2,6 +2,10 @@
 
 最新集中检查和当前发布分工见 [2026-09-24 检查](release-check-2026-09-24.md)。网页由项目所有者发布；不再等待额外 Pages Token。下方早期发布记录按时间保留。
 
+## 2026-09-24 六模型页面发布
+
+PR #23 合并后，GitHub 的 deploy 作业仍因未设置 `CLOUDFLARE_DEPLOY_ENABLED` 而跳过。已用该次检查通过的构建，经本机已有 Pages 权限发到原项目 `niulai-preview-20260922` 的 main。随后补上调试按钮的点击：按钮在全屏模型之上，但继承了页面层的 `pointer-events: none`。线上提交以 https://cowcoming.world/build-info.json 为准，不要把更早的 `1a66bcc` 记录当成当前页面。
+
 ## 2026-09-24 发布核对与断线修复
 
 本次实读生产状态：主域名发布提交为 `1a66bcce3d0e2c964310c669868367f8b4e5cb5c`，Worker 版本为 `dc4b0970-18ac-429e-958f-207d9e70adec`，已包含五动作协议、设备能力声明、六形态人格和 `interaction.start`。这些结果取代本文较早的待发布判断。GitHub `CLOUDFLARE_DEPLOY_ENABLED` 变量仍未配置，不能把合并等同于自动发布。
