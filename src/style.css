@@ -272,6 +272,76 @@ kbd {
   background: #07858529;
   color: #244248;
 }
+.model-picker {
+  position: relative;
+  flex-shrink: 0;
+}
+.model-picker .model-trigger {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  color: #60767a;
+}
+.model-trigger:hover:not(:disabled),
+.model-trigger[aria-expanded="true"] {
+  background: #0e7e8e18;
+  color: #176758;
+}
+.model-trigger:disabled { opacity: .36; cursor: not-allowed; }
+.model-menu, .model-feedback {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: -90px;
+  width: 250px;
+  padding: 12px;
+  border-radius: 18px;
+  background: #f9fcfaf5;
+  color: #294a43;
+  box-shadow: 0 12px 36px #24394d24;
+}
+.model-menu-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.model-menu-heading small { color: #84958f; font: 9px var(--mono); letter-spacing: .08em; }
+.model-options { display: grid; gap: 4px; }
+.model-picker .model-option {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  height: auto;
+  min-height: 44px;
+  border: 0;
+  border-radius: 11px;
+  padding: 10px 12px;
+  color: #294a43;
+  font-size: 13px;
+  background: transparent;
+  text-align: left;
+}
+.model-option:hover, .model-option[aria-pressed="true"] { background: #dcebe3 !important; }
+.model-option svg { margin-left: auto; }
+.model-swatch { width: 13px; height: 13px; border-radius: 50%; box-shadow: inset 0 0 0 1px #0000000a; }
+.model-menu-hint { margin: 10px 8px 3px; font-size: 11px; line-height: 1.6; color: #83938b; }
+.model-feedback { font-size: 12px; line-height: 1.7; }
+.model-feedback.with-menu { top: calc(100% + 224px); }
+.model-feedback p { margin: 0; }
+.model-picker .model-cancel { display: block; width: auto; height: auto; margin: 6px 0 0 auto; padding: 3px 7px; border-radius: 6px; color: #176758; font-size: 12px; }
+.model-spinner { animation: model-spin 1s linear infinite; }
+.model-picker button:focus-visible { outline: 2px solid #238572; outline-offset: 2px; }
+.greeting > .mouth-unavailable { color: var(--dim); font-size: 11px; line-height: 1.6; margin-top: 20px; }
+@keyframes model-spin { to { transform: rotate(360deg); } }
+@media (max-width: 768px) {
+  .model-menu, .model-feedback { right: -40px; width: min(250px, calc(100vw - 36px)); }
+}
 .scene-controls {
   display: flex;
   align-items: center;

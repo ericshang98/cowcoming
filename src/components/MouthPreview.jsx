@@ -3,12 +3,18 @@ import { useApp } from '../context';
 const poses = [['closed', '闭嘴'], ['open', '张嘴'], ['wide', '咧嘴'], ['round', '圆嘴']];
 
 export default function MouthPreview() {
-  const { controller } = useApp();
+  const { controller, homeModel } = useApp();
   const [pose, setPose] = useState('closed');
-  useEffect(() => () => {
+  useEffect(() => {
+    setPose('closed');
     controller.mouthPose = 'closed';
     controller.mouthPreview = false;
-  }, [controller]);
+    return () => {
+      controller.mouthPose = 'closed';
+      controller.mouthPreview = false;
+    };
+  }, [controller, homeModel.id]);
+  if (!homeModel.mouth) return <p className="mouth-unavailable">{homeModel.name}暂不支持口型</p>;
   return (
     <details className="mouth-preview" onToggle={event => {
       const open = event.currentTarget.open;

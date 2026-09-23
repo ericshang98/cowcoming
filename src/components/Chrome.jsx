@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
   MessageCircle,
-  FileText,
   House,
   FolderGit2,
   Sparkles,
@@ -17,6 +16,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import { useApp } from "../context";
+import ModelPicker from "./ModelPicker";
 export const routes = [
   ["home", "HOME", House],
   ["work", "WORK", FolderGit2],
@@ -71,7 +71,7 @@ export function Controls({ music = true }) {
   );
 }
 export function Header() {
-  const { mode, navigate, openChat, setCv, muted, setMuted, snapshot, reaction } =
+  const { mode, mobile, navigate, openChat, muted, setMuted, snapshot, reaction } =
     useApp();
   return (
     <>
@@ -92,9 +92,7 @@ export function Header() {
         >
           {muted ? <VolumeX /> : <Volume2 />}
         </button>
-        <button aria-label="Open living CV" onClick={() => setCv("open")}>
-          <FileText />
-        </button>
+        {mobile && <ModelPicker />}
         <button
           className="chat-dot"
           aria-label="Ask Fuch"
@@ -111,13 +109,7 @@ export function Header() {
         >
           <MessageCircle size={15} />
         </button>
-        <button
-          className="desktop-nav-icon"
-          aria-label="Open living CV"
-          onClick={() => setCv("open")}
-        >
-          <FileText size={13} />
-        </button>
+        {!mobile && <ModelPicker />}
         {routes.map(([id, title, Icon]) => (
           <button
             key={id}

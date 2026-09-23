@@ -14,6 +14,7 @@
     "qa:boot": "node scripts/boot-qa.cjs",
     "qa:world-niulai": "node scripts/world-niulai-qa.cjs",
     "qa:mouth": "node scripts/mouth-qa.cjs",
+    "qa:models": "node scripts/model-picker-qa.cjs",
     "docs:sync": "node scripts/sync-product-doc.mjs"
   },
   "dependencies": {

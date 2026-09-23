@@ -1,6 +1,7 @@
 const { chromium } = require("playwright");
 const fs = require("node:fs");
 const assert = require("node:assert/strict");
+const baseURL = process.env.QA_BASE_URL || "http://127.0.0.1:4178/";
 (async () => {
   const browser = await chromium.launch({ headless: true, channel: "chrome" });
   const page = await browser.newPage({
@@ -27,7 +28,7 @@ const assert = require("node:assert/strict");
       .getByRole("button", { name, exact: true })
       .click();
   try {
-    await page.goto("http://127.0.0.1:4178/");
+    await page.goto(baseURL);
     await page.waitForTimeout(800);
     await shot("boot");
     await page.waitForFunction(() => window.__replica?.getState().bootDone);
@@ -103,19 +104,8 @@ const assert = require("node:assert/strict");
     await shot("about");
     assert.equal(await page.getByLabel("Interactive 3D avatar").count(), 1);
     check("About morphs robot into human avatar");
-    await page
-      .getByRole("button", { name: "Open living CV", exact: true })
-      .filter({ visible: true })
-      .click();
-    await page.waitForTimeout(500);
-    await shot("resume");
-    await page.getByRole("button", { name: "Minimize resume" }).click();
-    assert.equal(await page.getByRole("dialog").count(), 0);
-    await page.getByRole("button", { name: "LIVE RESUME" }).click();
-    await page.getByRole("button", { name: "Maximize resume" }).click();
-    assert.equal(await page.locator(".floating-window.maximized").count(), 1);
-    await page.getByRole("button", { name: "Close resume" }).click();
-    check("resume open, minimize, restore, maximize and close");
+    assert.ok(await page.getByRole("button", { name: "模型选择（仅 HOME 可用）" }).isDisabled());
+    check("model picker is unavailable outside HOME");
     await page
       .getByRole("button", { name: "Ask Fuch", exact: true })
       .filter({ visible: true })
@@ -187,7 +177,7 @@ const assert = require("node:assert/strict");
     await shot("idea-detail");
     await page.getByRole("button", { name: "Close idea" }).click();
     check("IDEA52 enters, moves, fast-travels, discovers and opens an idea");
-    await page.goto("http://127.0.0.1:4178/?section=blog");
+    await page.goto(new URL("?section=blog", baseURL).href);
     await page.waitForTimeout(1200);
     assert.equal(
       await page

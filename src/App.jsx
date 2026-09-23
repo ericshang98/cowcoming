@@ -14,6 +14,8 @@ import ideas from "./ideas.json";
 import { makeController } from "./scene/motion.mjs";
 import { snapshot } from "./snapshot";
 import Character from "./scene/Character";
+import useHomeModel from "./scene/useHomeModel";
+import { modelForPage } from "./scene/home-models.mjs";
 import { Header, Ambient, Boot } from "./components/Chrome";
 import {
   Home,
@@ -74,6 +76,8 @@ export default function App() {
     sound = useRef(null),
     likeSequence = useRef({ time: 0, count: 0 }),
     viewRef = useRef();
+  const homeModels = useHomeModel(mode);
+  const characterModel = modelForPage(mode, homeModels.selection.model);
   const change = useCallback(
     (next) => {
       const q = new URLSearchParams();
@@ -205,6 +209,11 @@ export default function App() {
     controller.gesture("greet", "conversation");
   }, [controller]);
   const ctx = {
+    homeModel: homeModels.selection.model,
+    pendingModel: homeModels.pending,
+    modelError: homeModels.error,
+    chooseHomeModel: homeModels.choose,
+    cancelHomeModel: homeModels.cancel,
     mode,
     mobile,
     portfolio,
@@ -254,6 +263,9 @@ export default function App() {
         tracking,
         paused,
         likes,
+        homeModel: homeModels.selection.model.id,
+        pendingModel: homeModels.pending?.id || null,
+        modelError: homeModels.error,
       }),
     };
     return () => delete window.__replica;
@@ -267,6 +279,8 @@ export default function App() {
         <Ambient />
         {mode !== "blog" && (
           <Character
+            model={characterModel}
+            gltf={mode === "home" ? homeModels.selection.gltf : null}
             controller={controller}
             mode={mode}
             mobile={mobile}

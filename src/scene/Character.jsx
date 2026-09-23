@@ -22,10 +22,17 @@ const gestures = {
   spin: "bow",
   curious: "bow",
 };
-function Rig({ human, controller, placement, visible, onReady, entrance }) {
-  const gltf = useGLTF(human ? HUMAN : MASCOT),
-    { camera, gl } = useThree(),
-    root = useRef();
+function CachedRig({ asset, ...props }) {
+  const gltf = useGLTF(asset);
+  return <Rig {...props} asset={asset} gltf={gltf} />;
+}
+function ModelRig({ gltf, ...props }) {
+  return gltf ? <Rig {...props} gltf={gltf} /> : <CachedRig {...props} />;
+}
+function Rig({ human, asset, gltf, controller, placement, visible, onReady, entrance }) {
+  const { camera, gl } = useThree(),
+    root = useRef(),
+    initialScale = useRef(entrance ? 0.7 : placement.scale);
   const model = useMemo(() => {
     const m = clone(gltf.scene);
     m.traverse((o) => {
@@ -274,7 +281,7 @@ function Rig({ human, controller, placement, visible, onReady, entrance }) {
       bone.quaternion.premultiply(st.conj);
     }
     controller.rig = {
-      asset: human ? HUMAN : MASCOT,
+      asset,
       animation: st.active?.getClip().name || "idle",
       animations: Object.keys(actions),
       mouth: mouths.map(mesh => ({
@@ -293,7 +300,7 @@ function Rig({ human, controller, placement, visible, onReady, entrance }) {
     controller.headPitch = st.pitch;
   });
   return (
-    <group ref={root} scale={0.7}>
+    <group ref={root} scale={initialScale.current}>
       <group scale={metrics.s} position={metrics.pos}>
         <primitive object={model} />
       </group>
@@ -320,6 +327,8 @@ class SceneBoundary extends React.Component {
   }
 }
 export default function Character({
+  model,
+  gltf,
   controller,
   mode,
   mobile,
@@ -330,6 +339,13 @@ export default function Character({
 }) {
   const [human, setHuman] = useState(mode === "about"),
     [glitch, setGlitch] = useState(false);
+  useEffect(() => {
+    controller.queue.clear();
+    controller.mouthPose = "closed";
+    controller.mouthPreview = false;
+    controller.dragging = false;
+    controller.error = null;
+  }, [model.asset, controller]);
   useEffect(() => {
     if (human === (mode === "about")) return;
     setGlitch(true);
@@ -444,7 +460,7 @@ export default function Character({
   return (
     <div
       className={`character-stage ${glitch ? "transforming" : ""} ${mobile ? "mobile-character" : ""} mode-${mode} ${ready ? "ready" : ""}`}
-      aria-label={human ? "Interactive 3D avatar" : "Interactive 3D Niulai"}
+      aria-label={human ? "Interactive 3D avatar" : `互动 3D 角色 · ${model.name}`}
     >
       <div
         className="ground-shadow"
@@ -472,7 +488,10 @@ export default function Character({
               files="/env/studio_fuch.hdr"
               environmentIntensity={human ? 1 : 0.3}
             />
-            <Rig
+            <ModelRig
+              key={model.id}
+              asset={model.asset}
+              gltf={gltf}
               human={false}
               controller={controller}
               placement={placement}
@@ -485,7 +504,8 @@ export default function Character({
             />
             {human && (
               <Suspense fallback={null}>
-                <Rig
+                <ModelRig
+                  asset={HUMAN}
                   human
                   controller={controller}
                   placement={placement}
