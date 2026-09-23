@@ -1,0 +1,39 @@
+{
+  "poses": [
+    {
+      "id": "NOD",
+      "clip": "playful_nod_confirm",
+      "sampleTime": 1.15,
+      "amplitude": 1.25
+    },
+    {
+      "id": "SHAKE",
+      "clip": "playful_head_shake",
+      "sampleTime": 1.2,
+      "amplitude": 1.25
+    },
+    {
+      "id": "NOD_DOUBLE",
+      "clip": "playful_nod_proud",
+      "sampleTime": 1.08,
+      "amplitude": 1.25
+    },
+    {
+      "id": "TILT_LEFT",
+      "clip": "playful_tilt_curious_left",
+      "sampleTime": 1.7,
+      "amplitude": 1.25
+    },
+    {
+      "id": "TILT_RIGHT",
+      "clip": "playful_tilt_curious_right",
+      "sampleTime": 1.7,
+      "amplitude": 1.25
+    }
+  ],
+  "errors": [],
+  "legacySettingsPreserved": true,
+  "allThreeMouthMeshes": true,
+  "headTrackingDisabled": true,
+  "mobileNoOverflow": true
+}

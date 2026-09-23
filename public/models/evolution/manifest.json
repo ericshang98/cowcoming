@@ -373,6 +373,173 @@
         }
       ]
     },
+    "playful": {
+      "formId": "playful",
+      "formLabel": "骚牛",
+      "model": "/models/evolution/playful-e2ed5a89b3fc.glb",
+      "sha256": "e2ed5a89b3fc51d305265425584ba3bb60507609ffe33c085440c287f1534c03",
+      "sourceSha256": "3e266c6f9b737060cdfa6eb0aba6e33b73745f3aae0066b57a24ffc8962ec796",
+      "neutralPose": "reclining",
+      "headTracking": false,
+      "viewYawRadians": 0.6435011087932844,
+      "variants": [
+        {
+          "id": "playful_nod_confirm",
+          "clip": "playful_nod_confirm",
+          "label": "确认点头",
+          "formId": "playful",
+          "logicalId": "nod_confirm",
+          "baseActionId": "NOD",
+          "authoringPrimitive": "nod",
+          "baseActionLabel": "点头",
+          "durationSeconds": 2.6,
+          "description": "侧躺着慢半拍，轻轻点一下，停住再回正。",
+          "requiredBones": [
+            "Head"
+          ],
+          "occupiedBones": [
+            "Head"
+          ],
+          "entryPose": "reclining",
+          "exitPose": "reclining",
+          "interruptible": true,
+          "recoverySeconds": 0.35,
+          "interruptionRecoverySeconds": 0,
+          "semanticTags": [
+            "confirmation"
+          ],
+          "historicalScreenshotJointReference": [
+            3
+          ],
+          "hardwareCommands": false,
+          "actionId": "NOD"
+        },
+        {
+          "id": "playful_head_shake",
+          "clip": "playful_head_shake",
+          "label": "摇头",
+          "formId": "playful",
+          "logicalId": "head_shake",
+          "baseActionId": "SHAKE",
+          "authoringPrimitive": "head_shake",
+          "baseActionLabel": "摇头",
+          "durationSeconds": 3.4,
+          "description": "保持托头姿态，懒懒地左右摇头，最后一摆收小。",
+          "requiredBones": [
+            "Head"
+          ],
+          "occupiedBones": [
+            "Head"
+          ],
+          "entryPose": "reclining",
+          "exitPose": "reclining",
+          "interruptible": true,
+          "recoverySeconds": 0.35,
+          "interruptionRecoverySeconds": 0,
+          "semanticTags": [
+            "disagreement"
+          ],
+          "historicalScreenshotJointReference": [
+            5
+          ],
+          "hardwareCommands": false,
+          "actionId": "SHAKE"
+        },
+        {
+          "id": "playful_nod_proud",
+          "clip": "playful_nod_proud",
+          "label": "得意双点头",
+          "formId": "playful",
+          "logicalId": "nod_proud",
+          "baseActionId": "NOD_DOUBLE",
+          "authoringPrimitive": "nod",
+          "baseActionLabel": "点头",
+          "durationSeconds": 3.2,
+          "description": "微抬下巴，得意地点两下，第二下更轻；身体继续侧躺。",
+          "requiredBones": [
+            "Head"
+          ],
+          "occupiedBones": [
+            "Head"
+          ],
+          "entryPose": "reclining",
+          "exitPose": "reclining",
+          "interruptible": true,
+          "recoverySeconds": 0.35,
+          "interruptionRecoverySeconds": 0,
+          "semanticTags": [
+            "proud-confirmation"
+          ],
+          "historicalScreenshotJointReference": [
+            3
+          ],
+          "hardwareCommands": false,
+          "actionId": "NOD_DOUBLE"
+        },
+        {
+          "id": "playful_tilt_curious_left",
+          "clip": "playful_tilt_curious_left",
+          "label": "左侧好奇歪头",
+          "formId": "playful",
+          "logicalId": "tilt_curious_left",
+          "baseActionId": "TILT_LEFT",
+          "authoringPrimitive": "head_tilt_left",
+          "baseActionLabel": "左歪头",
+          "durationSeconds": 3.6,
+          "description": "维持侧躺托头，向自己的左侧轻歪头，停一拍再回正。",
+          "requiredBones": [
+            "Head"
+          ],
+          "occupiedBones": [
+            "Head"
+          ],
+          "entryPose": "reclining",
+          "exitPose": "reclining",
+          "interruptible": true,
+          "recoverySeconds": 0.35,
+          "interruptionRecoverySeconds": 0,
+          "semanticTags": [
+            "curiosity"
+          ],
+          "historicalScreenshotJointReference": [
+            4
+          ],
+          "hardwareCommands": false,
+          "actionId": "TILT_LEFT"
+        },
+        {
+          "id": "playful_tilt_curious_right",
+          "clip": "playful_tilt_curious_right",
+          "label": "右侧好奇歪头",
+          "formId": "playful",
+          "logicalId": "tilt_curious_right",
+          "baseActionId": "TILT_RIGHT",
+          "authoringPrimitive": "head_tilt_right",
+          "baseActionLabel": "右歪头",
+          "durationSeconds": 3.6,
+          "description": "维持侧躺托头，向自己的右侧轻歪头，停一拍再回正。",
+          "requiredBones": [
+            "Head"
+          ],
+          "occupiedBones": [
+            "Head"
+          ],
+          "entryPose": "reclining",
+          "exitPose": "reclining",
+          "interruptible": true,
+          "recoverySeconds": 0.35,
+          "interruptionRecoverySeconds": 0,
+          "semanticTags": [
+            "curiosity"
+          ],
+          "historicalScreenshotJointReference": [
+            4
+          ],
+          "hardwareCommands": false,
+          "actionId": "TILT_RIGHT"
+        }
+      ]
+    },
     "tough": {
       "formId": "tough",
       "formLabel": "硬牛",

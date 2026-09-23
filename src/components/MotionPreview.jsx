@@ -26,6 +26,17 @@ export default function MotionPreview({ controller, formId, ready }) {
   const tuning = document.forms[formId]?.actions[selected] || DEFAULT_TUNING;
   const generation = useRef(0);
   useEffect(() => {
+    if (
+      Object.keys(document.forms).length !== Object.keys(evolutionAssets).length
+    ) {
+      try {
+        commit(parseTuningDocument(JSON.stringify(document)));
+      } catch {
+        setSaved(false);
+      }
+    }
+  }, [document]);
+  useEffect(() => {
     controller.motionTuning = document;
   }, [controller, document]);
   function commit(next) {
@@ -50,7 +61,7 @@ export default function MotionPreview({ controller, formId, ready }) {
     a.download = "cowcoming-motion-tuning.json";
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setFileStatus(zh ? "已导出五种形态的全部参数" : "Exported all five forms");
+    setFileStatus(zh ? "已导出全部形态的参数" : "Exported all forms");
   }
   async function importFile(event) {
     const file = event.target.files?.[0];

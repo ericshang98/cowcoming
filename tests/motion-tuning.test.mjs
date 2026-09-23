@@ -10,7 +10,7 @@ import {
 } from "../src/live/motion-tuning.mjs";
 import { tuneClip } from "../src/live/tuned-clip.mjs";
 import { createResponsePlayer } from "../src/live/response-player.mjs";
-test("tuning round trips all 25 actions; rejects incompatible sources and unsafe values atomically", () => {
+test("tuning round trips all 30 actions; rejects incompatible sources and unsafe values atomically", () => {
   const doc = defaultTuningDocument();
   doc.forms.calf.actions.NOD = { speed: 0.5, amplitude: 1.25 };
   assert.deepEqual(parseTuningDocument(JSON.stringify(doc)), doc);
@@ -124,4 +124,17 @@ test("tuned playback captures parameters, waits for real completion and releases
     "invalid-tuning",
   );
   player.dispose();
+});
+
+test("legacy five-form settings gain playful defaults without losing any existing adjustments", () => {
+  const old = defaultTuningDocument();
+  delete old.forms.playful;
+  old.forms.calf.actions.NOD = { speed: 0.65, amplitude: 0.85 };
+  old.forms.dark.actions.TILT_RIGHT = { speed: 1.4, amplitude: 1.15 };
+  const next = parseTuningDocument(JSON.stringify(old));
+  assert.equal(Object.keys(next.forms).length, 6);
+  for (const id of Object.keys(old.forms))
+    assert.deepEqual(next.forms[id], old.forms[id]);
+  assert.deepEqual(next.forms.playful, defaultTuningDocument().forms.playful);
+  assert.equal(loadTuning({ getItem: () => JSON.stringify(old) }).error, false);
 });

@@ -1,0 +1,59 @@
+{
+  "method": "Original and final GLB reimported separately; compare every bone matrix at nine times per original clip",
+  "checks": [
+    {
+      "clip": "NOD",
+      "durationSeconds": 1.6,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.960464477539062e-07
+    },
+    {
+      "clip": "NOD_DOUBLE",
+      "durationSeconds": 2.4,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.960464477539062e-07
+    },
+    {
+      "clip": "SHAKE",
+      "durationSeconds": 2.0,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.960464477539062e-07
+    },
+    {
+      "clip": "TILT_LEFT",
+      "durationSeconds": 2.0,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.960464477539062e-07
+    },
+    {
+      "clip": "TILT_RIGHT",
+      "durationSeconds": 2.0,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.960464477539062e-07
+    },
+    {
+      "clip": "bow",
+      "durationSeconds": 2.966666666666667,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.960464477539062e-07
+    },
+    {
+      "clip": "idle",
+      "durationSeconds": 3.966666666666667,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 6.854534149169922e-07
+    },
+    {
+      "clip": "leg_sway",
+      "durationSeconds": 3.966666666666667,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 5.960464477539062e-07
+    },
+    {
+      "clip": "wave",
+      "durationSeconds": 2.966666666666667,
+      "sampledPoses": 9,
+      "maxBoneMatrixDifference": 6.556510925292969e-07
+    }
+  ]
+}

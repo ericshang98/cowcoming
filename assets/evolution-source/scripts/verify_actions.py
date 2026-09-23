@@ -39,7 +39,15 @@ def vertices():
         result.append(arr@mat[:3,:3].T+mat[:3,3]);ev.to_mesh_clear()
     return np.concatenate(result)
 
-foot_names=['LToeBase','RToeBase'] if manifest['formId'] in ('calf','tough') else ['Foot.L','Foot.R']
+foot_names=['LToeBase','RToeBase'] if manifest['formId'] in ('calf','tough','playful') else ['Foot.L','Foot.R']
+reclining = manifest['formId'] == 'playful'
+forward_axis = Vector((-.6,-.8,0)) if reclining else Vector((0,-1,0))
+left_axis = Vector((.8,-.6,0)) if reclining else Vector((1,0,0))
+def head_angles(q):
+    forward=q@forward_axis;up=q@Vector((0,0,1))
+    return (math.degrees(math.atan2(-forward.z,forward.dot(forward_axis))),
+            math.degrees(math.atan2(up.dot(left_axis),up.z)),
+            math.degrees(math.atan2(forward.dot(left_axis),forward.dot(forward_axis))))
 checks=[]
 for d in defs:
     a=activate(d['id']);first=vertices();rest_feet=[arm.pose.bones[n].matrix.translation.copy() for n in foot_names]
@@ -55,32 +63,38 @@ for d in defs:
         max_foot=max(max_foot,*[(arm.pose.bones[n].matrix.translation-r).length for n,r in zip(foot_names,rest_feet)])
         assert arm.pose.bones.get('Root',arm.pose.bones['Hips']).location.length<1e-6
         delta=(arm.pose.bones['Head'].matrix @ arm.data.bones['Head'].matrix_local.inverted()).to_quaternion()
-        forward=delta@Vector((0,-1,0));up=delta@Vector((0,0,1))
-        pitch.append(math.degrees(math.atan2(-forward.z,-forward.y)))
-        yaw.append(math.degrees(math.atan2(forward.x,-forward.y)))
-        roll.append(math.degrees(math.atan2(up.x,up.z)))
+        p,r,y=head_angles(delta);pitch.append(p);roll.append(r);yaw.append(y)
+        if reclining:
+            assert max(abs(p),abs(r),abs(y)) <= 6.01,(d['id'],'head angle',p,r,y)
+            for bone in arm.pose.bones:
+                if bone.name != 'Head':
+                    assert np.max(np.abs(np.array(bone.matrix)-np.array(arm.data.bones[bone.name].matrix_local)))<.0001,(d['id'],bone.name,'support moved')
     last=vertices();endpoint=float(np.linalg.norm(last-first,axis=1).max())
     assert endpoint<.0001,(d['id'],'endpoint',endpoint)
     assert max_foot<.0001,(d['id'],'feet',max_foot)
     assert max_move>.035,(d['id'],'insufficient visual motion',max_move)
-    if d['base']=='nod':assert max(pitch)>10 and max(map(abs,yaw))<1,(d['id'],max(pitch),max(yaw))
-    if d['base']=='head_tilt_left':assert max(roll)>14
-    if d['base']=='head_tilt_right':assert min(roll)<-14
-    if d['base']=='head_shake':assert max(yaw)>18 and min(yaw)<-18 and abs(yaw[-1])<.01
+    if d['base']=='nod':assert max(pitch)>(5 if reclining else 10) and max(map(abs,yaw))<1,(d['id'],max(pitch),max(yaw))
+    if d['base']=='head_tilt_left':assert max(roll)>(5 if reclining else 14)
+    if d['base']=='head_tilt_right':assert min(roll)<(-5 if reclining else -14)
+    if d['base']=='head_shake':assert max(yaw)>(5.5 if reclining else 18) and min(yaw)<(-5.5 if reclining else -18) and abs(yaw[-1])<.01
     checks.append(dict(clip=d['id'],frames=round(duration*120)+1,durationSeconds=duration,maxVertexDisplacement=max_move,maxFootDisplacement=max_foot,endpointMaxError=endpoint,pitchRange=[min(pitch),max(pitch)],rollRange=[min(roll),max(roll)],yawRange=[min(yaw),max(yaw)]))
 # Ensure the proud double nod has two distinct down strokes.
 activate(f"{manifest['formId']}_nod_proud")
 peaks=[]
-for time in [.96,1.28,1.69]:
+for time in ([1.05,1.42,1.98] if reclining else [.96,1.28,1.69]):
     f=time*120;scene.frame_set(int(f),subframe=f-int(f))
-    q=(arm.pose.bones['Head'].matrix@arm.data.bones['Head'].matrix_local.inverted()).to_quaternion();v=q@Vector((0,-1,0));peaks.append(math.degrees(math.atan2(-v.z,-v.y)))
-assert peaks[0]>peaks[2]>5 and peaks[1]<0,peaks
+    q=(arm.pose.bones['Head'].matrix@arm.data.bones['Head'].matrix_local.inverted()).to_quaternion();peaks.append(head_angles(q)[0])
+assert peaks[0]>peaks[2]>(4 if reclining else 5) and peaks[1]<0,peaks
 report=dict(source='Reimported final GLB',bones=len(arm.data.bones),clips=list(clips),morphs=sorted(morphs),newClipChecks=checks,proudNodPitchSamples=peaks,limitations=['No new hardware control','No sit/stand clips','No eyelid or eyebrow animation','Mesh self-intersection requires visual inspection; finite bounds alone do not prove no intersections'])
 (OUT/'verification.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 
+if os.environ.get('NIULAI_RENDER') == '0':
+    print('VERIFIED_WITHOUT_RENDER',len(checks),flush=True)
+    raise SystemExit(0)
+
 # Consistent 3/4 view for visual inspection of face, shoulders and planted feet.
-scene.render.engine='CYCLES';scene.cycles.samples=20;scene.cycles.use_denoising=True
-scene.render.resolution_x=800;scene.render.resolution_y=800;scene.render.resolution_percentage=100
+scene.render.engine='CYCLES';scene.cycles.samples=int(os.environ.get('NIULAI_RENDER_SAMPLES','20'));scene.cycles.use_denoising=True
+scene.render.resolution_x=int(os.environ.get('NIULAI_RENDER_SIZE','800'));scene.render.resolution_y=scene.render.resolution_x;scene.render.resolution_percentage=100
 scene.world=bpy.data.worlds.new('Studio World');scene.world.use_nodes=True
 scene.world.node_tree.nodes['Background'].inputs[0].default_value=(.24,.28,.33,1)
 scene.world.node_tree.nodes['Background'].inputs[1].default_value=.5
@@ -92,7 +106,7 @@ for pos,power,size in [((2,-4,6),600,4),((-4,-3,3),450,4),((2,4,5),800,3)]:
 activate(f"{manifest['formId']}_nod_confirm");scene.frame_set(0)
 base=vertices();floor_z=float(base[:,2].min())
 height=float(np.ptp(base,axis=0)[2]);width=float(np.ptp(base,axis=0)[0]);center=(base.min(axis=0)+base.max(axis=0))/2
-camera.location=Vector(center)+Vector((2.6,-7,1.72))*(height/2.1);point(camera,center);camera.data.ortho_scale=max(height,width)*1.28
+camera.location=Vector(center)+Vector((-2.5,-8,1.8) if reclining else (2.6,-7,1.72))*(height/2.1);point(camera,center);camera.data.ortho_scale=max(height,width)*1.28
 bpy.ops.mesh.primitive_plane_add(size=200,location=(0,0,floor_z-.002));plane=bpy.context.object
 mat=bpy.data.materials.new('Ground');mat.diffuse_color=(.79,.8,.8,1);plane.data.materials.append(mat)
 (OUT/'poses').mkdir(exist_ok=True)

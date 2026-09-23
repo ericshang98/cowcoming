@@ -31,13 +31,11 @@ async function waitReady(form) {
   );
 }
 async function upload(doc) {
-  await page
-    .locator(".motion-tuning-files input")
-    .setInputFiles({
-      name: "tuning.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify(doc)),
-    });
+  await page.locator(".motion-tuning-files input").setInputFiles({
+    name: "tuning.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(doc)),
+  });
   try {
     parseTuningDocument(JSON.stringify(doc));
   } catch {
@@ -52,6 +50,8 @@ async function upload(doc) {
 try {
   // Local bootstrap connects a genuine local Worker and Python simulator.
   await page.goto(base + "/__motion-lab/start");
+  await page.locator(".motion-form-select select").waitFor({ timeout: 60000 });
+  await page.locator(".motion-form-select select").selectOption("calf");
   await waitReady("calf");
   await page.locator('[data-tuning="speed"]').focus();
   await page.keyboard.press("End");
@@ -205,7 +205,7 @@ try {
     ),
   );
   console.log(
-    "PASS: 25 tuned GLB clips, relay playback, persistence, import/export, reset, stop and mobile layout",
+    "PASS: 30 tuned GLB clips, relay playback, persistence, import/export, reset, stop and mobile layout",
   );
 } finally {
   await browser.close();

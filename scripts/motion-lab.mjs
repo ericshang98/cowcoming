@@ -25,9 +25,12 @@ async function freePort(port = 0) {
   return result;
 }
 await freePort(webPort); // Do not replace a server that is already using this port.
+const inspectorPort = await freePort();
 const relayPort = await freePort(),
   relay = `http://127.0.0.1:${relayPort}`;
-const folder = resolve(".pwc/motion-lab");
+const folder = resolve(
+  webPort === 4337 ? ".pwc/motion-lab" : `.pwc/motion-lab-${webPort}`,
+);
 await mkdir(folder, { recursive: true, mode: 0o700 });
 const secret = crypto.randomBytes(32).toString("hex");
 const children = [];
@@ -98,6 +101,9 @@ try {
     [
       resolve("node_modules/wrangler/bin/wrangler.js"),
       "dev",
+      "--local",
+      "--inspector-port",
+      String(inspectorPort),
       "--config",
       join(folder, "wrangler.json"),
       "--port",

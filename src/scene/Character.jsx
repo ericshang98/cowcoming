@@ -90,6 +90,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     [gltf, mixer, model, characterId],
   );
   const responseManifest=Object.values(evolutionAssets).find(asset=>asset.model===modelAsset);
+  const reclining = responseManifest?.neutralPose === 'reclining';
   const responsePlayer=useRef(null);
   const state = useRef({
     time: 0,
@@ -258,7 +259,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     const half =
         Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z,
       t = entrance ? clamp(st.time / 3.6, 0, 1) : 1,
-      fit = characterId === "niulai" ? placement.scale : Math.min(placement.scale, 2 * half * camera.aspect * .88 / (metrics.width * metrics.s * 1.12)),
+      fit = reclining ? Math.min(placement.scale, 2 * half * camera.aspect * (gl.domElement.clientWidth < 769 ? .88 : .38) / (metrics.width * metrics.s * 1.12)) : characterId === "niulai" ? placement.scale : Math.min(placement.scale, 2 * half * camera.aspect * .88 / (metrics.width * metrics.s * 1.12)),
       size =
         fit * (entrance ? 0.68 + 0.32 * (1 - (1 - t) ** 3) : 1);
     controller.entranceProgress = t;
@@ -308,7 +309,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     group.updateMatrixWorld(true);
     let target = { body: 0, yaw: 0, pitch: 0 };
     if (
-      controller.tracking &&
+      !reclining && controller.tracking &&
       !controller.mouthPreview &&
       (controller.mouse.active || controller.gaze) &&
       bones.head &&
@@ -328,12 +329,12 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     if (controller.dragging) target.body = controller.dragYaw;
     if (moving) {
       st.body = damp(st.body, target.body, human ? 3.5 : 2.2, dt);
-      st.head = damp(st.head, responsePlayer.current?.busy ? 0 : target.yaw + controller.tilt.x * 0.26, 9, dt);
-      st.pitch = damp(st.pitch, responsePlayer.current?.busy ? 0 : target.pitch - controller.tilt.y * 0.15, 9, dt);
-      st.roll = damp(st.roll, livePose.roll, 9, dt);
+      st.head = damp(st.head, (reclining || responsePlayer.current?.busy) ? 0 : target.yaw + controller.tilt.x * 0.26, 9, dt);
+      st.pitch = damp(st.pitch, (reclining || responsePlayer.current?.busy) ? 0 : target.pitch - controller.tilt.y * 0.15, 9, dt);
+      st.roll = damp(st.roll, reclining ? 0 : livePose.roll, 9, dt);
     }
-    group.rotation.y = st.body;
-    group.rotation.z = controller.tilt.x * 0.035;
+    group.rotation.y = st.body + (responseManifest?.viewYawRadians || 0);
+    group.rotation.z = reclining ? 0 : controller.tilt.x * 0.035;
     for (const [bone, weight] of [
       [bones.neck, 0.4],
       [bones.head, 0.6],

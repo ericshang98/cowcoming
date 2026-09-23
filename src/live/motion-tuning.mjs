@@ -43,13 +43,21 @@ export function parseTuningDocument(text) {
     output = defaultTuningDocument();
   for (const key of ["format", "version", "actionContractVersion", "scope"])
     if (input?.[key] !== output[key]) throw Error("Incompatible tuning format");
-  if (
-    Object.keys(input.forms || {})
-      .sort()
-      .join() !== Object.keys(output.forms).sort().join()
-  )
+  const incomingIds = Object.keys(input.forms || {})
+    .sort()
+    .join();
+  const currentIds = Object.keys(output.forms).sort().join();
+  // The one supported migration: existing five-form files gain default playful
+  // settings. Never reset a user's already-tuned five forms on asset addition.
+  const legacyIds = Object.keys(output.forms)
+    .filter((id) => id !== "playful")
+    .sort()
+    .join();
+  const legacyFive = incomingIds === legacyIds && Boolean(output.forms.playful);
+  if (incomingIds !== currentIds && !legacyFive)
     throw Error("Incompatible forms");
   for (const [id, form] of Object.entries(output.forms)) {
+    if (legacyFive && id === "playful") continue;
     const source = input.forms[id];
     if (source?.modelSha256 !== form.modelSha256)
       throw Error("Model version differs");

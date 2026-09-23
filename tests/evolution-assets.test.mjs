@@ -4,8 +4,8 @@ import fs from "node:fs";
 import { createHash } from "node:crypto";
 import { evolutionAssets } from "../src/evolution-assets.mjs";
 import { ACTION_CATALOG } from "../shared/action-catalog.mjs";
-test("all five shipped rigs contain the exact five clips and their required bones", () => {
-  assert.equal(Object.keys(evolutionAssets).length, 5);
+test("all six shipped rigs contain the exact five clips and their required bones", () => {
+  assert.equal(Object.keys(evolutionAssets).length, 6);
   for (const [form, m] of Object.entries(evolutionAssets)) {
     const bytes = fs.readFileSync(
       new URL("../public" + m.model, import.meta.url),
@@ -28,4 +28,40 @@ test("all five shipped rigs contain the exact five clips and their required bone
     }
     assert.ok(!json.animations.some((a) => /approve/.test(a.name)));
   }
+});
+
+// The reclining pose must never inherit a standing character's wide head gaze.
+test("playful retains its original clips, mouth shapes and reclining presentation", () => {
+  const m = evolutionAssets.playful;
+  assert.equal(m.neutralPose, "reclining");
+  assert.equal(m.headTracking, false);
+  assert.ok(m.viewYawRadians > 0.6 && m.viewYawRadians < 0.7);
+  const bytes = fs.readFileSync(
+    new URL("../public" + m.model, import.meta.url),
+  );
+  const json = JSON.parse(
+    bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString(),
+  );
+  assert.equal(json.animations.length, 14);
+  for (const name of [
+    "idle",
+    "wave",
+    "bow",
+    "leg_sway",
+    ...Object.keys(ACTION_CATALOG),
+  ])
+    assert.ok(json.animations.some((a) => a.name === name));
+  const morphNames = new Set(
+    json.meshes.flatMap((m) => m.extras?.targetNames || []),
+  );
+  assert.deepEqual([...morphNames].sort(), [
+    "MouthOpen",
+    "MouthRound",
+    "MouthWide",
+  ]);
+  assert.ok(
+    m.variants.every(
+      (v) => v.entryPose === "reclining" && v.exitPose === "reclining",
+    ),
+  );
 });

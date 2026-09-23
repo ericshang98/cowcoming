@@ -1,0 +1,124 @@
+{
+  "ip_id": "niulai",
+  "form_id": "playful",
+  "name": "骚牛",
+  "version": "1.0.0",
+  "source": "电影牛来.3mf",
+  "model": "saoniu-mouth.glb",
+  "sha256": "3e266c6f9b737060cdfa6eb0aba6e33b73745f3aae0066b57a24ffc8962ec796",
+  "bytes": 2284992,
+  "blender": "5.2.2 LTS",
+  "triangles": 70744,
+  "bones": [
+    "Hips",
+    "Spine",
+    "Chest",
+    "Neck",
+    "Head",
+    "UpperArm_L",
+    "ForeArm_L",
+    "Hand_L",
+    "UpperArm_R",
+    "ForeArm_R",
+    "Hand_R",
+    "Thigh_L",
+    "Leg_L",
+    "LToeBase",
+    "Thigh_R",
+    "Leg_R",
+    "RToeBase"
+  ],
+  "animations": [
+    {
+      "name": "bow",
+      "durationSeconds": 3
+    },
+    {
+      "name": "idle",
+      "durationSeconds": 4
+    },
+    {
+      "name": "leg_sway",
+      "durationSeconds": 4
+    },
+    {
+      "name": "NOD",
+      "durationSeconds": 1.6333333333333333
+    },
+    {
+      "name": "NOD_DOUBLE",
+      "durationSeconds": 2.433333333333333
+    },
+    {
+      "name": "SHAKE",
+      "durationSeconds": 2.033333333333333
+    },
+    {
+      "name": "TILT_LEFT",
+      "durationSeconds": 2.033333333333333
+    },
+    {
+      "name": "TILT_RIGHT",
+      "durationSeconds": 2.033333333333333
+    },
+    {
+      "name": "wave",
+      "durationSeconds": 3
+    }
+  ],
+  "morphs": [
+    "MouthOpen",
+    "MouthWide",
+    "MouthRound"
+  ],
+  "defaultMorphWeights": [
+    0,
+    0,
+    0
+  ],
+  "upAxis": "+Y",
+  "approximateFaceForward": [
+    -0.6,
+    0,
+    0.8
+  ],
+  "neutralBounds": {
+    "min": [
+      -1.7792942349915855,
+      2.565314315557812e-07,
+      -0.7688003617526591
+    ],
+    "max": [
+      1.7795137630770204,
+      2.31252553020018,
+      0.6991579534855582
+    ]
+  },
+  "textureCount": 0,
+  "selfContained": true,
+  "actionContractVersion": 2,
+  "actionClipMap": {
+    "NOD": "NOD",
+    "SHAKE": "SHAKE",
+    "NOD_DOUBLE": "NOD_DOUBLE",
+    "TILT_LEFT": "TILT_LEFT",
+    "TILT_RIGHT": "TILT_RIGHT"
+  },
+  "hardwareProfile": null,
+  "capabilities": [
+    "reclining idle",
+    "small hand gesture",
+    "leg sway",
+    "five small head gestures",
+    "audio amplitude mouth demo"
+  ],
+  "missingCapabilities": [
+    "standing",
+    "walking",
+    "large head tracking",
+    "phoneme recognition",
+    "hardware execution",
+    "website integration acceptance"
+  ],
+  "productRevision": 212
+}

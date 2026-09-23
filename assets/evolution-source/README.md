@@ -1,4 +1,4 @@
-# 五形态动作源文件
+# 六形态动作源文件
 
 动作合同 2：NOD / SHAKE / NOD_DOUBLE / TILT_LEFT / TILT_RIGHT。WAIT 为等待控制。
 源 GLB、曲线和 Blender 验证报告按形态保存。网站使用 public/models/evolution 的哈希版本导出文件。
@@ -10,7 +10,7 @@ NIULAI_FORM=calf NIULAI_SOURCE="$PWD/assets/evolution-source/calf/source.glb" NI
 NIULAI_OUTPUT="$PWD/tmp/evolution/calf" /Applications/Blender.app/Contents/MacOS/Blender -b --python-exit-code 1 --python assets/evolution-source/scripts/verify_actions.py
 ```
 
-五形态输出到 `tmp/evolution/{form}` 后，运行 `node scripts/prepare-evolution-assets.mjs` 更新网页资源与 manifest。
+六形态输出到 `tmp/evolution/{form}` 后，运行 `node scripts/prepare-evolution-assets.mjs` 更新网页资源与 manifest。
 
 verify_legacy.py 需同样提供 NIULAI_SOURCE 和 NIULAI_OUTPUT，对比原有动画。新动作 120 Hz 采样，回到中立姿态，脚底不漂移。网站播放器单独等待动画结束和恢复过渡；硬件回执独立。
 
@@ -20,3 +20,8 @@ verify_legacy.py 需同样提供 NIULAI_SOURCE 和 NIULAI_OUTPUT，对比原有�
 硬牛原始 3MF 元数据：Designer「八云恋在找钓鱼竿」，License「BY-NC-SA」。转换和增加动画不改变模型许可。其他模型未在本交付中获得新的开源许可。公开网站展示与后续商用需继续遵守原模型授权；不能将接口代码许可扩展到模型。
 
 本目录只收录重建动作必要的绑定模型、作者脚本、曲线与验证报告；未收录旧六动作预览或“郑重批准”。
+
+
+## 骚牛补齐
+
+`playful/source.glb` 来自 Eric 提供的骚牛包，保留侧躺翘腿造型、原九段动画与三个口型；新五段回应只改变 Head，按斜向脸部坐标定义左右。来源和模型署名见 [playful/SOURCE.md](playful/SOURCE.md)。网页新资源为约 2.42 MB 的自包含 GLB。重建单个形态后可用 `NIULAI_FORMS=playful node scripts/prepare-evolution-assets.mjs` 更新，并校验其他五份资源的 SHA 不变。

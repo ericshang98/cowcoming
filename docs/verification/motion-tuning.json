@@ -81,6 +81,46 @@
       "status": "completed"
     },
     {
+      "formId": "playful",
+      "actionId": "NOD",
+      "clip": "playful_nod_confirm",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "playful",
+      "actionId": "SHAKE",
+      "clip": "playful_head_shake",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "playful",
+      "actionId": "NOD_DOUBLE",
+      "clip": "playful_nod_proud",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "playful",
+      "actionId": "TILT_LEFT",
+      "clip": "playful_tilt_curious_left",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
+      "formId": "playful",
+      "actionId": "TILT_RIGHT",
+      "clip": "playful_tilt_curious_right",
+      "speed": 1.5,
+      "amplitude": 1.25,
+      "status": "completed"
+    },
+    {
       "formId": "tough",
       "actionId": "NOD",
       "clip": "tough_nod_confirm",
@@ -208,7 +248,7 @@
       "amplitude": 1.25
     },
     "clip": "dark_nod_confirm",
-    "eventId": "0e868022-c44f-4f3d-bf17-f6494efc59e4:17ef0d64-a485-4e84-b1bb-10f6be7163ba",
+    "eventId": "adc9940d-57e5-467c-85e1-b060f152bf3e:72ebabc0-9914-4b99-be59-c1fd3c13339b",
     "formId": "dark"
   },
   "errors": [],
