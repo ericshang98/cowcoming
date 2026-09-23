@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { completedEvolutionTurn } from "./evolution-turn.mjs";
+import { completedEvolutionTurn, localInteractionContext } from "./evolution-turn.mjs";
 import { ACTION_CONTRACT_VERSION } from "../../shared/action-catalog.mjs";
 import { parseKey } from "../../shared/live-protocol.mjs";
 
@@ -155,7 +155,7 @@ export default function useLiveDevice(controller, active) {
             }
             if (m.type === "welcome") setClientId(m.clientId);
             if (m.type === "snapshot") {
-              if(snapshotRef.current && (snapshotRef.current.profile.revision!==m.profile.revision || !m.deviceOnline)){
+              if(snapshotRef.current && (snapshotRef.current.profile.revision!==m.profile.revision)){
                 current.current.controller.responsePlayer?.stop();
                 conversationCommands.current.clear();softwareResults.current.clear();setLastAnimation(null);
               }
@@ -173,6 +173,10 @@ export default function useLiveDevice(controller, active) {
             if (m.type === "error") setError(m.error);
             if (m.type === "command.sent")
               setReceipt({ commandId: m.commandId, status: "sent" });
+            if (m.type === "live.interaction" && current.current.active) {
+              const context = localInteractionContext(m.interaction, snapshotRef.current?.profile, current.current.controller.evolution?.context());
+              if (context) conversationCommands.current.set(m.interaction.commandId, context);
+            }
             if (m.type === "live.decision" && current.current.active) {
               const profile = snapshotRef.current?.profile;
               if (profile?.revision === m.decision.profileRevision && (!current.current.controller.evolution || current.current.controller.evolution.deviceFormReady?.(profile.revision, profile.formId))) {
@@ -213,7 +217,7 @@ export default function useLiveDevice(controller, active) {
             clearInterval(heartbeat.current);
             conversationCommands.current.clear();
             setClientId(null);
-            current.current.controller.responsePlayer?.stop();
+            // Already accepted animations finish during transport outages.
             conversationCommands.current.clear(); softwareResults.current.clear();
             current.current.controller.queue.clear();
             if (event.code === 4003) {
@@ -278,7 +282,7 @@ export default function useLiveDevice(controller, active) {
       }
       const context = current.current.controller.evolution?.context();
       if (data.command === 'interact' && context?.formId === profile?.formId) {
-        conversationCommands.current.set(commandId, { ...context, userText: data.input, profileRevision: profile.revision });
+        conversationCommands.current.set(commandId, { ...context, userText: data.input, profileRevision: profile.revision, replyMode: profile.replyMode });
       }
       if (send({ type: "command", commandId, ...data }))
         setReceipt({ commandId, status: "sending" });
@@ -313,5 +317,6 @@ export default function useLiveDevice(controller, active) {
     receipt,
     online: status === "connected" && Boolean(snapshot?.deviceOnline),
     relay: credentials.current?.relay || "",
+    localGatewayKey: credentials.current?.key,
   };
 }

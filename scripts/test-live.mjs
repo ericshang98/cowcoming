@@ -20,7 +20,7 @@ await writeFile(
       bindings: [{ name: "ROOMS", class_name: "DeviceRoom" }],
     },
     migrations: [{ tag: "v1", new_sqlite_classes: ["DeviceRoom"] }],
-    vars: { ALLOWED_ORIGINS: "http://127.0.0.1:4317" },
+    vars: { ALLOWED_ORIGINS: process.env.TEST_UI_ORIGIN || "http://127.0.0.1:4317" },
   }),
 );
 await writeFile(join(folder, ".dev.vars"), `ADMIN_KEY=${secret}\n`, {
@@ -65,7 +65,7 @@ try {
       throw new Error("Test Worker did not start");
     await new Promise((r) => setTimeout(r, 250));
   }
-  const test = spawn(process.execPath, ["scripts/live-relay-check.mjs"], {
+  const test = spawn(process.execPath, [process.env.TEST_RELAY_SCRIPT || "scripts/live-relay-check.mjs"], {
     env: { ...process.env, TEST_RELAY_URL: base, TEST_RELAY_ADMIN: secret },
     stdio: "inherit",
   });

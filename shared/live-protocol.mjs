@@ -1,3 +1,4 @@
+import formProfilesDefaults from "./form-profiles.json" with { type: "json" };
 export const FORM_IDS = [
   "calf",
   "normal",
@@ -41,12 +42,12 @@ export function initialRoom(roomId, label) {
     label,
     version: 1,
     evolutionMode: "manual",
+    personalityVersion: 1,
     profile: {
       revision: 1,
       actionContractVersion: ACTION_CONTRACT_VERSION,
       formId: "calf",
-      prompt:
-        "你是牛来。根据现场输入，在允许的动作中选择合适的回应。提示词只影响行为选择，不改变机械臂的运动限制。",
+      ...structuredClone(formProfilesDefaults.calf),
       allowedActions: [...ACTION_IDS],
       animationMap: structuredClone(DEFAULT_MAP),
     },
@@ -94,11 +95,16 @@ export function updateProfile(state, patch) {
     p.allowedActions = [...ACTION_IDS];
     p.animationMap = structuredClone(DEFAULT_MAP);
   }
+  if (patch.formId && patch.formId !== state.profile.formId && !formProfiles[patch.formId]) {
+    check(FORM_IDS.includes(patch.formId), "Unknown form");
+    Object.assign(p, structuredClone(formProfilesDefaults[patch.formId]));
+  }
   if (patch.formId !== undefined) {
     check(FORM_IDS.includes(patch.formId), "Unknown form");
     p.formId = patch.formId;
   }
   if (patch.prompt !== undefined) p.prompt = text(patch.prompt, 8000);
+  if (patch.languagePrompt !== undefined) p.languagePrompt = text(patch.languagePrompt, 8000);
   if (patch.allowedActions !== undefined) {
     check(
       Array.isArray(patch.allowedActions) &&
@@ -156,7 +162,8 @@ export function applyDeviceEvent(state, raw) {
   const e = { type: raw.type, eventId, at: Date.now() };
   let device = state.device,
     appliedRevision = state.appliedRevision,
-    messages = state.messages;
+    messages = state.messages,
+    commands = state.commands;
   switch (raw.type) {
     case "device.status": {
       device = { ...device };
@@ -191,6 +198,16 @@ export function applyDeviceEvent(state, raw) {
       );
       appliedRevision = raw.revision;
       e.revision = raw.revision;
+      break;
+    case "interaction.start":
+      check(raw.profileRevision === state.profile.revision && appliedRevision === raw.profileRevision, "Interaction uses an unapplied profile");
+      e.commandId = id(raw.commandId);
+      check(!commands.some(c => c.commandId === e.commandId), "Duplicate interaction ID");
+      e.profileRevision = raw.profileRevision;
+      e.formId = state.profile.formId;
+      e.userText = text(raw.userText || "", 2000, true);
+      e.replyMode = raw.replyMode === "silent" ? "silent" : "text";
+      commands = [...commands, {commandId: e.commandId, origin: "device", expiresAt: e.at + 120000}].slice(-200);
       break;
     case "decision":
       check(
@@ -322,6 +339,7 @@ export function applyDeviceEvent(state, raw) {
     device,
     appliedRevision,
     messages,
+    commands,
     version: state.version + 1,
     updatedAt: e.at,
     events: raw.type.startsWith("language.")
@@ -397,4 +415,18 @@ export function validateSignal(raw) {
     );
   }
   return s;
+}
+
+// One-time additive upgrade of persisted rooms. Preserve user-authored JEV prompts.
+export function upgradeRoomPersonality(state) {
+  if (!state?.profile || state.personalityVersion === 1) return state;
+  const oldDefault = "你是牛来。根据现场输入，在允许的动作中选择合适的回应。提示词只影响行为选择，不改变机械臂的运动限制。";
+  function upgrade(profile) {
+    const defaults = formProfilesDefaults[profile.formId];
+    return {...defaults, ...profile, languagePrompt: profile.languagePrompt || defaults.languagePrompt,
+      replyMode: defaults.replyMode, prompt: !profile.prompt || profile.prompt === oldDefault ? defaults.prompt : profile.prompt};
+  }
+  return {...state, personalityVersion: 1, version: state.version + 1,
+    profile: {...upgrade(state.profile), revision: state.profile.revision + 1}, appliedRevision: null,
+    formProfiles: Object.fromEntries(Object.entries(state.formProfiles || {}).map(([id,p])=>[id,upgrade(p)]))};
 }

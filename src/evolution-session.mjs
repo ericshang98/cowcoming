@@ -9,7 +9,7 @@ export function validateSettings(settings) {
   if (settings.endpoint) {
     const relative = /^\/(?!\/)[^\\\s?#]*$/.test(settings.endpoint);
     let remote = false;
-    try { const url = new URL(settings.endpoint); remote = url.protocol === 'https:' && !url.username && !url.password && !url.search && !url.hash; } catch { /* Relative gateway. */ }
+    try { const url = new URL(settings.endpoint); remote = (url.protocol === 'https:' || isLocalEvolutionGateway(settings.endpoint)) && !url.username && !url.password && !url.search && !url.hash; } catch { /* Relative gateway. */ }
     if (!relative && !remote) throw new Error('invalid_endpoint');
   }
   return { mode: settings.mode, interval: settings.interval, endpoint: settings.endpoint.trim(), model: settings.model.trim() };
@@ -69,10 +69,12 @@ export function evaluationRequest(state) {
   if (!state.pending) throw new Error('no_pending_evaluation');
   return { ...state.pending, model: state.settings.model, allowedNextForms: successors(state.form), turns: state.turns.slice(0, state.pending.turnCount) };
 }
+export const isLocalEvolutionGateway = endpoint => ['http://127.0.0.1:8768/evaluate', 'http://localhost:8768/evaluate'].includes(endpoint);
+
 // A configured gateway owns provider credentials and maps this contract to its LLM.
 // Never truncate the conversation or silently replace evaluation with a timer.
-export async function requestEvolutionEvaluation(endpoint, payload, { signal, fetcher = fetch } = {}) {
-  const response = await fetcher(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', signal, body: JSON.stringify(payload) });
+export async function requestEvolutionEvaluation(endpoint, payload, { signal, fetcher = fetch, localKey } = {}) {
+  const response = await fetcher(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(isLocalEvolutionGateway(endpoint) && localKey ? {Authorization: 'Bearer ' + localKey} : {}) }, credentials: 'same-origin', signal, body: JSON.stringify(payload) });
   if (!response.ok) throw new Error(`http_${response.status}`);
   const result = await response.json();
   if (result.requestId !== payload.requestId || result.sessionId !== payload.sessionId || result.generation !== payload.generation) throw new Error('invalid_response');
