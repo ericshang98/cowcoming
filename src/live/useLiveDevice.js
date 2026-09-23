@@ -177,13 +177,14 @@ export default function useLiveDevice(controller, active) {
               const profile = snapshotRef.current?.profile;
               if (profile?.revision === m.decision.profileRevision && (!current.current.controller.evolution || current.current.controller.evolution.deviceFormReady?.(profile.revision, profile.formId))) {
                 const decision=m.decision;
-                if(profile.actionContractVersion!==ACTION_CONTRACT_VERSION || decisions.current.has(decision.decisionId))return;
-                decisions.current.add(decision.decisionId);
+                const decisionKey = `${snapshotRef.current.roomId}:${decision.decisionId}`;
+                if(profile.actionContractVersion!==ACTION_CONTRACT_VERSION || decisions.current.has(decisionKey))return;
+                decisions.current.add(decisionKey);
                 if(decisions.current.size>1000)decisions.current.delete(decisions.current.values().next().value);
                 const ctx=current.current.controller.evolution?.context();
                 const player=current.current.controller.responsePlayer;
                 const promise=player && current.current.controller.responseForm===profile.formId
-                  ?player.play({eventId:decision.decisionId,formId:profile.formId,actionId:decision.actionId})
+                  ?player.play({eventId:decisionKey,formId:profile.formId,actionId:decision.actionId})
                   :Promise.resolve({status:'unavailable',reason:'model-not-loaded'});
                 setLastAnimation({actionId:decision.actionId,decisionId:decision.decisionId,status:'playing',clip:null});
                 promise.then(result=>{
