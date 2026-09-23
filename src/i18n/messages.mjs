@@ -320,3 +320,11 @@ messages.push(
 ['未来尚未揭晓', 'Still undiscovered'], ['你的故事，还在继续。', 'Your story is still unfolding.'],
 ['探索你的进化路线', 'Explore your evolution']
 );
+
+// Eric's current Home wording and interaction hint.
+messages.push(
+ ['基于 JEV 决策模型的','Powered by the JEV decision model,'],
+ ['可进化 AI 宠物。','an evolving AI pet.'],
+ ['基于 JEV 决策模型的可进化 AI 宠物，连接感知、决策与行动，让陪伴融入日常生活。','An evolving AI pet built on the JEV decision model, connecting perception, decisions and actions to bring companionship into everyday life.'],
+ ['按 L 进行交互','Press L to interact.']
+);

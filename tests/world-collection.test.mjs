@@ -83,3 +83,9 @@ test("storage errors preserve playable session and roundtrip valid progress", ()
     persistent: true,
   });
 });
+
+test('home Mama works without collecting stars while WORLD keeps its unlock rule', () => {
+  assert.equal(canPlayTrack('mama', [], 'home'), true);
+  assert.equal(canPlayTrack('mama', [], 'blog'), false);
+  assert.equal(canPlayTrack('mama', STARS.map(star => star.id), 'blog'), true);
+});

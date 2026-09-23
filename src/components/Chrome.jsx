@@ -168,7 +168,7 @@ export function Header() {
         <div className="snapshot-tag" aria-live="polite">
           <b>{tracking ? "鼠标跟随已开启" : "鼠标跟随已关闭"}</b>
           <span>
-            {activeIp.id !== 'niulai' ? activeIp.hint[language === 'en' ? 1 : 0] : collection.unlocked ? "左键叫妈妈 · L 挥挥手" : "WORLD 集齐星光，解锁叫妈妈 · L 挥手"}
+            {activeIp.id !== 'niulai' ? activeIp.hint[language === 'en' ? 1 : 0] : "按 L 进行交互"}
           </span>
         </div>
       )}
