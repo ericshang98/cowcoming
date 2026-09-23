@@ -60,7 +60,7 @@ export function BrandFooter({ trajectory = false }) {
   );
 }
 export function Home() {
-  const { mobile, navigate, muted, setMuted, paused, setPaused,
+  const { mobile, navigate, openChat, muted, setMuted, paused, setPaused,
     voiceState, interactionNotice, collection, activeIp, wave } = useApp();
   const { language } = useLanguage();
   const isNiulai = activeIp.id === 'niulai';
@@ -88,7 +88,7 @@ export function Home() {
           An evolving AI pet built on the JEV decision model, connecting perception, decisions and actions
           to bring companionship into everyday life.
         </p>
-        <button className="home-product-link" onClick={() => navigate("about")}>
+        <button className="home-product-link" onClick={() => openChat()}>
           Explore JEV <ArrowUpRight size={16} aria-hidden="true" />
         </button>
         {feedback && <div className="home-product-feedback" role="status">{feedback}</div>}

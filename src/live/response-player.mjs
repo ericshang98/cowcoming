@@ -13,6 +13,7 @@ export function createResponsePlayer({
   getTuning = () => DEFAULT_TUNING,
 }) {
   const seen = new Map();
+  const queue = [];
   let current = null,
     recovery = null,
     disposed = false;
@@ -41,6 +42,27 @@ export function createResponsePlayer({
     else current.action.fadeOut(0.35);
     recovery = { remaining: 0.35, status };
   }
+  function drain() {
+    if (current || disposed) return;
+    const job = queue.shift();
+    if (!job) return;
+    const { request, variant, tuning, resolve } = job;
+    if (request.actionId === "WAIT") {
+      resolve({status: "completed", clip: "idle", eventId: request.eventId, formId: manifest.formId});
+      drain();
+      return;
+    }
+    onStart();
+    mixer.stopAllAction();
+    const incoming = idle();
+    const tunedClip = tuning.amplitude === 1 ? null : tuneClip(actions[variant.clip].getClip(), tuning.amplitude);
+    const action = tunedClip ? mixer.clipAction(tunedClip) : actions[variant.clip];
+    action.reset().setEffectiveWeight(1).setEffectiveTimeScale(tuning.speed).setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = true;
+    action.play();
+    if (incoming) action.crossFadeFrom(incoming, 0.18, false);
+    current = { action, tunedClip, tuning, resolve, clip: variant.clip, eventId: request.eventId };
+  }
   const finished = (e) => {
     if (current && e.action === current.action && !recovery)
       recover("completed");
@@ -62,69 +84,31 @@ export function createResponsePlayer({
       if (!request.eventId) return Promise.resolve({ status: "invalid" });
       if (seen.has(request.eventId))
         return Promise.resolve({ status: "duplicate" });
-      seen.set(request.eventId, true);
-      if (seen.size > 1000) seen.delete(seen.keys().next().value);
-      if (request.actionId === "WAIT")
-        return Promise.resolve({
-          status: "completed",
-          clip: "idle",
-          eventId: request.eventId,
-          formId: manifest.formId,
-        });
       const spec = ACTION_CATALOG[request.actionId];
       const variant = manifest.variants.find(
         (v) => v.logicalId === spec?.suffix,
       );
       if (
-        !variant ||
+        request.actionId !== "WAIT" && (!variant ||
         !actions[variant.clip] ||
-        variant.requiredBones.some((b) => !bones.has(b))
+        variant.requiredBones.some((b) => !bones.has(b)))
       )
         return Promise.resolve({
           status: "unavailable",
           reason: "animation-not-loaded",
         });
-      if (current)
-        return Promise.resolve({
-          status: "unavailable",
-          reason: "animation-busy",
-        });
-      let tuning;
-      try {
-        tuning = validateTuning(getTuning(request.actionId));
-      } catch {
-        return Promise.resolve({
-          status: "unavailable",
-          reason: "invalid-tuning",
-        });
+      let tuning = DEFAULT_TUNING;
+      if (request.actionId !== "WAIT") {
+        try { tuning = validateTuning(getTuning(request.actionId)); }
+        catch { return Promise.resolve({status: "unavailable", reason: "invalid-tuning"}); }
       }
-      onStart();
-      mixer.stopAllAction();
-      const incoming = idle();
-      const tunedClip =
-        tuning.amplitude === 1
-          ? null
-          : tuneClip(actions[variant.clip].getClip(), tuning.amplitude);
-      const action = tunedClip
-        ? mixer.clipAction(tunedClip)
-        : actions[variant.clip];
-      action
-        .reset()
-        .setEffectiveWeight(1)
-        .setEffectiveTimeScale(tuning.speed)
-        .setLoop(THREE.LoopOnce, 1);
-      action.clampWhenFinished = true;
-      action.play();
-      if (incoming) action.crossFadeFrom(incoming, 0.18, false);
-      return new Promise((resolve) => {
-        current = {
-          action,
-          tunedClip,
-          tuning,
-          resolve,
-          clip: variant.clip,
-          eventId: request.eventId,
-        };
+      if (queue.length >= 32)
+        return Promise.resolve({status: "unavailable", reason: "animation-queue-full"});
+      seen.set(request.eventId, true);
+      if (seen.size > 1000) seen.delete(seen.keys().next().value);
+      return new Promise(resolve => {
+        queue.push({request, variant, tuning, resolve});
+        drain();
       });
     },
     update(dt) {
@@ -134,10 +118,12 @@ export function createResponsePlayer({
           const status = recovery.status;
           current.action.stop();
           settle(status);
+          drain();
         }
       }
     },
     stop() {
+      for (const job of queue.splice(0)) job.resolve({status: "interrupted", eventId: job.request.eventId, formId: manifest.formId});
       if (current) {
         current.action.stop();
         idle();

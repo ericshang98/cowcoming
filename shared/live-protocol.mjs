@@ -1,3 +1,5 @@
+import { PERSONA_VERSION, personaProfile } from './personas.mjs';
+import formProfilesDefaults from "./form-profiles.json" with { type: "json" };
 export const FORM_IDS = [
   "calf",
   "normal",
@@ -41,12 +43,11 @@ export function initialRoom(roomId, label) {
     label,
     version: 1,
     evolutionMode: "manual",
+    personalityVersion: PERSONA_VERSION,
     profile: {
       revision: 1,
       actionContractVersion: ACTION_CONTRACT_VERSION,
-      formId: "calf",
-      prompt:
-        "你是牛来。根据现场输入，在允许的动作中选择合适的回应。提示词只影响行为选择，不改变机械臂的运动限制。",
+      ...personaProfile('calf'),
       allowedActions: [...ACTION_IDS],
       animationMap: structuredClone(DEFAULT_MAP),
     },
@@ -98,7 +99,12 @@ export function updateProfile(state, patch) {
     check(FORM_IDS.includes(patch.formId), "Unknown form");
     p.formId = patch.formId;
   }
+  if (p.personaVersion !== PERSONA_VERSION ||
+      (patch.formId && patch.formId !== state.profile.formId && !formProfiles[patch.formId])) {
+    Object.assign(p, personaProfile(p.formId));
+  }
   if (patch.prompt !== undefined) p.prompt = text(patch.prompt, 8000);
+  if (patch.languagePrompt !== undefined) p.languagePrompt = text(patch.languagePrompt, 8000);
   if (patch.allowedActions !== undefined) {
     check(
       Array.isArray(patch.allowedActions) &&
@@ -139,6 +145,7 @@ export function updateProfile(state, patch) {
     formProfiles,
     appliedRevision: null,
     updatedAt: now,
+    messages: state.messages.map(m => m.status === "streaming" ? {...m, status:"interrupted"} : m),
     revealed: [...new Set([...state.revealed, p.formId])],
     history:
       p.formId === state.profile.formId
@@ -153,10 +160,15 @@ export function applyDeviceEvent(state, raw) {
   check(raw && typeof raw === "object", "Invalid event");
   const eventId = id(raw.eventId);
   if (state.seen.includes(eventId)) return state;
+  if (raw.type?.startsWith('language.') && raw.profileRevision !== undefined) {
+    check(raw.profileRevision === state.profile.revision && state.appliedRevision === raw.profileRevision,
+      'Language uses a stale or unapplied profile');
+  }
   const e = { type: raw.type, eventId, at: Date.now() };
   let device = state.device,
     appliedRevision = state.appliedRevision,
-    messages = state.messages;
+    messages = state.messages,
+    commands = state.commands;
   switch (raw.type) {
     case "device.status": {
       device = { ...device };
@@ -189,8 +201,22 @@ export function applyDeviceEvent(state, raw) {
         raw.revision === state.profile.revision && state.profile.actionContractVersion === ACTION_CONTRACT_VERSION && state.device.actionContractVersion === ACTION_CONTRACT_VERSION,
         "Stale profile acknowledgement",
       );
+      if (state.profile.personaVersion) {
+        check(raw.formId === state.profile.formId && raw.personaVersion === state.profile.personaVersion,
+          'Persona version or form was not applied by device');
+      }
       appliedRevision = raw.revision;
       e.revision = raw.revision;
+      break;
+    case "interaction.start":
+      check(raw.profileRevision === state.profile.revision && appliedRevision === raw.profileRevision, "Interaction uses an unapplied profile");
+      e.commandId = id(raw.commandId);
+      check(!commands.some(c => c.commandId === e.commandId), "Duplicate interaction ID");
+      e.profileRevision = raw.profileRevision;
+      e.formId = state.profile.formId;
+      e.userText = text(raw.userText || "", 2000, true);
+      e.replyMode = raw.replyMode === "silent" ? "silent" : "text";
+      commands = [...commands, {commandId: e.commandId, origin: "device", expiresAt: e.at + 120000}].slice(-200);
       break;
     case "decision":
       check(
@@ -204,6 +230,7 @@ export function applyDeviceEvent(state, raw) {
       );
       check(!state.events.some(x=>x.type==='decision' && x.decisionId===raw.decisionId), 'Duplicate decision ID');
       e.formId = state.profile.formId;
+      e.simulation = state.device.simulation;
       e.decisionId = id(raw.decisionId);
       e.actionId = raw.actionId;
       e.summary = text(raw.summary || "", 2000, true);
@@ -322,6 +349,7 @@ export function applyDeviceEvent(state, raw) {
     device,
     appliedRevision,
     messages,
+    commands,
     version: state.version + 1,
     updatedAt: e.at,
     events: raw.type.startsWith("language.")
@@ -397,4 +425,21 @@ export function validateSignal(raw) {
     );
   }
   return s;
+}
+
+// One-time additive upgrade of persisted rooms. Preserve user-authored JEV prompts.
+export function upgradeRoomPersonality(state) {
+  if (!state?.profile || state.personalityVersion === PERSONA_VERSION) return state;
+  const oldDefault = "你是牛来。根据现场输入，在允许的动作中选择合适的回应。提示词只影响行为选择，不改变机械臂的运动限制。";
+  function upgrade(profile) {
+    const defaults = personaProfile(profile.formId);
+    const prior = formProfilesDefaults[profile.formId];
+    return {...profile, ...defaults,
+      prompt: !profile.prompt || profile.prompt === oldDefault || profile.prompt === prior?.prompt
+        ? defaults.prompt : profile.prompt};
+  }
+  return {...state, personalityVersion: PERSONA_VERSION, version: state.version + 1,
+    profile: {...upgrade(state.profile), revision: state.profile.revision + 1}, appliedRevision: null,
+    messages: state.messages.map(m => m.status === "streaming" ? {...m, status:"interrupted"} : m),
+    formProfiles: Object.fromEntries(Object.entries(state.formProfiles || {}).map(([id,p])=>[id,upgrade(p)]))};
 }

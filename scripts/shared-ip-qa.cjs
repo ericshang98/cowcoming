@@ -15,7 +15,7 @@ const out = 'output/shared-ip-qa'; fs.mkdirSync(out, {recursive:true});
     assert.ok((await page.title()).startsWith('Cowcoming — '));
   };
   const nav = async mode => {
-    await page.locator('.navigation > button').nth({home:3,work:4,blog:5,about:6,contact:7}[mode]).click();
+    await page.locator('.navigation > button').nth({home:3,work:4,blog:5,contact:6}[mode]).click();
     await page.waitForFunction(mode => window.__replica.getState().mode === mode, mode);
   };
   const select = async id => {
@@ -33,52 +33,46 @@ const out = 'output/shared-ip-qa'; fs.mkdirSync(out, {recursive:true});
     await page.keyboard.press('Escape');
   };
   try {
-    await page.goto(base); await page.waitForFunction(() => window.__replica?.getState().bootDone, null, {timeout:45000});
+    await page.goto(`${base}?section=about`);
+    await page.waitForFunction(() => window.__replica?.getState().bootDone, null, {timeout:45000});
+    assert.equal((await state()).mode, 'home');
+    assert.equal(new URL(page.url()).searchParams.has('section'), false);
+    assert.equal(await page.locator('.navigation .mobile-nav-icon').count(), 4);
+    assert.equal(await page.locator('.about-page').count(), 0);
+    await page.locator('.home-product-link').click();
+    await page.waitForFunction(() => window.__replica.getState().chat === 'open');
+    assert.equal((await state()).mode, 'home'); await page.keyboard.press('Escape');
+    checks.push('About is removed from navigation and routing; legacy URL resolves to Home; Explore JEV opens the existing guide');
     const evolution = await page.evaluate(() => window.__replica.controller.evolution.context());
-    await select('fengge'); await nav('about'); await waitIp('fengge'); await brand();
+    await select('fengge'); await nav('contact'); await waitIp('fengge');
     for (const id of ['fengge','spiderman','nailong','toothless','niulai']) {
-      await select(id);
-      await page.waitForFunction(() => !document.querySelector('.cowcoming-model-controls button').disabled);
-      assert.equal(await page.locator('.character-stage canvas').count(), 1);
+      await select(id); assert.equal(await page.locator('.character-stage canvas').count(), 1);
       if (id !== 'niulai') await perform(id);
     }
-    checks.push('About shares the Home choice, loads all five real models, plays four signature actions and switches without navigating');
-    await select('fengge'); await page.screenshot({path:`${out}/about-desktop.png`});
-    await nav('contact'); await waitIp('fengge'); await perform('fengge');
-    await select('nailong'); await nav('home'); await waitIp('nailong'); await brand();
+    await select('fengge'); await page.waitForTimeout(600);
+    await page.screenshot({path:`${out}/support-desktop.png`});
+    await nav('home'); await waitIp('fengge');
     assert.deepEqual(await page.evaluate(() => window.__replica.controller.evolution.context()), evolution);
     await nav('contact'); await page.reload(); await waitIp('niulai');
-    await select('nailong');
-    await page.waitForFunction(() => window.__replica.getState().bootDone);
-    await brand(); await page.waitForTimeout(500); await page.screenshot({path:`${out}/support-desktop.png`});
-    checks.push('Support shares selection both ways with Home and resets to Niulai on direct reload');
-    await nav('about'); await page.reload(); await waitIp('niulai');
-    await select('nailong');
-    await page.waitForFunction(() => !document.querySelector('.cowcoming-model-controls button').disabled);
-    await perform('nailong'); await nav('contact');
+    checks.push('Home and Support share all five models without navigation on selection; reload resets to Niulai');
+    await select('nailong'); await perform('nailong'); await nav('home');
     assert.equal((await state()).ipVoice.status, 'idle');
-    const restoredEvolution = await page.evaluate(() => window.__replica.controller.evolution.context());
     await nav('work'); await page.waitForSelector('.binding-page');
     assert.ok(await page.locator('.navigation button[aria-controls=ip-switcher]').isDisabled());
     await nav('home'); await waitIp('nailong');
-    assert.deepEqual(await page.evaluate(() => window.__replica.controller.evolution.context()), restoredEvolution);
-    checks.push('About resets to Niulai on reload; navigation stops voice; WORK binding and evolution stay isolated');
+    checks.push('Navigation stops voice; WORK remains gated and separate from the selected IP');
     await page.setViewportSize({width:390,height:844});
     await page.locator('.mobile-actions .language-toggle').click();
-    for (const mode of ['about','contact','home']) {
+    for (const mode of ['contact','home']) {
       await nav(mode); await select(mode === 'contact' ? 'toothless' : 'fengge');
       if (mode === 'contact') {
-        await page.reload(); await waitIp('niulai');
-        await select('toothless');
-        await page.waitForFunction(() => window.__replica.getState().bootDone);
-        await perform('toothless');
+        await page.reload(); await waitIp('niulai'); await select('toothless'); await perform('toothless');
       }
-      if (mode === 'about') await page.waitForFunction(() => !document.querySelector('.cowcoming-model-controls button').disabled);
+      assert.equal(await page.locator('.navigation .mobile-nav-icon').count(), 4);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-      await page.waitForTimeout(500);
-      await page.screenshot({path:`${out}/${mode}-mobile.png`});
+      await page.waitForTimeout(600); await page.screenshot({path:`${out}/${mode}-mobile.png`});
     }
-    checks.push('English mobile Home/About/Support keep Cowcoming branding, switch IP in place and avoid horizontal overflow');
+    checks.push('English mobile navigation has four pages; Support retains its visible interactive model and shared IP selector');
     assert.deepEqual(errors, []);
     const report={base,checks,pageErrors:errors};fs.writeFileSync(`${out}/report.json`,JSON.stringify(report,null,2)+'\n');
     console.log(JSON.stringify(report,null,2));

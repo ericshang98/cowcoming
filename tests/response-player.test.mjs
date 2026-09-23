@@ -75,13 +75,10 @@ test("unavailable models never claim completion; stop interrupts actual playback
     "unavailable",
   );
   const p = f.player.play({ eventId: "b", formId: "calf", actionId: "NOD" });
-  assert.equal(
-    (await f.player.play({ eventId: "c", formId: "calf", actionId: "SHAKE" }))
-      .reason,
-    "animation-busy",
-  );
+  const queued = f.player.play({ eventId: "c", formId: "calf", actionId: "SHAKE" });
   f.player.stop();
   assert.equal((await p).status, "interrupted");
+  assert.equal((await queued).status, "interrupted");
   f.advance();
   assert.equal(f.player.busy, false);
   f.player.dispose();
@@ -157,4 +154,30 @@ test("evolution waits for both endpoints and excludes incomplete software result
     ).turn,
     undefined,
   );
+});
+
+test("burst decisions finish in order without losing the second action", async () => {
+  const f = fixture(), completed = [];
+  const first = f.player.play({eventId:"one", formId:"calf", actionId:"NOD"}).then(r=>{completed.push("one");return r;});
+  const second = f.player.play({eventId:"two", formId:"calf", actionId:"SHAKE"}).then(r=>{completed.push("two");return r;});
+  assert.equal((await f.player.play({eventId:"two",formId:"calf",actionId:"SHAKE"})).status,"duplicate");
+  f.advance(); await first;
+  assert.deepEqual(completed,["one"]);
+  f.advance(); assert.equal((await second).status,"completed");
+  assert.deepEqual(completed,["one","two"]);
+  f.player.dispose();
+});
+test("unavailable requests are retryable and do not consume event IDs",async()=>{
+  const f=fixture();
+  assert.equal((await f.player.play({eventId:"retry",formId:"calf",actionId:"invalid"})).status,"unavailable");
+  const result=f.player.play({eventId:"retry",formId:"calf",actionId:"NOD"});
+  f.advance(); assert.equal((await result).status,"completed");
+});
+test('WAIT stays behind an already playing action',async()=>{
+ const f=fixture();let done=false;
+ const motion=f.player.play({eventId:'movement',formId:'calf',actionId:'NOD'});
+ const waiting=f.player.play({eventId:'waiting',formId:'calf',actionId:'WAIT'}).then(r=>{done=true;return r;});
+ await Promise.resolve();assert.equal(done,false);
+ f.advance();assert.equal((await motion).status,'completed');
+ assert.equal((await waiting).status,'completed');f.player.dispose();
 });

@@ -34,7 +34,6 @@ import {
   ProjectDetail,
   SearchDialog,
 } from "./pages/Portfolio";
-import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Terminal from "./components/Terminal";
 import Resume from "./components/Resume";
@@ -42,12 +41,16 @@ import Wordle from "./components/Wordle";
 const World = lazy(() => import("./scene/World"));
 function route() {
   const q = new URLSearchParams(location.search);
+  if (q.get('section') === 'about') {
+    q.delete('section');
+    history.replaceState({}, '', location.pathname + (q.size ? `?${q}` : '') + location.hash);
+  }
   return {
     mode: q.has("project")
       ? "work"
       : q.has("idea")
         ? "blog"
-        : ["home", "hardware", "work", "about", "contact", "blog"].includes(
+        : ["home", "hardware", "work", "contact", "blog"].includes(
               q.get("section"),
             )
           ? q.get("section") === "hardware"
@@ -72,7 +75,7 @@ export default function App() {
   const [mobile, setMobile] = useState(innerWidth <= 768),
     [ready, setReady] = useState(false),
     [bootDone, setBootDone] = useState(() =>
-      ["blog", "about", "work", "contact"].includes(route().mode),
+      ["blog", "work", "contact"].includes(route().mode),
     ),
     [chat, setChat] = useState("closed"),
     [cv, setCv] = useState("closed"),
@@ -87,13 +90,13 @@ export default function App() {
   const [ipOpen, setIpOpen] = useState(false);
   const selection = useIpSelection(() => setIpOpen(false));
   const selectedIp = getIp(selection.active);
-  const canSwitchIp = ['home', 'about', 'contact'].includes(mode);
+  const canSwitchIp = ['home', 'contact'].includes(mode);
   const otherIpPage = canSwitchIp && selection.active !== 'niulai';
   const controller = useMemo(makeController, []),
     sound = useRef(null),
     viewRef = useRef();
   const live = useLiveDevice(controller, mode === "work");
-  const evolutionSession = useEvolutionSession({ enabled: live.online, roomId: live.snapshot?.roomId, form: live.snapshot?.profile.formId });
+  const evolutionSession = useEvolutionSession({ enabled: live.online, roomId: live.snapshot?.roomId, form: live.snapshot?.profile.formId, localGatewayKey: live.localGatewayKey });
   const deviceFormReady = useEvolutionDeviceSync(evolutionSession, live);
   const [evolutionRoute, setEvolutionRoute] = useState('celestial');
   useEffect(() => {
@@ -206,7 +209,7 @@ export default function App() {
   }, [mode, project, idea]);
   useEffect(() => {
     const section = mode === 'home' ? '基于 JEV 决策模型的可进化 AI 宠物'
-      : mode === 'about' ? 'ABOUT' : mode === 'contact' ? 'VOTE US'
+      : mode === 'contact' ? 'VOTE US'
       : mode === 'blog' ? 'WORLD' : 'WORK';
     document.title = `Cowcoming — ${translateText(section, language)}`;
   }, [mode, language]);
@@ -243,7 +246,7 @@ export default function App() {
         e.preventDefault();
         openChat();
       }
-      if (e.key === " " && mode !== "blog" && mode !== "about") {
+      if (e.key === " " && mode !== "blog") {
         e.preventDefault();
         controller.gesture("happy");
       }
@@ -348,7 +351,7 @@ export default function App() {
           <Suspense fallback={null}><IpAssetProbe ip={selection.pending.ip} onReady={selection.complete} onError={selection.fail} /></Suspense>
         </IpLoadBoundary>}
         <Ambient />
-        {mode !== "blog" && mode !== "about" && !(mode === "contact" && mobile) && (
+        {mode !== "blog" && !(mode === "contact" && mobile) && (
           <Character
             rigKey={mode === "work" ? "work-character" : "default-character"}
             controller={controller}
@@ -380,8 +383,6 @@ export default function App() {
             evolutionPage
           ) : mode === "work" ? (
             evolutionPage
-          ) : mode === "about" ? (
-            <About />
           ) : mode === "contact" ? (
             <Contact />
           ) : (
@@ -399,7 +400,7 @@ export default function App() {
         <div className="interface-chrome">
           <Header />
         </div>
-        {!bootDone && mode !== "blog" && mode !== "about" && (
+        {!bootDone && mode !== "blog" && (
           <Boot ready={ready} onDone={bootEnd} />
         )}
         <div className="minimized-tray">

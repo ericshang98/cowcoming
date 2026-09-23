@@ -95,3 +95,10 @@
 @media (max-width: 768px) {
   .contact-page .contact-character { height: 300px; margin: 0 0 20px; }
 }
+
+/* Inline mobile character stage, independent of the removed About page. */
+.contact-character { position: relative; }
+.contact-character .character-stage.mode-contained { inset: 0; width: 100%; height: 100%; pointer-events: auto; mask-image: none; }
+.contact-character .character-stage[aria-disabled="true"] { pointer-events: none; }
+.contact-character .ground-shadow { top: 86%; }
+.contact-character .scene-error { top: 35%; left: 10%; right: 10%; font-size: 14px; }

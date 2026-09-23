@@ -36,6 +36,8 @@ class DeviceClient:
     async def emit(self, event_type, **data):
         if self.ws is None or self.ws.closed:
             raise ConnectionError("Relay disconnected")
+        if event_type.startswith("language.") and self.profile:
+            data.setdefault("profileRevision", self.profile["revision"])
         await self.ws.send_json({"type": event_type, "eventId": event_id(), **data})
 
     async def send_signal(self, data):
@@ -104,15 +106,29 @@ class DeviceClient:
             decision_id = event_id()
             await self.emit("decision", decisionId=decision_id, commandId=command["commandId"], profileRevision=revision, actionId=decision["actionId"], summary=decision.get("summary", ""))
             await self.emit("action", decisionId=decision_id, status="started", detail="Local adapter started")
-            result = await self.adapter.execute(decision["actionId"])
-            await self.emit("action", decisionId=decision_id, status=result["status"], detail=result.get("detail", ""))
-            action_final = result["status"] in ("completed", "failed", "interrupted")
-            if user_input:
+            async def motion():
+                nonlocal action_final
+                result = await self.adapter.execute(decision["actionId"])
+                await self.emit("action", decisionId=decision_id, status=result["status"], detail=result.get("detail", ""))
+                action_final = result["status"] in ("completed", "failed", "interrupted")
+                return result
+            async def language():
+                nonlocal message_id
+                if not user_input: return
                 message_id = event_id()
                 await self.emit("language.start", messageId=message_id, commandId=command["commandId"], role="assistant", text="")
                 async for chunk in self.adapter.reply(user_input):
                     await self.emit("language.delta", messageId=message_id, text=chunk)
                 await self.emit("language.end", messageId=message_id)
+                message_id = None
+            # Both start in the same turn; speech does not wait for the arm to finish.
+            jobs = [asyncio.create_task(motion()), asyncio.create_task(language())]
+            try:
+                result, _ = await asyncio.gather(*jobs)
+            finally:
+                for job in jobs:
+                    if not job.done(): job.cancel()
+                await asyncio.gather(*jobs, return_exceptions=True)
             completed = result["status"] == "completed"
             await self.emit("command.result", commandId=command["commandId"], status="completed" if completed else "unknown", detail="Interaction complete" if completed else "Hardware completion not confirmed")
         except asyncio.CancelledError:
@@ -151,7 +167,7 @@ class DeviceClient:
                             self.camera.report_status = lambda status: self.emit("device.status", camera=status)
                         beat = asyncio.create_task(self.heartbeat())
                         print('Connected to device room', ticket['roomId'], flush=True)
-                        await self.emit("device.status", **await self.adapter.status(), camera="unknown" if self.camera else "offline", simulation=bool(self.adapter.simulation))
+                        await self.emit("device.status", **{**await self.adapter.status(), "camera": "unknown" if self.camera else "offline", "simulation": bool(self.adapter.simulation)})
                         async for frame in ws:
                             if frame.type != aiohttp.WSMsgType.TEXT:
                                 continue
@@ -165,17 +181,20 @@ class DeviceClient:
                                     continue
                                 try:
                                     validate_profile(message['profile'])
-                                    await self.adapter.apply_profile(message['profile'])
+                                    receipt = await self.adapter.apply_profile(message['profile'])
+                                    if message['profile'].get('personaVersion'):
+                                        if not isinstance(receipt, dict) or any(receipt.get(k) != message['profile'][k] for k in ('formId', 'personaVersion')):
+                                            raise ValueError('Adapter did not apply the requested persona')
                                     status=await self.adapter.status()
                                     if status.get('actionContractVersion') != ACTION_CONTRACT_VERSION:
                                         raise ValueError('Adapter action contract is not ready')
                                     executable_actions(message['profile'],status)
-                                    await self.emit('device.status',**status,simulation=bool(self.adapter.simulation))
+                                    await self.emit('device.status',**{**status, 'simulation':bool(self.adapter.simulation)})
                                 except Exception as error:
                                     await self.emit('log',text='Profile not applied: '+type(error).__name__)
                                     continue
                                 self.profile = message['profile']
-                                await self.emit('profile.applied', revision=self.profile['revision'])
+                                await self.emit('profile.applied', revision=self.profile['revision'], **(receipt or {}))
                                 self.ready = True
                             elif message['type'] == 'command':
                                 await self.command(message)

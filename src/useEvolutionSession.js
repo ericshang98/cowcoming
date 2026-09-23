@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import { createEvolutionSession, readEvolutionSettings, evolutionReducer, evaluationDue, evaluationRequest, requestEvolutionEvaluation, EVOLUTION_SETTINGS_KEY } from './evolution-session.mjs';
 
-export function useEvolutionSession({ enabled = true, roomId = null, form = 'calf' } = {}) {
+export function useEvolutionSession({ enabled = true, roomId = null, form = 'calf', localGatewayKey } = {}) {
   const [state, dispatch] = useReducer(evolutionReducer, null, () => {
     let storage; try { storage = window.localStorage; } catch { /* Storage is optional. */ }
     return createEvolutionSession(crypto.randomUUID(), readEvolutionSettings(storage));
@@ -30,13 +30,13 @@ export function useEvolutionSession({ enabled = true, roomId = null, form = 'cal
     let active = true;
     const abort = new AbortController();
     const timer = setTimeout(() => abort.abort(), 30000);
-    requestEvolutionEvaluation(state.settings.endpoint, evaluationRequest(state), { signal: abort.signal })
+    requestEvolutionEvaluation(state.settings.endpoint, evaluationRequest(state), { signal: abort.signal, localKey: localGatewayKey })
       .then(result => { if (active && enabledRef.current) dispatch({ type: 'result', result }); })
       .catch(error => { if (active && enabledRef.current) dispatch({ type: 'error', requestId: state.pending.requestId, error: error.name === 'AbortError' ? 'timeout' : error.message }); })
       .finally(() => clearTimeout(timer));
     return () => { active = false; clearTimeout(timer); abort.abort(); };
     // New turns must not cancel an in-flight snapshot; control changes do.
-  }, [state.pending, state.settings.endpoint, available]);
+  }, [state.pending, state.settings.endpoint, available, localGatewayKey]);
   const recordTurn = useCallback(turn => { if (enabledRef.current) dispatch({ type: 'turn', turn }); }, []);
   const context = useCallback(() => {
     const value = stateRef.current;

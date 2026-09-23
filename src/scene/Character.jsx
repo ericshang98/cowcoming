@@ -281,7 +281,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
     const floor = -1.5 - placement.y * 2 * half;
     if (characterId === 'fengge' && shadowRef.current) {
       // Project the same floor used by the soles into this canvas, including
-      // About's contained stage. CSS percentages otherwise leave a visible gap.
+      // the contained stage. CSS percentages otherwise leave a visible gap.
       st.shadow.set(group.position.x, floor, 0).project(camera);
       shadowRef.current.style.left = `${(st.shadow.x + 1) * 50}%`;
       shadowRef.current.style.top = `${(1 - st.shadow.y) * 50}%`;
@@ -430,14 +430,14 @@ export default function Character({
   onTap,
   characterId = 'niulai',
 }) {
-  // About contains the shared selected IP in its own model stage.
+  // Supporting pages can contain the selected IP in their own model stage.
   const stageRef = useRef(), shadowRef = useRef();
   const placement = useMemo(() => {
     // Loading has its own full-body framing. The mobile homepage deliberately
     // crops the legs, which would hide the walking animation during boot.
     if (!boot && mobile) return { scale: 0.95, x: 0, y: -0.18 };
-    if (mode === "about" && characterId === "fengge") return { scale: mobile ? 1.45 : 1.55, x: 0, y: .065 };
-    if (mode === "about") return { scale: mobile ? 1.3 : 1.4, x: 0, y: 0.02 };
+    if (mode === "contained" && characterId === "fengge") return { scale: mobile ? 1.45 : 1.55, x: 0, y: .065 };
+    if (mode === "contained") return { scale: mobile ? 1.3 : 1.4, x: 0, y: 0.02 };
     // WORK is Niulai's main stage, including on narrow screens. Supporting
     // content scrolls below it instead of turning the model into a thumbnail.
     if (mode === "work") {
@@ -459,9 +459,9 @@ export default function Character({
   }, [mode, mobile, overlay, boot, characterId, modelAsset]);
   useEffect(() => {
     let drag = null;
-    const blocked = mode === "about" && overlay;
+    const blocked = mode === "contained" && overlay;
     const point = (x, y) => {
-      const r = mode === "about" ? stageRef.current.getBoundingClientRect() : { left: 0, top: 0, width: innerWidth, height: innerHeight };
+      const r = mode === "contained" ? stageRef.current.getBoundingClientRect() : { left: 0, top: 0, width: innerWidth, height: innerHeight };
       return { x: ((x - r.left) / r.width) * 2 - 1, y: 1 - ((y - r.top) / r.height) * 2 };
     };
     const move = (e) => {
@@ -563,7 +563,7 @@ export default function Character({
       data-character={characterId}
       className={`character-stage ${mobile ? "mobile-character" : ""} mode-${mode} ${ready ? "ready" : ""}`}
       aria-label={characterId !== 'niulai' ? `Interactive 3D ${characterId}` : 'Interactive 3D Niulai'}
-      aria-disabled={mode === "about" && overlay ? true : undefined}
+      aria-disabled={mode === "contained" && overlay ? true : undefined}
     >
       <div
         ref={shadowRef}

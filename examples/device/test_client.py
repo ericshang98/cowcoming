@@ -72,3 +72,23 @@ class Contract(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(executable_actions(p,{'actionContractVersion':2,'hardware':'offline','supportedActions':['NOD']}),['WAIT'])
         p['animationMap']['NOD']=['nod-double']
         with self.assertRaises(ValueError): validate_profile(p)
+
+class PersonaAdapterTests(unittest.IsolatedAsyncioTestCase):
+    async def test_example_loads_six_personas_and_returns_actual_version(self):
+        from adapter import ExampleAdapter
+        from pathlib import Path
+        import json
+        data_path = Path(__file__).with_name('niulai-personas.json')
+        if not data_path.exists(): data_path = Path(__file__).resolve().parents[2]/'shared/niulai-personas.json'
+        catalog = json.loads(data_path.read_text())
+        from action_contract import ACTION_ANIMATIONS, ACTION_IDS
+        for form in catalog['forms']:
+            adapter = ExampleAdapter()
+            profile = {'revision':1,'actionContractVersion':2,'formId':form,'prompt':'偏好',
+                       'allowedActions':list(ACTION_IDS),'animationMap':ACTION_ANIMATIONS,
+                       'personaVersion':catalog['prompt_version']}
+            receipt = await adapter.apply_profile(profile)
+            self.assertEqual(receipt, {'formId':form,'personaVersion':catalog['prompt_version']})
+            self.assertEqual(adapter.persona, catalog['forms'][form])
+            with self.assertRaises(ValueError):
+                await adapter.apply_profile({**profile,'personaVersion':'stale'})

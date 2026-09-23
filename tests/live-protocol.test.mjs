@@ -1,3 +1,4 @@
+import { PERSONA_VERSION } from '../shared/personas.mjs';
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -54,10 +55,10 @@ test("manual profile edit increments revision without inventing evolution", () =
 test("device acknowledgements cannot apply a stale or future prompt revision", () => {
   const s = readyRoom();
   assert.throws(() =>
-    applyDeviceEvent(s, { type: "profile.applied", eventId: "a", revision: 2 }),
+    applyDeviceEvent(s, { type: "profile.applied", formId: "calf", personaVersion: PERSONA_VERSION, eventId: "a", revision: 2 }),
   );
   assert.equal(
-    applyDeviceEvent(s, { type: "profile.applied", eventId: "a", revision: 1 })
+    applyDeviceEvent(s, { type: "profile.applied", formId: "calf", personaVersion: PERSONA_VERSION, eventId: "a", revision: 1 })
       .appliedRevision,
     1,
   );
@@ -74,7 +75,7 @@ test("decision events are deduplicated and constrained by the applied profile", 
   };
   assert.throws(() => applyDeviceEvent(s, event), /profile/);
   s = applyDeviceEvent(s, {
-    type: "profile.applied",
+    type: "profile.applied", formId: "calf", personaVersion: PERSONA_VERSION,
     eventId: "a",
     revision: 1,
   });
@@ -190,7 +191,7 @@ test("each form keeps its own editable prompt and action mapping", () => {
 test("a completed action cannot move backwards and interrupted text stays interrupted", () => {
   let s = readyRoom();
   s = applyDeviceEvent(s, {
-    type: "profile.applied",
+    type: "profile.applied", formId: "calf", personaVersion: PERSONA_VERSION,
     eventId: "apply",
     revision: 1,
   });

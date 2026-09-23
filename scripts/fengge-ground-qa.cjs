@@ -12,7 +12,7 @@ try {
  await p.waitForFunction(()=>window.__replica.controller.rig.characterId==='fengge');
  for(const [width,height] of [[1440,1000],[1280,720],[390,844],[320,740]]) {
   await p.setViewportSize({width,height});
-  for(const [mode,index] of [['home',3],['about',6],['contact',7]]) {
+  for(const [mode,index] of [['home',3],['contact',6]]) {
    await p.locator('.navigation > button').nth(index).click();
    await p.waitForFunction(()=>window.__replica.controller.rig?.characterId==='fengge');await p.waitForTimeout(850);
    await p.evaluate(()=>window.__replica.controller.tracking=false);await p.mouse.move(0,0);await p.waitForTimeout(500);
