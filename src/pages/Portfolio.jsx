@@ -1,3 +1,4 @@
+import { Localized } from "../i18n/Language";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
@@ -10,15 +11,16 @@ import {
 } from "lucide-react";
 import { useApp } from "../context";
 import { Controls, TiltPrompt } from "../components/Chrome";
-import MouthPreview from "../components/MouthPreview";
+import NiulaiVoice from "../components/NiulaiVoice";
+import "./home-product.css";
 export function PageLead({ number, title, children }) {
   return (
-    <div className="page-lead">
+    <Localized><div className="page-lead">
       <span>
         {number} / {title}
       </span>
       <p>{children}</p>
-    </div>
+    </div></Localized>
   );
 }
 export function BrandFooter({ trajectory = false }) {
@@ -34,7 +36,7 @@ export function BrandFooter({ trajectory = false }) {
       ]
     : portfolio.portfolioData.brands;
   return (
-    <footer className="brand-footer">
+    <Localized><footer className="brand-footer">
       <Controls music={false} />
       <span className="brand-label">
         {trajectory ? (
@@ -54,247 +56,45 @@ export function BrandFooter({ trajectory = false }) {
           ))}
         </div>
       </div>
-    </footer>
-  );
-}
-export function Awards({ single = false }) {
-  const { setAwards } = useApp();
-  const names = [
-    "astonishing",
-    "ui",
-    "ux",
-    "awwwards-honors",
-    "innovation",
-    "special-kudos",
-    "awwwards-nominee",
-    "mesh",
-    "csswinner",
-    "webguru",
-    "wall-of-portfolios",
-  ];
-  return (
-    <div className={`award-orbit ${single ? "single" : ""}`}>
-      {(single ? ["special-kudos"] : names).map((a, i) => (
-        <button
-          className={`award award-${i}`}
-          key={a}
-          aria-label={`${a} — open Awards & Recognition`}
-          onClick={() => setAwards(true)}
-          onPointerMove={(e) => {
-            const r = e.currentTarget.getBoundingClientRect();
-            e.currentTarget.style.setProperty(
-              "--rx",
-              `${-(e.clientY - r.y - r.height / 2) / 7}deg`,
-            );
-            e.currentTarget.style.setProperty(
-              "--ry",
-              `${(e.clientX - r.x - r.width / 2) / 7}deg`,
-            );
-          }}
-          onPointerLeave={(e) => {
-            e.currentTarget.style.setProperty("--rx", "0deg");
-            e.currentTarget.style.setProperty("--ry", "0deg");
-          }}
-        >
-          <img src={`/awards/${a}.svg`} alt={a.replaceAll("-", " ")} />
-        </button>
-      ))}
-    </div>
+    </footer></Localized>
   );
 }
 export function Home() {
-  const { mobile, navigate, bootDone, ideas, openIdea, snapshot, reaction, setReactionId } =
-    useApp();
-  const [text, setText] = useState("");
-  useEffect(() => {
-    if (!bootDone) return;
-    let i = 0;
-    setText("");
-    const id = setInterval(() => {
-      i += 1;
-      setText(reaction.line.slice(0, i));
-      if (i >= reaction.line.length) clearInterval(id);
-    }, 16);
-    return () => clearInterval(id);
-  }, [bootDone, reaction]);
-  const latest = ideas.filter((x) => x.available).at(-1);
+  const { mobile, navigate, muted, setMuted, paused, setPaused,
+    voiceState, interactionNotice, collection } = useApp();
+  const feedback = voiceState.error || interactionNotice ||
+    (voiceState.status === "loading" ? "One moment—getting ready to speak…"
+      : voiceState.status === "playing" ? voiceState.track?.textEn : "");
   return (
-    <section className="home-page" data-pwc-critical="home">
-      <h1 className="hero-wordmark">牛来</h1>
-      <Awards single />
+    <Localized><section className="home-page" data-pwc-critical="home">
+      <h1 className="hero-wordmark">COW COMING</h1>
       <div className="home-tools">
         <Controls />
         <div className="idea-promotion">
-          <button onClick={() => navigate("blog")}>IDEA52 ↗</button>
-          <span>AN IDEA FOR EVERY WEEK IN 2026</span>
+          <button onClick={() => navigate("blog")}>WORLD ↗</button>
+          <span>收集星光 · 解锁第一声妈妈</span>
         </div>
-        <button className="latest-drop" onClick={() => openIdea(latest.id)}>
-          <span>LATEST</span> WK{latest.week} — {latest.title.toUpperCase()} →
+        <button className="latest-drop" onClick={() => navigate("blog")}>
+          <span>星光</span> {collection.collected.length}/27 · {collection.unlocked ? "已学会叫妈妈" : "继续收集"} →
         </button>
       </div>
-      <div className="greeting">
-        <span className="eyebrow">{snapshot.name}</span>
-        <p aria-live="polite">
-          {text || reaction.line}
-          <i className="typing-caret" />
+      <div className="greeting home-product">
+        <span className="eyebrow">POWERED BY JEV</span>
+        <h2>A new kind of<br />desktop companion.</h2>
+        <p className="home-product-description">
+          A robot built on the JEV model, connecting perception, decisions and actions
+          to bring companionship into everyday life.
         </p>
-        <div className="suggestions">
-          {snapshot.reactions.map((item) => (
-            <button
-              key={item.id}
-              aria-pressed={item.id === reaction.id}
-              onClick={() => setReactionId(item.id)}
-            >
-              {item.chip}
-            </button>
-          ))}
-        </div>
-        <MouthPreview />
+        <button className="home-product-link" onClick={() => navigate("about")}>
+          Explore JEV <ArrowUpRight size={16} aria-hidden="true" />
+        </button>
+        {feedback && <div className="home-product-feedback" role="status">{feedback}</div>}
+        {muted && feedback && <button className="interaction-resume" onClick={() => setMuted(false)}>Sound off · Unmute</button>}
+        {paused && feedback && <button className="interaction-resume" onClick={() => setPaused(false)}>Animation paused · Resume</button>}
       </div>
+      <NiulaiVoice />
       {mobile && <TiltPrompt />}
-    </section>
-  );
-}
-export function Work() {
-  const { portfolio, openProject, setSearch } = useApp();
-  const [active, setActive] = useState(null);
-  const sectors = [
-    "Product",
-    "Government",
-    "Government",
-    "Government",
-    "Health",
-    "Health",
-    "Media",
-    "Marketplace",
-  ];
-  return (
-    <section className="work-page page" data-pwc-critical="work">
-      <PageLead number="02" title="WORK">
-        A decade of national-scale work, serving over{" "}
-        <strong>12 million people</strong> — where I’ve been, and what I built.
-      </PageLead>
-      <aside className="career">
-        <div className="small-heading">
-          <span>CAREER</span>
-          <span>06</span>
-        </div>
-        <ol>
-          {portfolio.experiences.map((exp, i) => (
-            <li
-              key={exp.id}
-              className={
-                active === i || (active === null && i === 0) ? "current" : ""
-              }
-              onMouseEnter={() => setActive(i)}
-              onMouseLeave={() => setActive(null)}
-            >
-              <span>{exp.date.replace("Present", "NOW")}</span>
-              <strong>
-                {
-                  [
-                    "Digital Dubai",
-                    "MFine",
-                    "Prime Focus",
-                    "Let’s Service",
-                    "Pixelmattic",
-                    "eInfo Solutions",
-                  ][i]
-                }
-              </strong>
-              <small>{exp.role}</small>
-            </li>
-          ))}
-        </ol>
-      </aside>
-      <div className="work-list">
-        <div className="small-heading">
-          <span>SELECTED WORK</span>
-          <span>08</span>
-        </div>
-        <div className="work-scroll">
-          {portfolio.projects.map((p, i) => (
-            <button
-              className="project-card glass"
-              key={p.id}
-              onClick={() => openProject(p.id)}
-              onPointerMove={(e) => {
-                const r = e.currentTarget.getBoundingClientRect();
-                e.currentTarget.style.transform = `perspective(700px) rotateX(${(-(e.clientY - r.y - r.height / 2) / r.height) * 2.2}deg) rotateY(${((e.clientX - r.x - r.width / 2) / r.width) * 2.2}deg)`;
-              }}
-              onPointerLeave={(e) => (e.currentTarget.style.transform = "")}
-            >
-              <div className="project-art">
-                <img src={p.img} alt={p.name} />
-              </div>
-              <div className="project-copy">
-                <div className="project-meta">
-                  <span>
-                    {String(i + 1).padStart(2, "0")} · {sectors[i]}
-                  </span>
-                  <b>{p.impact?.value}</b>
-                </div>
-                <h2>{p.name}</h2>
-                <p>{p.decision}</p>
-                <div className="tags">
-                  {p.techStack.slice(0, 2).map((t) => (
-                    <span key={t}>{t.replaceAll("_", " ")}</span>
-                  ))}
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-      <BrandFooter />
-      <button className="search-launch" onClick={() => setSearch(true)}>
-        Search <kbd>⌘K</kbd>
-      </button>
-    </section>
-  );
-}
-export function About() {
-  const { portfolio } = useApp();
-  return (
-    <section className="about-page page" data-pwc-critical="about">
-      <PageLead number="03" title="ABOUT">
-        The human behind the systems — a decade turning national-scale
-        complexity into products people actually <strong>trust.</strong>
-      </PageLead>
-      <Awards />
-      <article className="about-copy">
-        <h1>Sayandeep Bose.</h1>
-        <span className="eyebrow">
-          BUILDER · SR. CX SPECIALIST · DIGITAL DUBAI AUTHORITY
-        </span>
-        <p>{portfolio.portfolioData.about.introduction}</p>
-        <div className="small-heading">
-          <span>BY THE NUMBERS</span>
-          <span>03</span>
-        </div>
-        <div className="stats">
-          {[
-            ["10+", "YEARS IN CX"],
-            ["20M+", "ACTIVE USERS"],
-            ["13+", "DESIGN AWARDS"],
-          ].map(([n, t]) => (
-            <div className="glass" key={n}>
-              <strong>{n}</strong>
-              <span>{t}</span>
-            </div>
-          ))}
-        </div>
-        <div className="manifesto glass">
-          <span className="small-heading">MANIFESTO</span>
-          <p>{portfolio.portfolioData.about.manifesto}</p>
-        </div>
-        <div className="about-caption">
-          CUSTOMER EXPERIENCE · NATIONAL SCALE
-          <br />© 2026 SAYANDEEP BOSE · DUBAI
-        </div>
-      </article>
-      <BrandFooter trajectory />
-    </section>
+    </section></Localized>
   );
 }
 export function ProjectDetail({ id }) {
@@ -327,7 +127,7 @@ export function ProjectDetail({ id }) {
     idx = portfolio.projects.indexOf(p),
     next = portfolio.projects[(idx + 1) % portfolio.projects.length];
   return (
-    <section className="detail-layer" data-pwc-critical="project-detail">
+    <Localized><section className="detail-layer" data-pwc-critical="project-detail">
       <div className="detail-toolbar">
         <button onClick={closeDetail} aria-label="Close project">
           <ChevronLeft size={15} />
@@ -518,65 +318,7 @@ export function ProjectDetail({ id }) {
           <img src={images[slide]} alt={p.name} />
         </div>
       )}
-    </section>
-  );
-}
-export function AwardsDialog() {
-  const { setAwards } = useApp();
-  const names = [
-    "Special Design Kudos",
-    "Best UI Design",
-    "Best UX Design",
-    "Awwwards Honors",
-    "Best Innovation",
-    "Site of the Day",
-    "Featured on Mesh",
-    "CSS Winner",
-    "Web Guru Award",
-    "Wall of Portfolios",
-  ];
-  const assets = [
-    "special-kudos",
-    "ui",
-    "ux",
-    "awwwards-honors",
-    "innovation",
-    "astonishing",
-    "mesh",
-    "csswinner",
-    "webguru",
-    "wall-of-portfolios",
-  ];
-  return (
-    <div className="window-backdrop" onClick={() => setAwards(false)}>
-      <section
-        className="awards-dialog glass"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Awards & Recognition"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          className="close-corner"
-          onClick={() => setAwards(false)}
-          aria-label="Close awards"
-        >
-          <X />
-        </button>
-        <span className="eyebrow">
-          BUILT WITH CURIOSITY. NOTICED BY THE WORLD.
-        </span>
-        <h1>Awards & Recognition</h1>
-        <div>
-          {names.map((name, i) => (
-            <figure key={name}>
-              <img src={`/awards/${assets[i]}.svg`} alt="" />
-              <figcaption>{name}</figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
-    </div>
+    </section></Localized>
   );
 }
 export function SearchDialog() {
@@ -591,7 +333,7 @@ export function SearchDialog() {
         (p.title + " " + p.tagline).toLowerCase().includes(q.toLowerCase()),
     );
   return (
-    <div className="window-backdrop" onClick={() => setSearch(false)}>
+    <Localized><div className="window-backdrop" onClick={() => setSearch(false)}>
       <section
         className="search-dialog glass"
         role="dialog"
@@ -643,6 +385,6 @@ export function SearchDialog() {
           )}
         </div>
       </section>
-    </div>
+    </div></Localized>
   );
 }

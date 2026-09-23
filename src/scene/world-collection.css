@@ -1,0 +1,384 @@
+.world-collection {
+  color: #c5e7df;
+}
+.world-collection canvas:focus {
+  outline: none;
+}
+.world-collection .world-progress {
+  bottom: 24px;
+  width: 216px;
+}
+.collection-dots {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 10px;
+  margin: 17px 0;
+}
+.collection-dots i {
+  height: 7px;
+  width: 7px;
+  border-radius: 50%;
+  background: #537a744d;
+  border: 1px solid #78a69c50;
+}
+.collection-dots i.lit {
+  background: #ffd588;
+  border-color: #ffe6ae;
+  box-shadow: 0 0 9px #f4c77066;
+}
+.world-collection .world-progress footer {
+  font-size: 8px;
+  gap: 8px;
+}
+.collection-storage {
+  color: #ffce8c;
+  font-size: 10px;
+  line-height: 1.7;
+  margin-top: 10px;
+}
+.radar b.collected {
+  background: #ffd588;
+  box-shadow: 0 0 5px #ffce88;
+}
+.world-collection-controls {
+  position: absolute;
+  right: 28px;
+  top: 98px;
+  display: flex;
+  gap: 8px;
+}
+.world-collection-controls button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #91d8c92b;
+  border-radius: 50%;
+  background: #062320c9;
+  color: #b4d7cf;
+}
+.world-reward-dock {
+  position: absolute;
+  top: 105px;
+  left: 26px;
+  max-width: 300px;
+}
+.world-reward {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+}
+.world-reward .eyebrow {
+  color: #94b7ac;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+}
+.world-reward strong {
+  font-size: 17px;
+  font-weight: 400;
+  color: #d7e9de;
+}
+.world-reward p {
+  font-size: 11px;
+  line-height: 1.65;
+  color: #91b7aa;
+  max-width: 290px;
+}
+.world-reward button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 10px 15px;
+  background: #c5eddf;
+  color: #123c34;
+  border-radius: 25px;
+  font-size: 12px;
+}
+.world-reward button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.collection-status {
+  position: absolute;
+  left: 50%;
+  top: 110px;
+  transform: translateX(-50%);
+  color: #ffe4a7;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 0 2px 12px #000;
+}
+.collection-status:not(:empty) {
+  border: 1px solid #c9aa6540;
+  border-radius: 25px;
+  padding: 10px 17px;
+  background: #0b201fc9;
+}
+.world-collection .world-map-overlay > section {
+  width: min(710px, 94vw);
+  padding: 28px 34px 22px;
+}
+.world-collection .world-map-overlay h2 {
+  font-size: 28px;
+  margin: 13px 0;
+}
+.world-collection .world-map-overlay p,
+.world-collection .world-map-overlay footer {
+  font-size: 11px;
+  line-height: 1.7;
+  color: #95b1a7;
+}
+.collection-map {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.35;
+  margin: 20px 0;
+  background:
+    repeating-radial-gradient(circle, #8ebdaa10 0 1px, transparent 2px 54px),
+    #021c1c;
+  border: 1px solid #8ebdaa20;
+  border-radius: 15px;
+}
+.map-north {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  font: 9px var(--mono);
+  color: #6e928b;
+}
+.map-star {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  background: #193d39;
+  border: 1px solid #83cabb90;
+  border-radius: 50%;
+  font: 9px var(--mono);
+  color: #c3ece0;
+}
+.map-star.lit {
+  background: #5a4928;
+  color: #ffe4a7;
+  border-color: #e8c784;
+}
+.map-star.targeted {
+  outline: 2px solid #c6f7e2;
+  outline-offset: 3px;
+}
+.map-player {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  color: #02291e;
+  padding: 4px 6px;
+  background: #b8ffe5;
+  border-radius: 9px;
+  font-size: 9px;
+  box-shadow: 0 0 18px #89f6bd88;
+  pointer-events: none;
+}
+.collection-celebration {
+  position: absolute;
+  right: 6vw;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(355px, 88vw);
+  padding: 30px;
+  border: 1px solid #dfbd7660;
+  border-radius: 24px;
+  background: #09211fed;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 0 65px #f5c97a15;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  color: #ffdb9d;
+  animation: collection-arrive 0.65s ease-out;
+}
+.collection-celebration h2 {
+  font-size: 31px;
+  font-weight: 400;
+  margin: 0;
+}
+.collection-celebration .eyebrow {
+  font-size: 8px;
+}
+.celebration-dismiss {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid #a3c5b633;
+  width: 100%;
+  color: #93b9ab;
+  font-size: 11px;
+}
+.world-collection .world-touch button {
+  touch-action: none;
+}
+.world-collection button:focus-visible {
+  outline: 2px solid #ffe2a5;
+  outline-offset: 4px;
+}
+@keyframes collection-arrive {
+  from {
+    opacity: 0;
+    translate: 0 15px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (max-width: 768px) {
+  .world-collection .world-intro {
+    padding: 28px 22px;
+  }
+  .world-collection .world-intro > p {
+    font-size: 16px;
+    line-height: 1.8;
+  }
+  .world-collection .world-intro-columns p {
+    font-size: 10px;
+    line-height: 1.8;
+  }
+  .world-collection .world-progress {
+    left: 12px;
+    bottom: 94px;
+    width: 142px;
+    padding: 12px;
+  }
+  .world-collection .world-progress > div:nth-child(2) {
+    margin-top: 0;
+  }
+  .collection-dots {
+    gap: 6px;
+    margin: 12px 0;
+  }
+  .collection-dots i {
+    width: 6px;
+    height: 6px;
+  }
+  .world-collection .world-progress footer {
+    font-size: 7px;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .world-collection .radar {
+    right: 16px;
+    bottom: 244px;
+    width: 80px;
+  }
+  .world-collection .radar > div {
+    width: 80px;
+    height: 80px;
+  }
+  .world-collection .radar > span {
+    display: block;
+    font-size: 7px;
+    margin-top: 7px;
+  }
+  .world-collection .world-touch {
+    right: 14px;
+    bottom: 104px;
+    left: auto;
+  }
+  .world-collection .world-touch button {
+    width: 39px;
+    height: 39px;
+  }
+  .world-reward-dock {
+    left: 16px;
+    top: 91px;
+    max-width: calc(100% - 104px);
+  }
+  .world-reward strong {
+    font-size: 14px;
+  }
+  .world-reward p {
+    font-size: 10px;
+  }
+  .world-reward button {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+  .world-collection-controls {
+    top: 90px;
+    right: 14px;
+    flex-direction: column;
+  }
+  .world-collection-controls button {
+    width: 32px;
+    height: 32px;
+  }
+  .collection-status {
+    top: 225px;
+    max-width: 90vw;
+    width: max-content;
+    font-size: 10px;
+  }
+  .world-collection .world-help {
+    display: none;
+  }
+  .world-collection .world-map-overlay > section {
+    padding: 25px 16px 18px;
+    max-height: calc(100dvh - 170px);
+  }
+  .world-collection .world-map-overlay h2 {
+    font-size: 21px;
+  }
+  .collection-map {
+    aspect-ratio: 0.9;
+  }
+  .map-star {
+    width: 24px;
+    height: 24px;
+    font-size: 8px;
+  }
+  .collection-celebration {
+    right: 5vw;
+    top: auto;
+    bottom: 94px;
+    transform: none;
+    width: 90vw;
+    padding: 21px;
+    gap: 10px;
+  }
+  .collection-celebration h2 {
+    font-size: 25px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .collection-celebration {
+    animation: none;
+  }
+}
+
+.map-star:active {
+  transform: translate(-50%, -50%) scale(0.98);
+}
+@media (max-width: 768px) {
+  .collection-map {
+    aspect-ratio: auto;
+    height: clamp(220px, calc(100dvh - 400px), 420px);
+  }
+}
+/* Keep map dismissal and scene controls below the fixed desktop navigation. */
+@media (min-width: 769px) {
+  .world-collection-controls { top: 145px; }
+  .world-collection .world-map-overlay { padding: 140px 0 30px; }
+  .world-collection .world-map-overlay > section { max-height: calc(100dvh - 180px); }
+  .collection-map { aspect-ratio: auto; height: min(43dvh, 400px); }
+}
+
+.world-easter-egg { border-top: 1px solid #dfbd7636; padding-top: 12px; margin-top: 2px; }
+.world-easter-egg p { color: #e1cfa8; margin: 0 0 9px; }
+.world-easter-egg a, .world-easter-egg .creator-contact { color: #f5db9f; font: 12px var(--mono); overflow-wrap: anywhere; text-decoration-color: #f5db9f60; text-underline-offset: 4px; user-select: text; }

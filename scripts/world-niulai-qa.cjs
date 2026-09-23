@@ -1,64 +1,122 @@
-const { chromium } = require('playwright');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
+const { chromium } = require("playwright");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
 (async () => {
- const browser = await chromium.launch({channel:'chrome',headless:true,...(process.env.QA_PROXY ? {proxy:{server:process.env.QA_PROXY}} : {})});
- const page = await browser.newPage({viewport:{width:1280,height:850}});
- const requests=[],errors=[],checks=[];
- page.on('request',r=>requests.push(r.url()));
- page.on('pageerror',e=>errors.push(e.message));
- const check=name=>{checks.push(name);console.log('PASS',name)};
- try {
-  await page.goto((process.env.QA_BASE_URL || 'http://127.0.0.1:4178/')+'?section=blog');
-  await page.getByRole('button',{name:/ENTER IDEA52/}).click();
-  await page.getByLabel('World quality').selectOption('LOW');
-  // Wait for the actual model and environment transfer before sending input;
-  // a fixed delay starts movement before Explorer mounts on a cold CDN visit.
-  await page.waitForFunction(() => ['niulai-mouth.glb','studio_fuch.hdr'].every(name =>
-    performance.getEntriesByType('resource').some(r => r.name.endsWith(name) && r.responseEnd > 0)
-  ));
-  await page.waitForTimeout(1000);
-  assert.ok(!requests.some(u=>u.includes('mascot-anim.glb')), 'IDEA52 must not load the old robot');
-  assert.ok(requests.some(u=>u.includes('niulai-mouth.glb')), 'IDEA52 loads the supplied Niulai');
-  check('exploration uses Niulai instead of the original robot');
-  await page.screenshot({path:'.pwc/evidence/world-niulai-idle.png'});
-  const meters=async()=>parseInt(await page.locator('.world-progress footer').innerText(),10);
-  const initial=await meters();
-  await page.keyboard.down('w');
-  await page.waitForTimeout(2300);
-  await page.screenshot({path:'.pwc/evidence/world-niulai-walking.png'});
-  await page.keyboard.up('w');
-  assert.ok(await meters()>initial,'walking must advance the player');
-  check('walking moves through the grass');
-  await page.keyboard.down('d');
-  await page.keyboard.down('Shift');
-  await page.waitForTimeout(2300);
-  await page.screenshot({path:'.pwc/evidence/world-niulai-running.png'});
-  await page.keyboard.up('d');
-  await page.keyboard.up('Shift');
-  check('turning and accelerated movement render');
-  await page.getByRole('button',{name:'Open world map'}).click();
-  await page.locator('.world-map-grid button').nth(1).click();
-  await page.locator('.near-idea').waitFor();
-  await page.keyboard.press('Space');
-  await page.locator('.idea-detail').waitFor();
-  await page.getByRole('button',{name:'Close idea',exact:true}).click();
-  check('fast travel and idea details still work');
-  await page.setViewportSize({width:390,height:844});
-  const before=await meters();
-  const up=page.locator('.world-touch button').filter({hasText:'↑'});
-  const button=await up.boundingBox();
-  await page.mouse.move(button.x+button.width/2,button.y+button.height/2);
-  await page.mouse.down();
-  await page.waitForTimeout(1600);
-  await page.mouse.up();
-  assert.ok(await meters()>before,'touch movement must advance the player');
-  await page.screenshot({path:'.pwc/evidence/world-niulai-mobile.png'});
-  check('mobile movement works');
-  assert.deepEqual(errors,[]);
-  check('no browser runtime errors');
- } finally {
-  fs.writeFileSync('.pwc/world-niulai-verification.json',JSON.stringify({baseURL:process.env.QA_BASE_URL||'http://127.0.0.1:4178/',checks,errors},null,2));
-  await browser.close();
- }
-})().catch(e=>{console.error(e);process.exitCode=1});
+  const browser = await chromium.launch({ channel: "chrome", headless: true });
+  const page = await browser.newPage({
+    viewport: { width: 1280, height: 850 },
+  });
+  const errors = [],
+    checks = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  const check = (name) => {
+    checks.push(name);
+    console.log("PASS", name);
+  };
+  const base = process.env.QA_BASE_URL || "http://127.0.0.1:4227/";
+  const enter = async () => {
+    await page
+      .getByRole("button", { name: /进入 WORLD|继续探索 WORLD/ })
+      .click();
+    await page.getByLabel(/World quality|画面质量/).selectOption("LOW");
+    await page.getByLabel("星光世界，使用方向键或 WASD 移动").waitFor();
+    await page.locator("canvas[aria-label]").focus();
+  };
+  const count = () =>
+    page.locator(".world-collection").getAttribute("data-collected");
+  try {
+    await page.goto(base + "?section=blog");
+    await enter();
+    assert.equal(await count(), "0");
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () =>
+        document.querySelector(".world-collection")?.dataset.collected === "1",
+      null,
+      { timeout: 20000 },
+    );
+    await page.keyboard.up("w");
+    check("real movement collects the first star");
+    const before = await page.locator(".world-progress footer").innerText();
+    await page
+      .getByRole("button", { name: "打开星光地图", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "星光 2，设为目标", exact: true })
+      .click();
+    assert.equal(await count(), "1");
+    assert.equal(
+      await page.locator(".world-progress footer").innerText(),
+      before,
+    );
+    check("map targeting neither teleports nor collects");
+    await page.reload();
+    await enter();
+    assert.equal(await count(), "1");
+    check("refresh preserves collection");
+    // Seed a test-only save: the first star is still required to earn the reward.
+    await page.evaluate(() =>
+      localStorage.setItem(
+        "niulai-world-stars-v1",
+        JSON.stringify(
+          Array.from(
+            { length: 26 },
+            (_, i) => `star-${String(i + 2).padStart(2, "0")}`,
+          ),
+        ),
+      ),
+    );
+    await page.reload();
+    await enter();
+    assert.equal(await count(), "26");
+    await page.keyboard.down("w");
+    await page
+      .getByRole("heading", { name: "全部点亮！", exact: true })
+      .waitFor({ timeout: 20000 });
+    await page.keyboard.up("w");
+    assert.equal(await count(), "27");
+    await page.getByRole("button", { name: "好啦，歇一会儿", exact: true }).waitFor();
+    check("last pickup unlocks and starts the looping mama recording");
+    await page.getByRole("button", { name: "暂停探索", exact: true }).click();
+    assert.equal(
+      await page
+        .getByRole("button", { name: "继续叫妈妈", exact: true })
+        .isDisabled(),
+      true,
+    );
+    check("pause stops voice and blocks further input");
+    await page
+      .getByRole("button", { name: "已暂停 · 继续探索", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "继续在世界里走走", exact: true })
+      .click();
+    await page.setViewportSize({ width: 390, height: 844 });
+    fs.mkdirSync(".pwc/evidence", { recursive: true });
+    await page.screenshot({
+      path: ".pwc/evidence/world-collection-mobile.png",
+    });
+    await page.reload();
+    await enter();
+    assert.equal(await count(), "27");
+    assert.equal(
+      await page
+        .getByRole("heading", { name: "全部点亮！", exact: true })
+        .count(),
+      0,
+    );
+    check("completed save stays unlocked without repeating celebration");
+    assert.deepEqual(errors, []);
+    check("no runtime errors");
+  } finally {
+    fs.mkdirSync(".pwc", { recursive: true });
+    fs.writeFileSync(
+      ".pwc/world-collection-verification.json",
+      JSON.stringify({ base, checks, errors }, null, 2),
+    );
+    await browser.close();
+  }
+})().catch((e) => {
+  console.error(e);
+  process.exitCode = 1;
+});

@@ -1,0 +1,93 @@
+/* Preserve the two cards in Eric's screenshot; the column is never a scroll container. */
+.contact-page .contact-info.vote-story {
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+.contact-page .vote-story > .glass { flex: none; padding: 26px; }
+.contact-page .vote-story .vote-label { color: #567377; font: 10px var(--mono); letter-spacing: .16em; }
+.contact-page .vote-event h2 { font-size: 32px; margin: 20px 0 12px; letter-spacing: -.04em; }
+.contact-page .vote-event h2 span { display: block; font-size: 22px; margin-top: 4px; letter-spacing: .06em; }
+.contact-page .vote-edition { font-size: 12px; color: #5e6c71; }
+.contact-page .vote-event-meta { display: grid; gap: 10px; margin: 22px 0; color: #617278; font: 11px var(--mono); }
+.contact-page .vote-event-meta span { display: flex; gap: 9px; align-items: center; }
+.contact-page .vote-event a, .contact-page .vote-idea button { display: inline-flex; align-items: center; gap: 12px; color: var(--accent); font-size: 13px; line-height: 1.8; }
+.contact-page .vote-idea h2 { font-size: 23px; line-height: 1.6; margin: 15px 0 12px; }
+.contact-page .vote-idea p { font-size: 13px; color: #65767c; line-height: 1.9; margin-bottom: 18px; }
+/* Fit the same content above the existing footer on shorter desktop displays. */
+@media (min-width: 769px) and (max-height: 850px) {
+  .contact-page .vote-story { gap: 14px; }
+  .contact-page .vote-story > .glass { padding: 20px 26px; }
+  .contact-page .vote-event h2 { margin: 12px 0 10px; }
+  .contact-page .vote-event-meta { margin: 16px 0; }
+  .contact-page .vote-idea h2 { margin: 12px 0 10px; }
+  .contact-page .vote-idea p { margin-bottom: 12px; }
+}
+@media (min-width: 769px) and (max-height: 740px) {
+  .contact-page .vote-story { gap: 12px; }
+  .contact-page .vote-story > .glass { padding: 16px 22px; }
+  .contact-page .vote-event h2 { margin: 8px 0; }
+  .contact-page .vote-event-meta { margin: 12px 0; gap: 8px; }
+  .contact-page .vote-idea h2 { margin: 8px 0; line-height: 1.45; }
+  .contact-page .vote-idea p { line-height: 1.7; margin-bottom: 8px; }
+}
+
+.contact-page .intent-options button.vote-blank:disabled {
+  min-height: 48px;
+  background: #fff;
+  opacity: 1;
+  border-color: transparent;
+  cursor: default;
+}
+
+.contact-page .vote-event .vote-event-title {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #121716;
+}
+.contact-page .vote-event-title img {
+  display: block;
+  width: 100%;
+  height: 84px;
+  object-fit: contain;
+}
+
+.contact-page .intent-options .event-link-label {
+  display: inline;
+  margin-left: 9px;
+  color: #8d999e;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.contact-page .conversation .vote-team-name {
+  margin: 12px 0 6px;
+  font-size: 72px;
+  font-weight: 750;
+  line-height: 1.02;
+  letter-spacing: -.025em;
+  color: #151e21;
+}
+.contact-page .conversation .vote-team-pronunciation {
+  display: block;
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: .06em;
+  color: #7b878d;
+}
+
+.contact-page .conversation .vote-team-bubble {
+  width: 100%;
+  max-width: 100%;
+}
+.contact-page .vote-team-name > span { display: block; }
+.contact-page .conversation-scroll { padding-top: 14px; padding-bottom: 12px; }
+@media (max-width: 380px) {
+  .contact-page .conversation .vote-team-name { font-size: 56px; }
+}

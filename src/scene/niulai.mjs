@@ -26,13 +26,14 @@ export function prepareMouth(model) {
   return mouths;
 }
 
-export function updateMouth(mouths, pose, dt) {
+export function updateMouth(mouths, pose, dt, voiceLevel = null) {
+  const target = voiceLevel === null ? poses[pose] : { MouthOpen: Math.min(1, Math.max(0, voiceLevel)) };
   for (const mesh of mouths) {
     for (const name of Object.values(shapes)) {
       const index = mesh.morphTargetDictionary[name];
       if (index === undefined) continue;
       mesh.morphTargetInfluences[index] = damp(
-        mesh.morphTargetInfluences[index], poses[pose]?.[name] || 0, 12, dt,
+        mesh.morphTargetInfluences[index], target?.[name] || 0, 12, dt,
       );
     }
   }

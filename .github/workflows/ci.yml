@@ -1,12 +1,17 @@
-name: Test and build
+name: Verify and publish Cowcoming
 on:
   push:
   pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: cowcoming-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -16,3 +21,60 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          name: site-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Explain deployment setup
+        if: github.ref == 'refs/heads/main' && vars.CLOUDFLARE_DEPLOY_ENABLED != 'true'
+        run: echo 'Build verified. Automatic publishing is not enabled yet; complete docs/deployment.md setup. No production deployment was attempted.' >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    needs: verify
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.CLOUDFLARE_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      deployments: write
+    environment:
+      name: production
+      url: https://cowcoming.world/
+    env:
+      CLOUDFLARE_ACCOUNT_ID: 2dda3e857959219ddd0bd2bf990bd7a1
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: site-${{ github.sha }}
+          path: dist/
+      - name: Require the deployment credential
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo '::error::Add the CLOUDFLARE_API_TOKEN Actions secret as described in docs/deployment.md.'
+            exit 1
+          fi
+      - name: Publish the verified build
+        id: publish
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4.58.0'
+          command: pages deploy dist --project-name niulai-preview-20260922 --branch main --commit-hash ${{ github.sha }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify the live domain serves this commit and these assets
+        run: node scripts/verify-deployment.mjs https://cowcoming.world "$GITHUB_SHA"
+      - name: Record the deployed version
+        env:
+          DEPLOYMENT_URL: ${{ steps.publish.outputs.deployment-url }}
+        run: |
+          printf 'Published commit `%s` to https://cowcoming.world/\n\nDeployment: %s\n\nVersion: https://cowcoming.world/build-info.json\n' "$GITHUB_SHA" "$DEPLOYMENT_URL" >> "$GITHUB_STEP_SUMMARY"

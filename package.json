@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "vite build",
+    "build": "vite build && node scripts/write-build-info.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test tests/*.test.mjs",
     "qa": "node scripts/verify.cjs",
@@ -14,7 +14,9 @@
     "qa:boot": "node scripts/boot-qa.cjs",
     "qa:world-niulai": "node scripts/world-niulai-qa.cjs",
     "qa:mouth": "node scripts/mouth-qa.cjs",
-    "docs:sync": "node scripts/sync-product-doc.mjs"
+    "docs:sync": "node scripts/sync-product-doc.mjs",
+    "qa:about": "node scripts/about-qa.cjs",
+    "verify:deployment": "node scripts/verify-deployment.mjs"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",

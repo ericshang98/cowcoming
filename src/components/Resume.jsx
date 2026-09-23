@@ -1,3 +1,4 @@
+import { Localized } from "../i18n/Language";
 import { useRef, useState } from "react";
 import { Download, Moon, Sun } from "lucide-react";
 import { useApp } from "../context";
@@ -11,7 +12,7 @@ export default function Resume() {
       .querySelector("#cv-" + id)
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   return (
-    <Window
+    <Localized><Window
       title="LIVE_RESUME_NODE"
       kind="resume"
       onClose={() => setCv("closed")}
@@ -107,6 +108,6 @@ export default function Resume() {
           <a href="mailto:hello@fuch.ai">hello@fuch.ai ↗</a>
         </section>
       </div>
-    </Window>
+    </Window></Localized>
   );
 }

@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "initialForm": "normal",
+  "forms": [
+    {
+      "id": "normal",
+      "name": "普通牛来",
+      "model": "builtin:niulai",
+      "actions": [
+        "look",
+        "bow",
+        "nod",
+        "tilt",
+        "reflect"
+      ]
+    },
+    {
+      "id": "young",
+      "name": "幼年牛来",
+      "model": "young.glb",
+      "actions": [
+        "look",
+        "bow"
+      ]
+    },
+    {
+      "id": "mature",
+      "name": "成熟牛来",
+      "model": "mature.glb",
+      "actions": [
+        "look",
+        "nod",
+        "tilt"
+      ]
+    },
+    {
+      "id": "hard",
+      "name": "硬牛",
+      "model": "hard.glb",
+      "actions": []
+    }
+  ],
+  "edges": []
+}

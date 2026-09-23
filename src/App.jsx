@@ -1,3 +1,4 @@
+import { Localized, useLanguage, translateText } from "./i18n/Language";
 import React, {
   lazy,
   Suspense,
@@ -7,22 +8,24 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { FileText, MessageCircle, X } from "lucide-react";
+import { FileText, MessageCircle } from "lucide-react";
 import { AppContext } from "./context";
 import portfolio from "./portfolio.json";
 import ideas from "./ideas.json";
 import { makeController } from "./scene/motion.mjs";
-import { snapshot } from "./snapshot";
+import { useWorldCollection } from "./useWorldCollection";
+import { useNiulaiVoice } from "./useNiulaiVoice";
+import { isWaveShortcut } from "./voice-interactions.mjs";
 import Character from "./scene/Character";
+import Evolution from "./pages/Evolution";
+import { resolvePreview, selectEvolutionForm } from "./evolution.mjs";
 import { Header, Ambient, Boot } from "./components/Chrome";
 import {
   Home,
-  Work,
-  About,
   ProjectDetail,
-  AwardsDialog,
   SearchDialog,
 } from "./pages/Portfolio";
+import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Terminal from "./components/Terminal";
 import Resume from "./components/Resume";
@@ -35,10 +38,12 @@ function route() {
       ? "work"
       : q.has("idea")
         ? "blog"
-        : ["home", "work", "about", "contact", "blog"].includes(
+        : ["home", "hardware", "work", "about", "contact", "blog"].includes(
               q.get("section"),
             )
-          ? q.get("section")
+          ? q.get("section") === "hardware"
+            ? "work"
+            : q.get("section")
           : "home",
     project: q.get("project"),
     idea: q.get("idea"),
@@ -52,28 +57,37 @@ function pref(name, fallback) {
   }
 }
 export default function App() {
+  const { language } = useLanguage();
   const [locationState, setLocationState] = useState(route),
     { mode, project, idea } = locationState;
   const [mobile, setMobile] = useState(innerWidth <= 768),
     [ready, setReady] = useState(false),
-    [bootDone, setBootDone] = useState(() => route().mode === "blog"),
+    [bootDone, setBootDone] = useState(() =>
+      ["blog", "about"].includes(route().mode),
+    ),
     [chat, setChat] = useState("closed"),
     [cv, setCv] = useState("closed"),
     [query, setQuery] = useState(null),
     [tracking, setTracking] = useState(() => pref("tracking", true)),
     [muted, setMuted] = useState(() => pref("muted", false)),
     [paused, setPaused] = useState(() => pref("paused", false)),
-    [likes, setLikes] = useState(() => pref("likes", 12018)),
-    [musicOpen, setMusicOpen] = useState(false),
-    [awards, setAwards] = useState(false),
+    [voiceOpen, setVoiceOpen] = useState(false),
     [search, setSearch] = useState(false),
     [wordle, setWordle] = useState(false),
-    [worldEntered, setWorldEntered] = useState(false),
-    [reactionId, setReactionId] = useState(snapshot.reactions[0].id);
+    [worldEntered, setWorldEntered] = useState(false);
   const controller = useMemo(makeController, []),
     sound = useRef(null),
-    likeSequence = useRef({ time: 0, count: 0 }),
     viewRef = useRef();
+  const [evolutionSelection, setEvolutionSelection] = useState({ route: 'celestial', form: 'calf' });
+  const [previewModelState, setPreviewModelState] = useState({ model: null, status: 'loading' });
+  const evolutionPreview = resolvePreview(evolutionSelection.route, evolutionSelection.form);
+  const activeModel = mode === 'work' ? evolutionPreview.model : resolvePreview().model;
+  const evolutionPage = <Evolution
+    preview={evolutionPreview}
+    modelStatus={previewModelState.model === evolutionPreview.model ? previewModelState.status : 'loading'}
+    onSelectRoute={route => setEvolutionSelection({ route, form: 'calf' })}
+    onSelectForm={form => setEvolutionSelection(previous => selectEvolutionForm(previous.route, form))}
+  />;
   const change = useCallback(
     (next) => {
       const q = new URLSearchParams();
@@ -91,8 +105,11 @@ export default function App() {
     (m) => {
       setChat("closed");
       setSearch(false);
-      setAwards(false);
-      change({ mode: m, project: null, idea: null });
+      change({
+        mode: m === "hardware" ? "work" : m,
+        project: null,
+        idea: null,
+      });
     },
     [change],
   );
@@ -104,16 +121,12 @@ export default function App() {
     setChat("open");
     setCv((v) => (v === "open" ? "minimized" : v));
   };
-  const like = useCallback(() => {
-    setLikes((n) => n + 1);
-    const s = likeSequence.current,
-      now = performance.now();
-    s.count = now - s.time < 12000 ? s.count + 1 : 1;
-    s.time = now;
-    controller.gesture(
-      s.count >= 4 ? "flip" : s.count >= 2 ? "dance" : "cheer",
-    );
-  }, [controller]);
+  const collection = useWorldCollection();
+  const worldBlocked = chat === "open" || cv === "open" || search || wordle || voiceOpen;
+  const voice = useNiulaiVoice({
+    controller, muted, paused, mode, collected: collection.collected,
+    enabled: (mode === "home" || (mode === "blog" && worldEntered)) && bootDone && chat !== "open" && cv !== "open" && !search && !wordle,
+  });
   useEffect(() => {
     const resize = () => setMobile(innerWidth <= 768),
       pop = () => {
@@ -130,20 +143,28 @@ export default function App() {
   useEffect(() => {
     controller.tracking = tracking;
     controller.paused = paused;
-    for (const [k, v] of Object.entries({ tracking, paused, muted, likes }))
-      localStorage.setItem("fuch-replica-" + k, JSON.stringify(v));
+    try {
+      for (const [k, v] of Object.entries({ tracking, paused, muted }))
+        localStorage.setItem("fuch-replica-" + k, JSON.stringify(v));
+    } catch { /* Controls remain usable when browser storage is unavailable. */ }
     document.documentElement.classList.toggle("motion-paused", paused);
-  }, [tracking, paused, muted, likes, controller]);
+  }, [tracking, paused, muted, controller]);
   useEffect(() => {
-    document.title = `牛来 — ${mode === "home" ? "感知" : mode === "blog" ? "IDEA52" : mode.toUpperCase()}`;
+    setVoiceOpen(false);
     viewRef.current?.scrollTo(0, 0);
   }, [mode, project, idea]);
+  useEffect(() => {
+    const title = mode === "about"
+      ? "Cowcoming — 基于 JEV 决策模型的可进化 AI 宠物"
+      : `牛来 — ${mode === "home" ? "和牛来玩" : mode === "blog" ? "WORLD" : mode === "contact" ? "为牛来投一票" : mode.toUpperCase()}`;
+    document.title = translateText(title, language);
+  }, [mode, language]);
   useEffect(() => {
     const key = (e) => {
       if (wordle) return;
       if (e.key === "Escape") {
-        setAwards(false);
         setSearch(false);
+        setVoiceOpen(false);
         setWordle(false);
         if (chat === "open") setChat("closed");
         else if (cv === "open") setCv("closed");
@@ -155,8 +176,13 @@ export default function App() {
         setSearch((v) => !v);
         return;
       }
+      if (mode === "home" && isWaveShortcut(e)) {
+        e.preventDefault();
+        voice.wave();
+        return;
+      }
       if (
-        /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) ||
+        /INPUT|TEXTAREA|SELECT|BUTTON|A/.test(e.target.tagName) ||
         e.target.isContentEditable
       )
         return;
@@ -164,15 +190,14 @@ export default function App() {
         e.preventDefault();
         openChat();
       }
-      if (e.key.toLowerCase() === "l") like();
-      if (e.key === " " && mode !== "blog") {
+      if (e.key === " " && mode !== "blog" && mode !== "about") {
         e.preventDefault();
         controller.gesture("happy");
       }
     };
     addEventListener("keydown", key);
     return () => removeEventListener("keydown", key);
-  }, [mode, chat, cv, project, idea, like, wordle]);
+  }, [mode, chat, cv, project, idea, voice.wave, wordle]);
   useEffect(() => {
     const down = (e) => {
       if (muted) return;
@@ -183,7 +208,7 @@ export default function App() {
           )();
         const ac = sound.current;
         ac.resume();
-        if (!e.target.closest("button,a")) return;
+        if (!e.target.closest("button,a") || e.target.closest(".niulai-voice")) return;
         const osc = ac.createOscillator(),
           gain = ac.createGain();
         osc.type = "sine";
@@ -228,16 +253,11 @@ export default function App() {
     setMuted,
     paused,
     setPaused,
-    like,
-    likes,
-    snapshot,
-    reaction:
-      snapshot.reactions.find((item) => item.id === reactionId) ??
-      snapshot.reactions[0],
-    setReactionId,
-    musicOpen,
-    setMusicOpen,
-    setAwards,
+    ...voice,
+    collection,
+    worldBlocked,
+    voiceOpen,
+    setVoiceOpen,
     setSearch,
     setWordle,
   };
@@ -253,25 +273,32 @@ export default function App() {
         bootDone,
         tracking,
         paused,
-        likes,
+        voice: voice.voiceState,
       }),
     };
     return () => delete window.__replica;
   }, [ctx]);
   const overlay = chat === "open" || cv === "open" || !!project || !!idea;
   return (
-    <AppContext.Provider value={ctx}>
+    <Localized><AppContext.Provider value={ctx}>
       <div
         className={`app ${mobile ? "mobile" : "desktop"} route-${mode} ${bootDone ? "boot-complete" : "booting"}`}
       >
         <Ambient />
-        {mode !== "blog" && (
+        {mode !== "blog" && mode !== "about" && (
           <Character
             controller={controller}
             mode={mode}
             mobile={mobile}
             ready={ready}
-            onReady={() => setReady(true)}
+            modelAsset={activeModel}
+            onReady={() => {
+              setReady(true);
+              setPreviewModelState({ model: activeModel, status: 'ready' });
+            }}
+            onError={() => {
+              setPreviewModelState({ model: activeModel, status: 'error' });
+            }}
             boot={bootDone}
             overlay={overlay}
           />
@@ -279,26 +306,21 @@ export default function App() {
         <main
           className="page-host"
           ref={viewRef}
-          onDoubleClick={(e) => {
-            if (
-              mobile &&
-              mode === "home" &&
-              !e.target.closest("button,a,input")
-            )
-              like();
-          }}
+
         >
           {mode === "home" ? (
             <Home />
+          ) : mode === "hardware" ? (
+            evolutionPage
           ) : mode === "work" ? (
-            <Work />
+            evolutionPage
           ) : mode === "about" ? (
             <About />
           ) : mode === "contact" ? (
             <Contact />
           ) : (
             <Suspense
-              fallback={<div className="world-loading">PREPARING IDEA52…</div>}
+              fallback={<div className="world-loading">PREPARING WORLD…</div>}
             >
               <World
                 entered={worldEntered}
@@ -311,7 +333,7 @@ export default function App() {
         <div className="interface-chrome">
           <Header />
         </div>
-        {!bootDone && mode !== "blog" && (
+        {!bootDone && mode !== "blog" && mode !== "about" && (
           <Boot ready={ready} onDone={bootEnd} />
         )}
         <div className="minimized-tray">
@@ -330,48 +352,17 @@ export default function App() {
           {chat === "minimized" && (
             <button className="glass" onClick={() => setChat("open")}>
               <MessageCircle size={18} />
-              FUCH TERMINAL
+              JEV 决策指南
             </button>
           )}
         </div>
         {project && <ProjectDetail id={project} />}{" "}
         {chat === "open" && <Terminal />}
         {cv === "open" && <Resume />}
-        {awards && <AwardsDialog />}
         {search && <SearchDialog />}
         {wordle && <Wordle />}
-        {musicOpen && (
-          <aside className="music-card glass">
-            <button
-              className="close-corner"
-              aria-label="Close music card"
-              onClick={() => setMusicOpen(false)}
-            >
-              <X size={12} />
-            </button>
-            <MusicRecord />
-            <div>
-              <span>LAST JAMMED TO · SOURCE SNAPSHOT</span>
-              <strong>Californication</strong>
-              <small>Red Hot Chili Peppers</small>
-              <a
-                href="https://music.apple.com/us/album/californication/945575406?i=945575413"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Listen ↗
-              </a>
-            </div>
-          </aside>
-        )}
+
       </div>
-    </AppContext.Provider>
-  );
-}
-function MusicRecord() {
-  return (
-    <div className="record-art">
-      <i />
-    </div>
+    </AppContext.Provider></Localized>
   );
 }

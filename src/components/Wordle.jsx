@@ -1,3 +1,4 @@
+import { Localized } from "../i18n/Language";
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useApp } from "../context";
@@ -66,7 +67,7 @@ export default function Wordle() {
     return result;
   }
   return (
-    <div className="wordle-overlay">
+    <Localized><div className="wordle-overlay">
       <section role="dialog" aria-modal="true" aria-label="Daily word game">
         <button
           className="close-corner"
@@ -111,6 +112,6 @@ export default function Wordle() {
           </div>
         </div>
       </section>
-    </div>
+    </div></Localized>
   );
 }

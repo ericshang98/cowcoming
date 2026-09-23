@@ -47,4 +47,6 @@ npm run docs:sync # 可选：通过已授权 lark-cli 更新产品快照
 | `docs/deployment.md` | Cloudflare 线上项目及发布步骤 |
 | `docs/provenance/` | 原型来源和历史说明，不是当前产品规格 |
 
-GitHub Actions 自动执行测试和构建；**当前不会自动部署线上站点**。发布方式见部署说明。原型中仍有旧模板内容，不能当成牛来的正式产品要求。
+GitHub Actions 自动测试和构建。开发分支和 PR 只检查；配置发布密钥并启用后，`main` 通过检查会自动更新 `cowcoming.world`。Actions 也支持在 main 手动重新发布。首次启用步骤和当前状态见 [部署说明](docs/deployment.md)。线上版本可通过 `/build-info.json` 与 GitHub 提交核对。
+
+其他电脑上的 Agent 统一使用本仓库：先 pull，创建 `codex/` 分支开发、测试并提交，再通过 PR 合并 main。不要在旧的原型目录继续维护另一份源码。原型中仍有旧模板内容，不能当成正式产品要求。

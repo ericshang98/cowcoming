@@ -1,3 +1,4 @@
+import { Localized } from "../i18n/Language";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -6,16 +7,19 @@ import {
   Send,
   ChevronLeft,
   Check,
-  CalendarClock,
+  CalendarDays,
+  MapPin,
   Mail,
   Linkedin,
   Dribbble,
 } from "lucide-react";
 import { useApp } from "../context";
-import { PageLead, BrandFooter } from "./Portfolio";
+import { PageLead } from "./Portfolio";
+import { Controls } from "../components/Chrome";
+import "./contact-left.css";
 import { topics, questions, validateAnswer } from "./contact-flow.mjs";
 export default function Contact() {
-  const { controller, portfolio } = useApp();
+  const { controller, portfolio, navigate } = useApp();
   const [topic, setTopic] = useState(null),
     [step, setStep] = useState(0),
     [answers, setAnswers] = useState({}),
@@ -86,10 +90,9 @@ export default function Contact() {
     .map((x) => `${x.label}: ${answers[x.key] || "—"}`)
     .join("\n");
   return (
-    <section className="contact-page page" data-pwc-critical="contact">
-      <PageLead number="04" title="CONTACT">
-        Open to freelance and contract work — tell me what you’re building, and
-        you’ll hear back within ~6 hours.
+    <Localized><section className="contact-page page" data-pwc-critical="contact">
+      <PageLead number="04" title="VOTE US">
+        牛来参加 EvoTavern 进化酒馆，期待你的一票。
       </PageLead>
       <div className="contact-layout">
         <div className="conversation glass">
@@ -98,11 +101,11 @@ export default function Contact() {
               <MessageSquare size={20} />
             </div>
             <div>
-              <h2>Message Fuch</h2>
-              <p>Sayandeep’s assistant</p>
+              <h2>Vote for 牛来</h2>
+              <p>EvoTavern 进化酒馆 · 参赛项目</p>
             </div>
             <div className="conversation-meta">
-              <span>~6h reply</span>
+              <span>深圳场</span>
               {topic && phase === "questions" && (
                 <span>
                   {step + 1} / {qs.length}
@@ -113,18 +116,32 @@ export default function Contact() {
           <div className="conversation-scroll" ref={scroll}>
             {!topic ? (
               <>
-                <div className="bubble">
-                  <p>Hey, I’m Fuch.</p>
-                  <h2>What brings you here?</h2>
+                <div className="bubble vote-team-bubble">
+                  <p>嗨，我是牛来。</p>
+                  <h2>喜欢我，就给我投一票。</h2>
+                  <h3 className="vote-team-name"><span>23号</span><span>犇犇队</span></h3>
+                  <span className="vote-team-pronunciation">bēn bēn</span>
                 </div>
                 <div className="intent-options">
-                  {topics.map((t, i) => (
-                    <button key={t.id} onClick={() => start(t.id)}>
-                      <span>
-                        <strong>{t.title}</strong>
-                        <small>{t.hint}</small>
-                      </span>
-                      <ArrowRight size={18} />
+                  {[
+                    { id: "vote", title: "", hint: "", disabled: true },
+                    { id: "event", title: "看看这场黑客松", hint: "EvoTavern · 深圳场", action: () => window.open("https://hackathon.evomap.ai/shenzhen", "_blank", "noopener,noreferrer") },
+                    { id: "hello", title: "先和牛来打个招呼", hint: "体验牛来的回应", action: () => navigate("home") },
+                  ].map((t) => (
+                    <button
+                      key={t.id}
+                      disabled={t.disabled}
+                      onClick={t.action}
+                      className={t.disabled ? "vote-blank" : undefined}
+                      aria-label={t.disabled ? "投票（暂不可用）" : undefined}
+                    >
+                      {!t.disabled && <>
+                        <span>
+                          <strong>{t.title}{t.id === "event" && <span className="event-link-label">hackathon.evomap.ai</span>}</strong>
+                          <small>{t.hint}</small>
+                        </span>
+                        <ArrowRight size={18} />
+                      </>}
                     </button>
                   ))}
                 </div>
@@ -307,85 +324,37 @@ export default function Contact() {
             </footer>
           )}
         </div>
-        <aside className="contact-info">
-          <div className="contact-find-card glass">
-            <span className="small-heading">FIND ME</span>
-            <div className="contact-links">
-              {[
-                [
-                  "Book a call",
-                  "cal.com/sayandeep-bose",
-                  "https://cal.com/sayandeep-bose",
-                ],
-                ["Email", "hello@fuch.ai", "mailto:hello@fuch.ai"],
-                [
-                  "LinkedIn",
-                  "linkedin.com/in/sayandeep-b",
-                  "https://www.linkedin.com/in/sayandeep-b/",
-                ],
-                [
-                  "Dribbble",
-                  "dribbble.com/fuchai",
-                  "https://dribbble.com/fuchai",
-                ],
-              ].map(([name, label, href], i) => {
-                const Icon = [CalendarClock, Mail, Linkedin, Dribbble][i];
-                return (
-                  <a key={name} href={href} target="_blank" rel="noreferrer">
-                    <i className="contact-link-icon">
-                      <Icon size={15} />
-                    </i>
-                    <span>
-                      <strong>{name}</strong>
-                      <small>{label}</small>
-                    </span>
-                    <ArrowUpRight size={14} />
-                  </a>
-                );
-              })}
+        <aside className="contact-info vote-story">
+          <div className="vote-event glass">
+            <span className="vote-label">WE ARE BUILDING AT</span>
+            <h2 className="vote-event-title"><img src="/images/evotavern/shenzhen-lockup.png" alt="第 4 届 EvoTavern 进化酒馆 Agent 黑客松" width="1129" height="512" /></h2>
+            <p className="vote-edition">第 4 届 Agent 黑客松 · 深圳场</p>
+            <div className="vote-event-meta">
+              <span><CalendarDays size={14} />2026.09.21 — 09.24</span>
+              <span><MapPin size={14} />深圳 · The Final Round</span>
             </div>
+            <a href="https://hackathon.evomap.ai/shenzhen" target="_blank" rel="noopener noreferrer">了解这场黑客松 <ArrowUpRight size={16} /></a>
           </div>
-          <div className="contact-bio-card glass">
-            <div className="contact-person">
-              <img src="/images/avatar.jpg" alt="Sayandeep Bose" />
-              <div>
-                <h3>Sayandeep Bose</h3>
-                <span>SR. CX SPECIALIST · DUBAI</span>
-                <p>
-                  <i />
-                  Open to freelance
-                </p>
-              </div>
-            </div>
-            <span className="small-heading">WHAT I BRING</span>
-            <ol className="capability-list">
-              <li>
-                Product strategy & experience leadership at national scale
-              </li>
-              <li>Product design, brand identities & design systems</li>
-              <li>AI products, designed and engineered end to end</li>
-            </ol>
-            <div className="contact-location">
-              <div>
-                <span className="small-heading">WHERE</span>
-                <strong>Dubai, UAE</strong>
-                <small>GULF STANDARD TIME · ASYNC OK</small>
-              </div>
-              <div>
-                <strong>
-                  {new Intl.DateTimeFormat("en", {
-                    timeZone: "Asia/Dubai",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  }).format(new Date())}
-                </strong>
-                <small>HIS LOCAL TIME</small>
-              </div>
-            </div>
+          <div className="vote-idea glass">
+            <span className="vote-label">MEET NIULAI</span>
+            <h2>让一次回应，<br />成为一次相遇。</h2>
+            <p>从转头看向你，到用动作和声音回应你。我们想让牛来从屏幕走进现实，成为一个有性格、能互动的小家伙。</p>
+            <button onClick={() => navigate("home")}>先和牛来打个招呼 <ArrowRight size={16} /></button>
           </div>
         </aside>
       </div>
-      <BrandFooter />
-    </section>
+      <footer className="brand-footer">
+        <Controls music={false} />
+        <span className="brand-label">EVOTAVERN · 深圳场</span>
+        <div className="ticker">
+          <div>
+            {[...Array(2)].flatMap((_, repeat) => [
+              "EvoTavern 进化酒馆", "2026.09.21 — 09.24", "深圳 · The Final Round",
+              "CYBERBODY", "NEW LIFE", "GHOST NETWORK", "SECTION 9", "为牛来加油",
+            ].map((text, i) => <span key={`${repeat}-${i}`}>{text} <i>•</i></span>))}
+          </div>
+        </div>
+      </footer>
+    </section></Localized>
   );
 }
