@@ -48,6 +48,15 @@ try{
  await page.waitForFunction(()=>window.__replica.controller.responsePlayer.busy);
  await page.waitForFunction(()=>!window.__replica.controller.responsePlayer.busy,null,{timeout:15000});
  assert.ok(latest.events.some(e=>e.commandId==='browser_shake'&&e.status==='completed'));
+ await page.locator('.evolution-node').filter({has:page.locator('strong',{hasText:/^骚牛$/})}).click();
+ await wait(()=>latest.profile.formId==='playful'&&latest.appliedRevision===latest.profile.revision);
+ await page.getByRole('tab',{name:'Large Language Model'}).click();
+ const input=page.locator('.live-input input');
+ await input.fill('你怎么这么自恋');
+ await input.press('Enter');
+ await wait(()=>latest.events.some(e=>e.type==='decision'&&e.formId==='playful'&&e.actionId==='WAIT'));
+ await wait(()=>latest.messages.some(m=>m.role==='assistant'&&m.status==='complete'&&m.text.includes('头部')));
+ console.log('PASS reference form accepts browser text and completes WAIT without an animation asset');
  assert.equal(latest.device.simulation,true);
  assert.deepEqual(errors,[]);
  assert.equal(messages.filter(m=>m.type==='error').length,0);
