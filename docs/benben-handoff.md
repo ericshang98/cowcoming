@@ -1,87 +1,74 @@
-# benben × Cowcoming：直接运行的交接
+# 2026-09-24 统一联调交接
 
-网页与 Worker 在 `ericshang98/cowcoming` 维护；本机机械臂、摄像头、JEV 与同步桥在 `Mark10667/benben` 维护。朋友不需要重新实现硬件适配器，也不需要重新提供已接入模型。benben 的 `web/` 是版本标记明确的网页源码副本，线上发布仍从 cowcoming 仓库进行。
+当前入口是本地 Qwen `qwen2.5:7b` → Fish 流式语音，同时由 JEV 选择动作；五舵机执行器负责下发角度。六人格使用 `niulai-six-v1-6194348364b6`，网页与本机必须确认同一形态、人格版本和 revision。
 
-## 两个人怎样一起调
+## 代码与上线状态
 
-1. 网站负责人创建一个房间，分别私下交付 Browser Key 和 Device Key。已有配对继续使用原房间，不在群聊、Git 或截图中公开密钥。网站负责人可按 `scripts/create-device.mjs` 创建房间。
-2. 朋友在自己的电脑更新 benben，保留已有的串口、摄像头与已验证轨迹；启动下面的程序。
-3. **朋友在同一台电脑**打开 https://cowcoming.world/?section=work ，填该房间 Browser Key。你也可以在自己的电脑用同一 Browser Key 观察动作和文本；本地相机画面只在拥有该摄像头服务的电脑显示。
-4. 他继续在本机调试台输入文字／点选动作。已启动的基础动作自动传到网页当前形态。你从网页切换形态时，当前本地一套表演先结束，再应用新提示词并回报版本。
+- 网页和 Worker：[ericshang98/cowcoming](https://github.com/ericshang98/cowcoming)。
+- 本机控制器、相机、模型与桥接：[Mark10667/benben](https://github.com/Mark10667/benben)（私有，需要队友权限）。`web/` 是带提交版本的网页源码镜像，生产发布仍从 cowcoming 进行。
+- Worker 六人格版已发布，源码 `8f27c51`，版本 `97165e27-4c59-4047-970f-66b55727adc1`。主站 Pages 上次核验仍为 `1a66bcc`，等待 Pages/Edit 凭据；本次 Git 同步不代表网页已经更新。
+- 本机可独立试玩，也可运行最新网页的本地开发版；无需等待 Pages Token。生产页面与新桥接已做兼容检查，但新网页功能须使用本地新版或等待 Pages 发布。
 
-## 朋友运行的命令
+## 队友启动方式
 
-在 benben 根目录、他自己的现有 Python 环境中安装新增的网络依赖：
+下列本机路径均相对 benben 根目录；使用 Python 3.12。已有环境先保留本机配置；新的电脑按 `docs/speech.md`、`docs/free-reply.md`、`docs/five-servo-motions.md` 安装各自需要的依赖与模型。模型、录音、虚拟环境和 API Key 不在仓库中。
 
-```sh
-.venv/bin/python -m pip install -r requirements-cowcoming.txt
-```
-
-在已有 `.env.local` 中补充（不要覆盖已有 API Key）：
-
-```dotenv
-COWCOMING_RELAY_URL=https://cowcoming-live.shangyiyong98.workers.dev
-COWCOMING_DEVICE_KEY=填同一房间的DeviceKey
-OPENROUTER_API_KEY=自己的模型Key
-COWCOMING_LANGUAGE_MODEL=openai/gpt-4.1-mini
-```
-
-本机 JEV 沿用已有 `typesafe/jev-1.13`；独立语言模型默认使用上面的 OpenRouter 模型。也支持 `COWCOMING_LANGUAGE_URL` 与 `COWCOMING_LANGUAGE_API_KEY` 指向兼容的 chat/completions 服务。变量只在本机读取，不发送到网页或写入 Git。
-
-先只联调软件：
+先在另一个终端准备项目 Ollama（Apple silicon 使用原生 arm64；Intel Mac 去掉 `arch -arm64`）：
 
 ```sh
-.venv/bin/python -m niu_reactions.server --cowcoming
+mkdir -p .cache/ollama
+OLLAMA_HOST=127.0.0.1:11435 OLLAMA_MODELS="$PWD/.cache/ollama" \
+  OLLAMA_NUM_PARALLEL=1 OLLAMA_MAX_LOADED_MODELS=1 OLLAMA_NO_CLOUD=true \
+  arch -arm64 ollama serve
 ```
 
-打开 http://127.0.0.1:8766/ 。预演会播放语音和软件动画，不打开串口；网页明确标为模拟，不计进化轮数。小牛默认无声；其他形态的文字由独立 LLM 流式生成，macOS `say` 播放同一段文字，并与机械动作并行。未联网的旧素材试听仍保留原录音播放器。
+首次下载模型：`OLLAMA_HOST=127.0.0.1:11435 ollama pull qwen2.5:7b`。JEV 使用 `.env.local` 的 `OPENROUTER_API_KEY`；Fish 在本地调试台配置。豆包 ASR 为可选，见 `docs/doubao-asr.md`。不要同时启动第二个占用 11435 或 8766 的服务。
 
-他准备好实际机械臂后，才自行使用已有串口参数启动：
+先启动五舵机**软件预演**控制器（不打开串口）：
 
 ```sh
-.venv/bin/python -m niu_reactions.server --cowcoming \
-  --enable-hardware --arm-port "$BENBEN_ARM_PORT" --cowcoming-mode hardware
+.venv/bin/python -m niu_reactions.server --motion-profile five_servo --cowcoming
 ```
 
-`--cowcoming-mode hardware` 控制网页命令的执行模式；本地调试台仍要明确选择“实机播放”。启动本身不动作。不另起第二份程序占用同一机械臂，不需要我们远程重启他的服务。
-
-摄像头沿用他已有的 8765 服务，另开只读预览桥：
+另开桥接进程，Device Key 文件只包含密钥，权限设为 600：
 
 ```sh
-.venv/bin/python web/examples/device/local_preview.py
+.venv/bin/python -m venv .venv-bridge
+.venv-bridge/bin/python -m pip install -r requirements-cowcoming.txt
+.venv-bridge/bin/python -m niu_reactions.cowcoming_bridge \
+  --relay https://cowcoming-live.shangyiyong98.workers.dev \
+  --local http://127.0.0.1:8766 --device-key-file .env.cowcoming-device-key
 ```
 
-网页 Camera → 编辑 → 本地视觉程序，地址 `http://127.0.0.1:8767/snapshot`，填 `.pwc/local-preview.key` 中的本地访问密钥，允许浏览器访问本地网络后开启。复用同帧图像、人体框、人脸框、跟踪 ID；不重复打开相机、不经云端上传帧。
+打开本机 http://127.0.0.1:8766/ 或 `/live`；网页用同一房间的 Browser Key。结束收音后切换网页形态，等待设备配置确认，再从本机输入文字或语音。未使用网页时可省略 `--cowcoming` 和桥接进程。Device Key、Browser Key、相机预览 Key 分别用于不同入口。
 
-## 自动进化：也提供了可运行网关
-
-在朋友的 `.env.local` 再填 `COWCOMING_BROWSER_KEY=与网页相同的BrowserKey`。运行：
+现场确认串口和机械支撑后，使用以下参数替代软件预演控制器；启动本身不移动：
 
 ```sh
-.venv/bin/python -m niu_reactions.evolution_gateway
+.venv/bin/python -m niu_reactions.server --motion-profile five_servo --cowcoming \
+  --enable-hardware --arm-port "$BENBEN_ARM_PORT"
 ```
 
-网页左下角进化设置选自动，周期填 5（可改 10），评估模型填可用的 OpenRouter 模型 ID，例如 `openai/gpt-4.1-mini`，API 地址填 `http://127.0.0.1:8768/evaluate`。网关只监听本机、校验网页 Origin 和 Browser Key；模型 Key 留在本地。浏览器仅对这个固定本机网关地址附加房间鉴权，不会把 Browser Key 发给自定义远程网关。
+`BENBEN_ARM_PORT` 必须是当前设备的实际端口。不要给新版增加旧的 `--cowcoming-mode` 参数。点击实机“开始互动”才下发默认姿态并开启会话。正常结束用页面“结束收音并持位”（`/live/finish`）；停止并卸力是另一个操作。退出或重启服务会卸力，承重期间必须先支撑好。
 
-每次按完整历史请求独立 LLM，代码校验只保持或前进一个合法节点；同一请求 ID 去重，不截断历史，不因满 5 轮就强制升级。可以通过 `COWCOMING_EVOLUTION_URL` / `COWCOMING_EVOLUTION_API_KEY` 接其他兼容提供商。跨电脑观察网页不调用朋友的 localhost；自动进化在运行网关的那台电脑配置即可。
+## 摄像头和网页开发
 
-## 数据与行为约定
+沿用现有 `niu_vision` 的 8765 服务。只读预览桥在 benben 根目录运行 `python3 web/examples/device/local_preview.py`；网页 Camera → 本地视觉程序 → `http://127.0.0.1:8767/snapshot`，填写 `.pwc/local-preview.key`。它复用原摄像头，不另开采集、不把图像送进 Worker。浏览器需允许本地网络访问；远程手机不能用电脑的 localhost。
 
-- 设备先声明 `actionContractVersion=2` 与真实 `supportedActions`，应用网页 profile 后确认 revision。
-- 本地输入先发 `interaction.start`，用同一 commandId 关联用户文本、LLM 分片、JEV 决策与结果；网页输入沿用已有 commandId，不重复注册。
-- `decision.actionId` 决定当前形态的已编排骨骼动画。网页依次完整播放；队列最多 32 项。硬件后续失败/停止不会追着中断网页动作，断线也不重播历史。显式重置、换形态或离开 WORK 会清除旧动画。
-- 完成回执用于记录事实与进化计数，不是播放下一帧的控制命令。实机、同形态、完整输入与回复（含小牛明确无声）及两边动作完成才计轮。演示、纯点选、重复与中断均不计。
-- 共享六形态提示词来自产品快照修订 212；新指令以当前交接为准。旧房间通用人格自动补齐，用户自己写的 JEV 提示词保留；独立语言提示词可在 Device lab 修改。
+需要最新网页时，在 cowcoming 仓库（或 benben 的 `web/`）用 Node 24 执行 `npm ci`、`npm run dev`。按网页连接面板绑定同一生产房间，避免启动第二个设备桥。Pages Token 只影响云端网页发布，不影响本机测试。
 
-## 已有素材与实机能力
+## 动作与延迟修复
 
-不用再索取或制作已有模型。网页现有小牛、普通牛来、硬牛、仙牛、暗黑牛的绑定模型和五类动画继续复用；仓库中的骚牛仍是明确标示的参考模型，未把参考模型冒充独立验收资产。该阶段支持独立语言回复和 WAIT；WAIT 无需等待不存在的动画资产，实机模式下的完整文字互动可正常计轮、评估下一步进化。
+- 本机保留已授权的 11 个五舵机动作，加独立 `restore_pose` 共 12 个候选。网页 NOD 动画映射不再过滤本机转头、转身、站坐等动作。网页目前只投影本机单点头为 NOD，其余本机动作记录实际执行日志，不伪造其他动画。
+- “呃／嗯／那个／OK”开头的明确动作请求进入 12 秒 JEV 等待窗口，普通聊天仍为 3 秒；超时不补做旧动作。
+- Apple silicon 的 Ollama 修复为原生 arm64。现场同类输入 Qwen 热启动为 1.146／1.507 秒，冷启动含加载为 5.324 秒；不是每轮总延迟保证。识别、JEV、网络和播音仍会影响体验。
+- `reaction_turn` 输出每轮请求 ID、候选、拒绝原因和分段耗时；不记录用户台词、录音或密钥。日志位置取决于启动重定向；`scripts/start_chat.py` 使用 `outputs/reaction-service.log`。
+- 五舵机按固定时间下发角度，结束只表示指令播放完，`position_verified=false`；桥接发送 `action.sent`，不冒充传感器确认的物理完成。
 
-本次核对到 benben 已标记 verified 的是 `nod` 与 `shake_head`。`nod` 轨迹含两次点头，映射 `NOD_DOUBLE`；`shake_head` 映射 `SHAKE`；`WAIT` 不运动。不把尚未实机验证的单点头和左右歪头自动开放。以后验证了新的现有轨迹，只需在对应 reaction JSON 中填写正式 `action_id` 并保持原硬件验证流程，网页已有对应动画，无需改云端协议。
+## 保留的上游功能与当前限制
 
-## 验收与边界
+队友新增的视觉属性、五轴跟随工具、网页镜像和 `evolution_gateway` 保留。早期内嵌桥接／网页输入／回合证据控制器保存在 `server_legacy.py`、`cowcoming_legacy.py`、`decision_legacy.py` 与对应测试中，仅用于旧协议软件预览，不能替代当前五舵机入口；也不能确认新版六人格回执。早期 OpenRouter 语言＋macOS say 配置只适用于这一参考实现。
 
-- 自动化已覆盖真实 Worker / WebSocket / benben Controller / 网页 Three.js 动画的完整链路；测试用假的动作执行器、语言提供商和画面，不打开真实机械臂或摄像头。
-- 模型 Key、串口和相机服务由朋友本机配置。真实 JEV/LLM 调用、语音设备与物理动作需要他现场跑一轮；软件测试不能冒充实机验收。
-- 自动进化的周期、合法路径、完整历史、重置、本地输入计数及本机评估网关均已提供。真实评估模型需使用朋友自己的有效 API Key；未配置或模型报错时保留当前形态，不伪造升级。
-- 五动作协议和新本地事件需要网站与 Worker 同版发布。仅复制 web 文件夹或仅更新 Python 不等于线上网站已更新。
+当前生产桥的输入来自本机，网页 `interact/action` 明确拒绝；网页停止仍走同一个本机停止接口。本地自主回合与网页自动进化计数尚未统一，不能宣称完整自动进化已完成。进化网关独立保留并有测试，但不会凭空补出缺失的有效回合。
+
+人格仍可继续调校；完整麦克风到全部真实动作的修复后重测尚未完成。软件回归和合成执行器测试不能代替全套实机验收。上传源码不自动重启任何现场服务。
