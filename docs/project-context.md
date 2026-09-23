@@ -50,7 +50,7 @@ World 的 27 星光与 mama 彩蛋继续独立保存，不作为形态进化条�
 
 原工作站的 `perfect-web-clone-v4/showcase/products/fuch` 只作为迁移来源；后续以 cowcoming 的提交为准，不继续从旧目录或 /tmp 产物覆盖 main。个人授权文件、Cookie、Token、node_modules、dist 和 QA 截图不入库。
 
-生产站点仍为 https://cowcoming.world/ ，Cloudflare Pages 项目 `niulai-preview-20260922`，旧域名 `niulai.nexting.design` 指向同一项目。GitHub Actions 已提供 main 测试后发布与线上版本验证；是否完成首次凭据启用见 [部署说明](deployment.md)。
+生产站点仍为 https://cowcoming.world/ ，Cloudflare Pages 项目 `niulai-preview-20260922`，旧域名 `niulai.nexting.design` 已按 Eric 要求移除 Pages 绑定，后续只使用主域名；DNS 清理状态见部署说明。GitHub Actions 已提供 main 测试后发布与线上版本验证；是否完成首次凭据启用见 [部署说明](deployment.md)。
 
 ## 验证与后续记录
 
