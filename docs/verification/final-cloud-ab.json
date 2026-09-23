@@ -1,0 +1,103 @@
+{
+  "scope": "Real cloud A/B; fixed text; silent PCM, simulated actions; no ASR or hardware",
+  "summary": {
+    "after_reply": {
+      "turns": 2,
+      "ok": 2,
+      "decisions_received": 2,
+      "actions": 2,
+      "gap_samples": 2,
+      "median_motion_after_audio_ms": 495.3
+    },
+    "parallel": {
+      "turns": 2,
+      "ok": 2,
+      "decisions_received": 2,
+      "actions": 1,
+      "gap_samples": 1,
+      "median_motion_after_audio_ms": 0.0
+    }
+  },
+  "cases": [
+    {
+      "form": "normal",
+      "input": "请点一下头",
+      "schedule": "after_reply",
+      "ok": true,
+      "reply": "点头这活儿，我出手就该是行业级的，偏巧今天给你露一手。",
+      "decision": "nod",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "nod"
+      ],
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 924.5,
+        "jev_started_ms": 924.5,
+        "audio_started_ms": 1843.5,
+        "motion_dispatched_ms": 2316.5,
+        "motion_after_audio_ms": 473.0
+      }
+    },
+    {
+      "form": "normal",
+      "input": "请点一下头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "这就给您点个带排场的头，力度拿捏得比敲铜锣还讲究呢",
+      "decision": "nod",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "nod"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.0,
+        "reply_ready_ms": 803.0,
+        "audio_started_ms": 1202.9,
+        "motion_dispatched_ms": 1202.9,
+        "motion_after_audio_ms": 0.0
+      }
+    },
+    {
+      "form": "normal",
+      "input": "我是不是特别没用？",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "别瞎想，你这叫厚积薄发，只是现在还没到我这种吹牛逼还不带打草稿的段位罢了",
+      "decision": "idle",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.1,
+        "reply_ready_ms": 892.8,
+        "audio_started_ms": 1285.1
+      }
+    },
+    {
+      "form": "normal",
+      "input": "我是不是特别没用？",
+      "schedule": "after_reply",
+      "ok": true,
+      "reply": "啥没用？牛都觉得自己能拉车、能挤奶，你这点小纠结顶多算没找着自己的小活儿，哪就没用了？",
+      "decision": "shake_head",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "shake_head"
+      ],
+      "timing": {
+        "schedule": "after_reply",
+        "reply_ready_ms": 1126.1,
+        "jev_started_ms": 1126.1,
+        "audio_started_ms": 1660.1,
+        "motion_dispatched_ms": 2177.7,
+        "motion_after_audio_ms": 517.6
+      }
+    }
+  ]
+}

@@ -11,6 +11,8 @@ import { chromium } from 'playwright';
 
 const benben = resolve(process.env.BENBEN_PATH || '../benben');
 const python = process.env.BENBEN_PYTHON || join(benben, '.venv-bridge/bin/python');
+const schedule = process.env.JEV_SCHEDULE || 'after_reply';
+assert.ok(['after_reply', 'parallel'].includes(schedule), 'Invalid JEV_SCHEDULE');
 const folder = await mkdtemp(join(tmpdir(), 'benben-cowcoming-qa-'));
 const children = [], logs = new Map();
 let browser;
@@ -59,12 +61,13 @@ try {
     '--ip', '127.0.0.1', '--persist-to', join(folder, 'state')],
     { env: { ...process.env, WRANGLER_SEND_METRICS: 'false' } });
   child(process.execPath, [resolve('node_modules/vite/bin/vite.js'), '--host', '127.0.0.1', '--port', new URL(web).port, '--strictPort']);
-  const fixture = child(python, ['-m', 'tests.cowcoming_fixture'], { cwd: benben });
+  const fixture = child(python, ['-m', 'tests.cowcoming_fixture', '--jev-schedule', schedule], { cwd: benben });
   const info = await until(() => {
     const line = logs.get(fixture).split('\n').find(l => l.startsWith('{"port":'));
     return line && JSON.parse(line);
   }, 'synthetic controller startup');
   const local = `http://127.0.0.1:${info.port}`;
+  assert.equal((await (await fetch(local+'/state')).json()).jev_schedule, schedule);
   await until(async () => (await fetch(relay + '/health')).ok, 'Worker startup', 60000);
   await until(async () => (await fetch(web)).ok, 'Vite startup');
   const roomResponse = await fetch(relay + '/v1/rooms', { method: 'POST',
@@ -223,13 +226,17 @@ createRoot(document.getElementById('root')).render(<App/>);`);
       assert.equal(observed.result.status, 'completed');
       assert.equal(observed.receipt.status, 'sent');
       await until(async () => !(await (await fetch(local+'/state')).json()).busy, 'matrix turn finish');
-      matrix.push({formId,motionId,actionId,clip:observed.result.clip,software:'completed',hardware:'synthetic-timed-sent'});
+      const timing = (await (await fetch(local+'/state')).json()).synchronization_timing;
+      assert.equal(timing.schedule, schedule);
+      assert.ok(timing.motion_dispatched_ms >= timing.audio_started_ms);
+      if (schedule === 'parallel') assert.ok(timing.jev_started_ms <= timing.reply_ready_ms);
+      matrix.push({schedule,timing,formId,motionId,actionId,clip:observed.result.clip,software:'completed',hardware:'synthetic-timed-sent'});
     }
     console.log(formId + ': all five local decisions reached matching real GLB animations');
   }
   report.push('All six forms acknowledge the same persona version; all 30 local-motion/real-GLB combinations pass, including distinct single/double nod and left/right tilt. No real motors.');
   assert.deepEqual(errors, []);
-  await writeFile('.pwc/benben-bridge-qa.json', JSON.stringify({ synthetic: true, checks: report, matrix, pageErrors: errors }, null, 2));
+  await writeFile('.pwc/benben-bridge-qa.json', JSON.stringify({ schedule, synthetic: true, checks: report, matrix, pageErrors: errors }, null, 2));
   console.log(JSON.stringify({ passed: report.length, synthetic: true, checks: report }, null, 2));
 } catch (error) {
   console.error('Browser errors:', JSON.stringify(errors));

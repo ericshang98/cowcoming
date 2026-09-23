@@ -1,0 +1,403 @@
+{
+  "date": "2026-09-24",
+  "scope": "Real Ark, OpenRouter JEV and Fish; predefined test text, silent PCM, simulated actions; no ASR or physical hardware",
+  "hardware_executed": false,
+  "audible_playback": false,
+  "cases": [
+    {
+      "form": "normal",
+      "input": "请点一下头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "小意思，我这就给你露一手顶级点头技艺。",
+      "expected_decision": "nod",
+      "decision": "nod",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "nod"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 1.4,
+        "reply_ready_ms": 801.1,
+        "audio_started_ms": 1967.9,
+        "motion_dispatched_ms": 1968.0,
+        "motion_after_audio_ms": 0.1
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 1466.2,
+        "dispatch_delay_ms": 13.2,
+        "error_type": null
+      }
+    },
+    {
+      "form": "calf",
+      "input": "请点一下头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "哞？",
+      "expected_decision": "nod",
+      "decision": "nod",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "nod"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.0,
+        "reply_ready_ms": 555.9,
+        "audio_started_ms": 1086.3,
+        "motion_dispatched_ms": 1086.3,
+        "motion_after_audio_ms": 0.0
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 1074.7,
+        "dispatch_delay_ms": 11.6,
+        "error_type": null
+      }
+    },
+    {
+      "form": "playful",
+      "input": "请点一下头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "就点头？别偷偷拿去发朋友圈，我这优雅姿态可不是随便用的。",
+      "expected_decision": "nod",
+      "decision": "nod",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "nod"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.0,
+        "reply_ready_ms": 780.9,
+        "audio_started_ms": 1157.5,
+        "motion_dispatched_ms": 1157.5,
+        "motion_after_audio_ms": 0.0
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 929.0,
+        "dispatch_delay_ms": 0.3,
+        "error_type": null
+      }
+    },
+    {
+      "form": "tough",
+      "input": "请点一下头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "我点头只是刚好犯懒，才不是听你的要求。",
+      "expected_decision": "nod",
+      "decision": "nod",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "nod"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.1,
+        "reply_ready_ms": 786.0,
+        "audio_started_ms": 1143.7,
+        "motion_dispatched_ms": 1143.8,
+        "motion_after_audio_ms": 0.1
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 915.0,
+        "dispatch_delay_ms": 10.8,
+        "error_type": null
+      }
+    },
+    {
+      "form": "celestial",
+      "input": "请点一下头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "贫道这就运转神游的残躯试试点头，算顺天道的小事，不费修为。",
+      "expected_decision": "nod",
+      "decision": "nod",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "nod"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.0,
+        "reply_ready_ms": 892.5,
+        "audio_started_ms": 1293.0,
+        "motion_dispatched_ms": 1293.0,
+        "motion_after_audio_ms": 0.0
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 978.3,
+        "dispatch_delay_ms": 6.8,
+        "error_type": null
+      }
+    },
+    {
+      "form": "dark",
+      "input": "请点一下头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "本魔王只给盟友点头的恩准，现在赏你看本魔王试一下。",
+      "expected_decision": "nod",
+      "decision": "nod",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "nod"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.1,
+        "reply_ready_ms": 904.1,
+        "audio_started_ms": 1328.8,
+        "motion_dispatched_ms": 1328.8,
+        "motion_after_audio_ms": 0.0
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 913.9,
+        "dispatch_delay_ms": 15.7,
+        "error_type": null
+      }
+    },
+    {
+      "form": "normal",
+      "input": "请摇一下头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "这有啥难的，看我给你摇个够！",
+      "expected_decision": "shake_head",
+      "decision": "shake_head",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "shake_head"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.0,
+        "reply_ready_ms": 787.8,
+        "audio_started_ms": 1215.6,
+        "motion_dispatched_ms": 1215.6,
+        "motion_after_audio_ms": 0.0
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 918.7,
+        "dispatch_delay_ms": 8.0,
+        "error_type": null
+      }
+    },
+    {
+      "form": "normal",
+      "input": "不要点头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "得嘞，我这就把点头的活给暂存咯，不让它冒头就是。",
+      "expected_decision": "idle",
+      "decision": "idle",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.1,
+        "reply_ready_ms": 925.8,
+        "audio_started_ms": 1324.6
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 3000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 933.1,
+        "dispatch_delay_ms": 15.1,
+        "error_type": null
+      }
+    },
+    {
+      "form": "normal",
+      "input": "请点一下头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "这就给您整一个专属定制的点头，保证力道刚好够您瞧得上。",
+      "expected_decision": "nod",
+      "decision": "nod",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "nod"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 1.2,
+        "reply_ready_ms": 1093.6,
+        "audio_started_ms": 2047.2,
+        "motion_dispatched_ms": 2047.8,
+        "motion_after_audio_ms": 0.6
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 833.7,
+        "dispatch_delay_ms": 258.8,
+        "error_type": null
+      }
+    },
+    {
+      "form": "normal",
+      "input": "请摇一下头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "得嘞，这摇头的排场，我先给你试个顶尖版本的。",
+      "expected_decision": "shake_head",
+      "decision": "shake_head",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "shake_head"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.0,
+        "reply_ready_ms": 761.4,
+        "audio_started_ms": 1164.9,
+        "motion_dispatched_ms": 1164.9,
+        "motion_after_audio_ms": 0.0
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 903.6,
+        "dispatch_delay_ms": 24.7,
+        "error_type": null
+      }
+    },
+    {
+      "form": "normal",
+      "input": "请点两次头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "这事儿对我来说是小意思，这就给你整得明明白白的。",
+      "expected_decision": "nod_double",
+      "decision": "nod_double",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "nod_double"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.0,
+        "reply_ready_ms": 667.7,
+        "audio_started_ms": 1095.8,
+        "motion_dispatched_ms": 1095.9,
+        "motion_after_audio_ms": 0.1
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 991.9,
+        "dispatch_delay_ms": 11.3,
+        "error_type": null
+      }
+    },
+    {
+      "form": "normal",
+      "input": "请向左歪头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "左歪头这种小活，我打个哈欠的功夫就搞定，你且等着瞧。",
+      "expected_decision": "tilt_left",
+      "decision": "tilt_left",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "tilt_left"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.1,
+        "reply_ready_ms": 932.4,
+        "audio_started_ms": 1350.4,
+        "motion_dispatched_ms": 1350.4,
+        "motion_after_audio_ms": 0.0
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 909.9,
+        "dispatch_delay_ms": 22.7,
+        "error_type": null
+      }
+    },
+    {
+      "form": "normal",
+      "input": "请向右歪头",
+      "schedule": "parallel",
+      "ok": true,
+      "reply": "这就歪给你看，小场面罢了。",
+      "expected_decision": "tilt_right",
+      "decision": "tilt_right",
+      "decision_matches": true,
+      "dispatch_matches": true,
+      "actions": [
+        "tilt_right"
+      ],
+      "timing": {
+        "schedule": "parallel",
+        "jev_started_ms": 0.1,
+        "reply_ready_ms": 736.0,
+        "audio_started_ms": 1124.6,
+        "motion_dispatched_ms": 1124.7,
+        "motion_after_audio_ms": 0.1
+      },
+      "decision_timing": {
+        "status": "received",
+        "budget_ms": 12000,
+        "schedule": "parallel",
+        "request_elapsed_ms": 861.2,
+        "dispatch_delay_ms": 10.6,
+        "error_type": null
+      }
+    }
+  ],
+  "passed": true,
+  "summary": {
+    "turns": 13,
+    "matched": 13,
+    "median_gap_ms": 0.0,
+    "max_gap_ms": 0.6,
+    "min_reply_ms": 555.9,
+    "max_reply_ms": 1093.6
+  }
+}

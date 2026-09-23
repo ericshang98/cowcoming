@@ -1,0 +1,12 @@
+{
+  "checks": [
+    "Loaded actual model: calf",
+    "Loaded actual model: normal",
+    "Loaded actual model: playful",
+    "Loaded actual model: celestial",
+    "Loaded actual model: tough",
+    "Loaded actual model: dark",
+    "Mobile playful model loads without horizontal overflow"
+  ],
+  "errors": []
+}
