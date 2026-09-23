@@ -17,9 +17,11 @@ import { useWorldCollection } from "./useWorldCollection";
 import { useNiulaiVoice } from "./useNiulaiVoice";
 import { isWaveShortcut } from "./voice-interactions.mjs";
 import Character from "./scene/Character";
-import useLiveDevice from "./live/useLiveDevice";
 import Evolution from "./pages/Evolution";
-import { resolvePreview, selectEvolutionForm } from "./evolution.mjs";
+import useLiveDevice from "./live/useLiveDevice";
+import { useEvolutionDeviceSync } from "./live/useEvolutionDeviceSync";
+import { useEvolutionSession } from "./useEvolutionSession";
+import { resolvePreview, forms } from "./evolution.mjs";
 import { Header, Ambient, Boot } from "./components/Chrome";
 import {
   Home,
@@ -79,21 +81,33 @@ export default function App() {
   const controller = useMemo(makeController, []),
     sound = useRef(null),
     viewRef = useRef();
-  const [evolutionSelection, setEvolutionSelection] = useState({ route: 'celestial', form: 'calf' });
-  const [previewModelState, setPreviewModelState] = useState({ model: null, status: 'loading' });
-  const live = useLiveDevice(controller, mode === 'work');
-  const revealed = live.snapshot?.revealed;
-  const evolutionPreview = resolvePreview(evolutionSelection.route, evolutionSelection.form, revealed);
+  const evolutionSession = useEvolutionSession();
+  const live = useLiveDevice(controller, mode === "work");
+  const deviceFormReady = useEvolutionDeviceSync(evolutionSession, live);
+  const [evolutionRoute, setEvolutionRoute] = useState('celestial');
   useEffect(() => {
-    if (live.snapshot?.profile.formId) setEvolutionSelection(previous => selectEvolutionForm(previous.route, live.snapshot.profile.formId, live.snapshot.revealed));
-  }, [live.snapshot?.profile.formId, live.snapshot?.profile.revision]);
+    const branch = forms[evolutionSession.state.form].branch;
+    if (branch) setEvolutionRoute(branch);
+  }, [evolutionSession.state.form]);
+  useEffect(() => {
+    // Connection adapters capture context at input start and report only completed turns.
+    controller.evolution = { context: evolutionSession.context, recordTurn: evolutionSession.recordTurn, deviceFormReady };
+    return () => { delete controller.evolution; };
+  }, [controller, evolutionSession.context, evolutionSession.recordTurn, deviceFormReady]);
+  const [previewModelState, setPreviewModelState] = useState({ model: null, status: 'loading' });
+  const evolutionPreview = resolvePreview(forms[evolutionSession.state.form].branch || evolutionRoute, evolutionSession.state.form, Object.keys(forms));
   const activeModel = mode === 'work' ? evolutionPreview.model : resolvePreview().model;
   const evolutionPage = <Evolution
     live={live}
     preview={evolutionPreview}
     modelStatus={previewModelState.model === evolutionPreview.model ? previewModelState.status : 'loading'}
-    onSelectRoute={route => setEvolutionSelection({ route, form: 'calf' })}
-    onSelectForm={form => setEvolutionSelection(previous => selectEvolutionForm(previous.route, form, revealed))}
+    session={{ ...evolutionSession, reset: () => {
+      if (live.online) live.command({ command: "stop" });
+      evolutionSession.reset();
+    } }}
+    browseRoute={evolutionRoute}
+    onSelectRoute={setEvolutionRoute}
+    onSelectForm={form => evolutionSession.dispatch({ type: 'select', form })}
   />;
   const change = useCallback(
     (next) => {
@@ -135,6 +149,12 @@ export default function App() {
     enabled: (mode === "home" || (mode === "blog" && worldEntered)) && bootDone && chat !== "open" && cv !== "open" && !search && !wordle,
   });
   useEffect(() => {
+    controller.queue.clear();
+    controller.gaze = null;
+    controller.dragYaw = 0;
+    voice.stopVoice();
+  }, [evolutionSession.state.sessionId, evolutionSession.state.form, controller]);
+  useEffect(() => {
     const resize = () => setMobile(innerWidth <= 768),
       pop = () => {
         setLocationState(route());
@@ -149,13 +169,13 @@ export default function App() {
   }, []);
   useEffect(() => {
     controller.tracking = tracking;
-    controller.paused = paused;
+    controller.paused = mode === "work" ? false : paused;
     try {
       for (const [k, v] of Object.entries({ tracking, paused, muted }))
         localStorage.setItem("fuch-replica-" + k, JSON.stringify(v));
     } catch { /* Controls remain usable when browser storage is unavailable. */ }
-    document.documentElement.classList.toggle("motion-paused", paused);
-  }, [tracking, paused, muted, controller]);
+    document.documentElement.classList.toggle("motion-paused", mode === "work" ? false : paused);
+  }, [tracking, paused, muted, mode, controller]);
   useEffect(() => {
     setVoiceOpen(false);
     viewRef.current?.scrollTo(0, 0);
@@ -199,12 +219,12 @@ export default function App() {
       }
       if (e.key === " " && mode !== "blog" && mode !== "about") {
         e.preventDefault();
-        if (mode !== "work" || !live.snapshot) controller.gesture("happy");
+        controller.gesture("happy");
       }
     };
     addEventListener("keydown", key);
     return () => removeEventListener("keydown", key);
-  }, [mode, chat, cv, project, idea, voice.wave, wordle, Boolean(live.snapshot)]);
+  }, [mode, chat, cv, project, idea, voice.wave, wordle]);
   useEffect(() => {
     const down = (e) => {
       if (muted) return;
@@ -294,6 +314,7 @@ export default function App() {
         <Ambient />
         {mode !== "blog" && mode !== "about" && (
           <Character
+            key={mode === "work" ? `${evolutionSession.state.sessionId}:${evolutionSession.state.form}` : "default-character"}
             controller={controller}
             mode={mode}
             mobile={mobile}

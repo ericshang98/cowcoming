@@ -88,6 +88,8 @@ export function updateProfile(state, patch) {
     patch && patch.expectedRevision === state.profile.revision,
     "Profile revision conflict; refresh first",
   );
+  const source = patch.source || "manual";
+  check(["manual", "automatic", "reset"].includes(source), "Invalid profile source");
   const formProfiles = {
     ...(state.formProfiles || {}),
     [state.profile.formId]: structuredClone(state.profile),
@@ -149,7 +151,7 @@ export function updateProfile(state, patch) {
         ? state.history
         : [
             ...state.history,
-            { formId: p.formId, at: now, source: "manual" },
+            { formId: p.formId, at: now, source },
           ].slice(-50),
   };
 }
@@ -275,6 +277,7 @@ export function applyDeviceEvent(state, raw) {
         {
           id: e.messageId,
           role: raw.role,
+          ...(raw.commandId ? { commandId: id(raw.commandId) } : {}),
           text: text(raw.text || "", 16000, true),
           status: "streaming",
           at: e.at,

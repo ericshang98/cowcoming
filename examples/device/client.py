@@ -90,7 +90,7 @@ class DeviceClient:
             user_input = command.get("input", "")
             if user_input:
                 mid = event_id()
-                await self.emit("language.start", messageId=mid, role="user", text=user_input)
+                await self.emit("language.start", messageId=mid, commandId=command["commandId"], role="user", text=user_input)
                 await self.emit("language.end", messageId=mid)
             decision = await self.adapter.decide(user_input, command.get("actionId"))
             if self.profile["revision"] != revision or decision["actionId"] not in allowed:
@@ -103,7 +103,7 @@ class DeviceClient:
             action_final = result["status"] in ("completed", "failed", "interrupted")
             if user_input:
                 message_id = event_id()
-                await self.emit("language.start", messageId=message_id, role="assistant", text="")
+                await self.emit("language.start", messageId=message_id, commandId=command["commandId"], role="assistant", text="")
                 async for chunk in self.adapter.reply(user_input):
                     await self.emit("language.delta", messageId=message_id, text=chunk)
                 await self.emit("language.end", messageId=message_id)

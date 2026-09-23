@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { completedEvolutionTurn } from "./evolution-turn.mjs";
 import { parseKey, chooseAnimation } from "../../shared/live-protocol.mjs";
 
 export function normalizeRelay(value) {
@@ -30,11 +31,13 @@ export default function useLiveDevice(controller, active) {
     heartbeat = useRef(null);
   const credentials = useRef(null),
     snapshotRef = useRef(null),
-    signalListeners = useRef(new Set());
+    signalListeners = useRef(new Set()),
+    conversationCommands = useRef(new Map());
   const current = useRef({ controller, active });
   current.current = { controller, active };
   const stop = useCallback(() => {
     generation.current++;
+    conversationCommands.current.clear();
     clearTimeout(retry.current);
     clearInterval(heartbeat.current);
     socket.current?.close();
@@ -150,6 +153,11 @@ export default function useLiveDevice(controller, active) {
             if (m.type === "snapshot") {
               snapshotRef.current = m;
               setSnapshot(m);
+              for (const [commandId, context] of conversationCommands.current) {
+                const completion = completedEvolutionTurn(m, commandId, context);
+                if (completion.terminal) conversationCommands.current.delete(commandId);
+                if (completion.turn) current.current.controller.evolution?.recordTurn(completion.turn);
+              }
             }
             if (m.type === "signal")
               for (const fn of signalListeners.current) fn(m);
@@ -158,7 +166,7 @@ export default function useLiveDevice(controller, active) {
               setReceipt({ commandId: m.commandId, status: "sent" });
             if (m.type === "live.decision" && current.current.active) {
               const profile = snapshotRef.current?.profile;
-              if (profile?.revision === m.decision.profileRevision) {
+              if (profile?.revision === m.decision.profileRevision && (!current.current.controller.evolution || current.current.controller.evolution.deviceFormReady?.(profile.revision, profile.formId))) {
                 const clip = chooseAnimation(
                   m.decision.actionId,
                   profile.animationMap,
@@ -227,15 +235,21 @@ export default function useLiveDevice(controller, active) {
     (data) => {
       setError("");
       const commandId = crypto.randomUUID();
+      const profile = snapshotRef.current?.profile;
+      const context = current.current.controller.evolution?.context();
+      if (data.command === 'interact' && context?.formId === profile?.formId) {
+        conversationCommands.current.set(commandId, { ...context, userText: data.input, profileRevision: profile.revision });
+      }
       if (send({ type: "command", commandId, ...data }))
         setReceipt({ commandId, status: "sending" });
+      else conversationCommands.current.delete(commandId);
     },
     [send],
   );
   const updateProfile = useCallback(
     (patch) => {
       setError("");
-      send({
+      return send({
         type: "profile.update",
         expectedRevision: snapshotRef.current?.profile.revision,
         ...patch,

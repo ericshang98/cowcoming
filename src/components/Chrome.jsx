@@ -11,6 +11,7 @@ import {
   Volume2,
   VolumeX,
   Pause,
+  RotateCcw,
   Play,
   Scan,
   Music2,
@@ -26,7 +27,7 @@ export const routes = [
   ["about", "ABOUT", User],
   ["contact", "VOTE US", Send],
 ];
-export function Controls({ music = true, onExpand }) {
+export function Controls({ music = true, onExpand, onReset }) {
   const {
     tracking,
     setTracking,
@@ -59,11 +60,12 @@ export function Controls({ music = true, onExpand }) {
         {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
       </button>
       <button
-        aria-label={paused ? "Resume animations" : "Pause animations"}
-        aria-pressed={paused}
-        onClick={() => setPaused(!paused)}
+        aria-label={onReset ? "Reset to calf" : paused ? "Resume animations" : "Pause animations"}
+        title={onReset ? "Reset to calf" : undefined}
+        aria-pressed={onReset ? undefined : paused}
+        onClick={onReset || (() => setPaused(!paused))}
       >
-        {paused ? <Play size={15} /> : <Pause size={15} />}
+        {onReset ? <RotateCcw size={15} /> : paused ? <Play size={15} /> : <Pause size={15} />}
       </button>
       {music && (
         <button

@@ -36,8 +36,8 @@ export default function DeviceDebug({ live, onClose }) {
     <LiveDialog title={t("设备调试", "Device lab")} onClose={onClose}>
       <p>
         {t(
-          "自动进化尚未启用。这里手动设置形态与提示词，电脑端应用后交给 JEV 选择动作。",
-          "Automatic evolution is off. Set the form and prompt here; the local process applies them before JEV chooses actions.",
+          "进化节奏在左下角设置。这里修改形态、提示词和动作配置；手动切换会接管当前形态。",
+          "Set evolution cadence at the lower left. Edit forms, prompts and actions here; manually changing a form takes control of evolution.",
         )}
       </p>
       <form onSubmit={save}>

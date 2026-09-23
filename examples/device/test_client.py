@@ -33,6 +33,7 @@ class Runtime(unittest.IsolatedAsyncioTestCase):
         client.profile = profile
         await client.interact({"commandId": "c", "input": "hello"}, 3, ['NOD'])
         events = client.ws.messages
+        self.assertTrue(all(e.get("commandId") == "c" for e in events if e["type"] == "language.start"))
         self.assertEqual(next(e for e in events if e['type'] == 'decision')['profileRevision'], 3)
         self.assertEqual(next(e for e in events if e['type'] == 'action' and e['status'] == 'completed')['detail'], 'Simulation finished; no hardware moved.')
         self.assertEqual(events[-1]['status'], 'completed')
