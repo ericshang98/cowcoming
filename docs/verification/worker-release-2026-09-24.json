@@ -1,0 +1,42 @@
+{
+  "sourceCommit": "c9aff9426ede4daa013c6232755797d4b3fe6c66",
+  "deployment": "549a0e57-63cf-45d6-af56-521c46328b7a",
+  "versions": [
+    {
+      "version_id": "245ef800-59e3-4de3-8d6c-46b1af71e7ca",
+      "percentage": 100
+    }
+  ],
+  "createdAt": "2026-09-23T22:02:08.130126Z",
+  "bindings": [
+    {
+      "name": "ADMIN_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "ALLOWED_ORIGINS",
+      "type": "plain_text"
+    },
+    {
+      "name": "ROOMS",
+      "type": "durable_object_namespace",
+      "namespace_id": "e87a21ea27384549999f1aae44737fcd"
+    }
+  ],
+  "subdomain": {
+    "enabled": true,
+    "previews_enabled": true
+  },
+  "playfulExclusionAbsent": true,
+  "actionCapabilitiesPresent": true,
+  "closeHandlerPresent": true,
+  "healthStatus": 200,
+  "browserAuth": true,
+  "deviceOnline": true,
+  "profileRevision": 35,
+  "appliedRevision": 35,
+  "personaVersion": "niulai-six-v1-6194348364b6",
+  "websiteCommit": "1a66bcce3d0e2c964310c669868367f8b4e5cb5c",
+  "webMergeCommit": "2ec85bc948c7315fb18d577ee35f6c8ddda29400",
+  "webPullRequest": "https://github.com/ericshang98/cowcoming/pull/33"
+}
