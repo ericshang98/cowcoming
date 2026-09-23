@@ -94,13 +94,27 @@ scene.add(new THREE.HemisphereLight(0xffffff,0x607880,3));
 const bounds=new THREE.Box3().setFromObject(gltf.scene),center=bounds.getCenter(new THREE.Vector3()),size=bounds.getSize(new THREE.Vector3());
 const camera=new THREE.PerspectiveCamera(40,640/480,.01,1000);camera.position.copy(center).add(new THREE.Vector3(0,size.y*.1,Math.max(size.y,size.x)*2));camera.lookAt(center);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(640,480);document.body.appendChild(renderer.domElement);
-const mixer=new THREE.AnimationMixer(gltf.scene),actions={},bones=new Set();
-gltf.scene.traverse(o=>{if(o.isBone)bones.add(o.name)});for(const c of gltf.animations)actions[c.name]=mixer.clipAction(c);
+let mixer=new THREE.AnimationMixer(gltf.scene); const actions={},bones=new Set();
+gltf.scene.traverse(o=>{if(o.isBone){bones.add(o.name);if(o.userData.name)bones.add(o.userData.name)}});for(const c of gltf.animations)actions[c.name]=mixer.clipAction(c);
 actions.idle=actions.idle||actions[gltf.animations.find(c=>/idle/i.test(c.name))?.name];
 window.results=[];window.starts=0;
-const player=createResponsePlayer({mixer,actions,bones,manifest,onStart:()=>window.starts++});
+let player=createResponsePlayer({mixer,actions,bones,manifest,onStart:()=>window.starts++});
 const play=player.play.bind(player);player.play=request=>play(request).then(result=>{window.results.push(result);return result});
 const controller={responsePlayer:player,responseForm:'normal',queue:{clear(){}}};window.player=player;
+let activeModel=gltf.scene;
+window.loadForm=async form=>{
+ const asset=evolutionAssets[form], loaded=await new GLTFLoader().loadAsync(asset.model);
+ player.dispose();mixer.stopAllAction();scene.remove(activeModel);activeModel=loaded.scene;scene.add(activeModel);
+ mixer=new THREE.AnimationMixer(activeModel);const nextActions={},nextBones=new Set();
+ activeModel.traverse(o=>{if(o.isBone){nextBones.add(o.name);if(o.userData.name)nextBones.add(o.userData.name)}});
+ for(const c of loaded.animations)nextActions[c.name]=mixer.clipAction(c);
+ player=createResponsePlayer({mixer,actions:nextActions,bones:nextBones,manifest:asset,onStart:()=>window.starts++});
+ const run=player.play.bind(player);player.play=request=>run(request).then(result=>{window.results.push(result);return result});
+ controller.responsePlayer=player;controller.responseForm=form;window.player=player;
+ const b=new THREE.Box3().setFromObject(activeModel),c=b.getCenter(new THREE.Vector3()),z=b.getSize(new THREE.Vector3());
+ camera.position.copy(c).add(new THREE.Vector3(0,z.y*.1,Math.max(z.y,z.x)*2));camera.lookAt(c);
+};
+
 let last=performance.now();renderer.setAnimationLoop(now=>{const dt=Math.min(.1,(now-last)/1000);last=now;player.update(dt);mixer.update(dt);renderer.render(scene,camera)});
 function App(){const live=useLiveDevice(controller,true);window.live=live;return <><h2>点头联调 · 合成执行器 / 真实模型动画</h2><pre>{JSON.stringify({connection:live.status,animation:live.lastAnimation,receipt:live.snapshot?.events.filter(e=>e.type==='action').at(-1)},null,2)}</pre></>}
 createRoot(document.getElementById('root')).render(<App/>);`);
@@ -162,8 +176,16 @@ createRoot(document.getElementById('root')).render(<App/>);`);
   await page.waitForFunction(() => window.live.snapshot.events.some(e => e.type === 'command.result' && e.status === 'failed'));
   assert.equal(await page.evaluate(() => window.starts), 5);
   report.push('Unsupported web interaction is explicitly rejected instead of invoking a second JEV.');
+  const cases = [
+    ['nod','NOD','点一下头','nod_confirm'],
+    ['shake_head','SHAKE','摇摇头','head_shake'],
+    ['nod_double','NOD_DOUBLE','点两次头','nod_proud'],
+    ['tilt_left','TILT_LEFT','向左歪头','tilt_curious_left'],
+    ['tilt_right','TILT_RIGHT','向右歪头','tilt_curious_right'],
+  ];
+  const matrix = [];
   for (const formId of ['calf','normal','playful','tough','celestial','dark']) {
-    await page.evaluate(formId => window.live.updateProfile({formId}), formId);
+    await page.evaluate(formId => window.live.updateProfile({formId, allowedActions: ['NOD','SHAKE','NOD_DOUBLE','TILT_LEFT','TILT_RIGHT','WAIT']}), formId);
     await page.waitForFunction(formId => window.live.snapshot?.profile.formId === formId &&
       window.live.snapshot.appliedRevision === window.live.snapshot.profile.revision,
       formId, {polling:100, timeout:15000});
@@ -172,17 +194,42 @@ createRoot(document.getElementById('root')).render(<App/>);`);
     const localState = await localResponse.json();
     assert.equal(localState.form_id, formId);
     assert.equal(localState.persona_version, current.personaVersion);
-    if (formId === 'playful') {
-      await localPost('/run', {request_id: 'qa_playful_nod', mode: 'hardware', form_id: formId,
-        reply_mode: 'fast', text: '点一下头'});
-      await page.waitForFunction(() => window.live.snapshot.events.some(e =>
-        e.type === 'decision' && e.actionId === 'NOD' && e.formId === 'playful'));
-      await until(async () => !(await (await fetch(local + '/state')).json()).busy, 'playful turn finish');
+    assert.deepEqual((await page.evaluate(()=>window.live.snapshot.device.supportedActions)).sort(),
+      ['NOD','SHAKE','NOD_DOUBLE','TILT_LEFT','TILT_RIGHT','WAIT'].sort());
+    await page.evaluate(form => window.loadForm(form), formId);
+    for (const [motionId, actionId, text, suffix] of cases) {
+      const before = await page.evaluate(()=>({starts:window.starts, results:window.results.length}));
+      const request_id = 'qa_' + formId + '_' + motionId;
+      await localPost('/run', {request_id, mode:'hardware', form_id:formId, reply_mode:'fast', text});
+      try {
+        await page.waitForFunction(before => window.starts === before.starts+1 &&
+          window.results.length === before.results+1 && !window.player.busy,
+          before, {polling:100, timeout:20000});
+      } catch (error) {
+        const localState = await (await fetch(local+'/state')).json();
+        console.error('Matrix failure', JSON.stringify({formId,motionId,before,
+          controller:{phase:localState.phase,error:localState.error,motion:localState.motion,
+            candidates:localState.motion_candidates,selected:localState.motion_reaction_id},
+          browser:await page.evaluate(()=>({starts:window.starts,results:window.results.slice(-2),
+            animation:window.live.lastAnimation,error:window.live.error,
+            events:window.live.snapshot.events.slice(-4)}))}));
+        throw error;
+      }
+      const observed = await page.evaluate(()=>({decision:window.live.snapshot.events.findLast(e=>e.type==='decision'),
+        result:window.results.at(-1), receipt:window.live.snapshot.events.findLast(e=>e.type==='action')}));
+      assert.equal(observed.decision.actionId, actionId);
+      assert.equal(observed.decision.formId, formId);
+      assert.equal(observed.result.clip, formId+'_'+suffix);
+      assert.equal(observed.result.status, 'completed');
+      assert.equal(observed.receipt.status, 'sent');
+      await until(async () => !(await (await fetch(local+'/state')).json()).busy, 'matrix turn finish');
+      matrix.push({formId,motionId,actionId,clip:observed.result.clip,software:'completed',hardware:'synthetic-timed-sent'});
     }
+    console.log(formId + ': all five local decisions reached matching real GLB animations');
   }
-  report.push('All six webpage forms reach the real local controller and return matching persona-version acknowledgements with a synthetic playful NOD projection and no real motor command.');
+  report.push('All six forms acknowledge the same persona version; all 30 local-motion/real-GLB combinations pass, including distinct single/double nod and left/right tilt. No real motors.');
   assert.deepEqual(errors, []);
-  await writeFile('.pwc/benben-bridge-qa.json', JSON.stringify({ synthetic: true, checks: report, pageErrors: errors }, null, 2));
+  await writeFile('.pwc/benben-bridge-qa.json', JSON.stringify({ synthetic: true, checks: report, matrix, pageErrors: errors }, null, 2));
   console.log(JSON.stringify({ passed: report.length, synthetic: true, checks: report }, null, 2));
 } catch (error) {
   console.error('Browser errors:', JSON.stringify(errors));

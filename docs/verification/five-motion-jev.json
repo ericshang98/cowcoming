@@ -1,0 +1,41 @@
+{
+  "scope": "real JEV; synthetic text/labels only; no persona, history, audio or hardware",
+  "passed": true,
+  "rows": [
+    {
+      "input": "请点一下头",
+      "expected": "nod",
+      "selected": "nod",
+      "elapsed_ms": 990.0,
+      "passed": true
+    },
+    {
+      "input": "请摇摇头",
+      "expected": "shake_head",
+      "selected": "shake_head",
+      "elapsed_ms": 923.0,
+      "passed": true
+    },
+    {
+      "input": "请点两次头",
+      "expected": "nod_double",
+      "selected": "nod_double",
+      "elapsed_ms": 1120.2,
+      "passed": true
+    },
+    {
+      "input": "请向左歪头",
+      "expected": "tilt_left",
+      "selected": "tilt_left",
+      "elapsed_ms": 1064.8,
+      "passed": true
+    },
+    {
+      "input": "请向右歪头",
+      "expected": "tilt_right",
+      "selected": "tilt_right",
+      "elapsed_ms": 957.0,
+      "passed": true
+    }
+  ]
+}
