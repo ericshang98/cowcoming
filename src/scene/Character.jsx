@@ -440,10 +440,12 @@ export default function Character({
     if (mode === "about") return { scale: mobile ? 1.3 : 1.4, x: 0, y: 0.02 };
     // WORK is Niulai's main stage, including on narrow screens. Supporting
     // content scrolls below it instead of turning the model into a thumbnail.
-    if (mode === "work")
+    if (mode === "work") {
+      const formScale = modelAsset === evolutionAssets.calf.model ? 0.85 : 1;
       return mobile
-        ? { scale: 1.45, x: 0, y: 0.02 }
-        : { scale: 1.22, x: -0.12, y: 0.02 };
+        ? { scale: 1.45 * formScale, x: 0, y: 0.02 }
+        : { scale: 1.22 * formScale, x: -0.12, y: 0.02 };
+    }
     if (overlay) return { scale: 0.24, x: 0.37, y: -0.3, ground: false };
     if (mode === "home" && characterId === "fengge") return { scale: mobile ? 1.45 : 1.6, x: 0, y: .055 };
     if (mobile && mode === "home" && characterId !== "niulai") return { scale: 1.2, x: 0, y: -.06 };
@@ -454,7 +456,7 @@ export default function Character({
     if (mode === "contact" && characterId === "fengge") return { scale: 1.5, x: 0, y: .065 };
     if (mode === "contact") return { scale: 1.22, x: 0, y: 0.04 };
     return { scale: 1.25, x: 0, y: -0.02 };
-  }, [mode, mobile, overlay, boot, characterId]);
+  }, [mode, mobile, overlay, boot, characterId, modelAsset]);
   useEffect(() => {
     let drag = null;
     const blocked = mode === "about" && overlay;
