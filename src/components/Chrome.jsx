@@ -99,7 +99,7 @@ export function Header() {
   } = useApp();
   const { language } = useLanguage();
   const name = mode === 'home' ? (language === 'en' ? activeIp.nameEn : activeIp.name) : '牛来';
-  const switchLabel = language === 'en' ? 'Switch IP' : '切换 IP';
+  const switchLabel = language === 'en' ? (mode === 'home' ? 'Switch IP' : 'Switch IP (HOME only)') : (mode === 'home' ? '切换 IP' : '切换 IP（仅首页可用）');
   return (
     <Localized><>
       <header className="identity">
@@ -121,7 +121,7 @@ export function Header() {
         >
           {muted ? <VolumeX /> : <Volume2 />}
         </button>
-        <button aria-label={switchLabel} title={switchLabel} aria-haspopup="dialog" aria-expanded={ipOpen} aria-controls="ip-switcher" onClick={openIp}>
+        <button disabled={mode !== "home"} aria-label={switchLabel} title={switchLabel} aria-haspopup="dialog" aria-expanded={ipOpen} aria-controls="ip-switcher" onClick={openIp}>
           <UsersRound />
         </button>
         <button
@@ -143,6 +143,7 @@ export function Header() {
         </button>
         <button
           className="desktop-nav-icon"
+          disabled={mode !== "home"}
           aria-label={switchLabel}
           title={switchLabel}
           aria-haspopup="dialog" aria-expanded={ipOpen} aria-controls="ip-switcher"

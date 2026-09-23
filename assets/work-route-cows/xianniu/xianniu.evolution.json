@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "initialForm": "xianniu",
+  "forms": [
+    {
+      "id": "xianniu",
+      "name": "仙牛",
+      "model": "xianniu-web.glb",
+      "actions": [
+        "look",
+        "bow",
+        "nod",
+        "tilt",
+        "reflect"
+      ]
+    }
+  ],
+  "edges": []
+}

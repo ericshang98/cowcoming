@@ -96,7 +96,7 @@ export function Home() {
         {paused && feedback && <button className="interaction-resume" onClick={() => setPaused(false)}>Animation paused · Resume</button>}
       </div>
       {isNiulai && <NiulaiVoice />}
-      {mobile && <TiltPrompt />}
+      {mobile && isNiulai && <TiltPrompt />}
     </section></Localized>
   );
 }

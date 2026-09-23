@@ -1,0 +1,18 @@
+{
+  "at": "2026-09-23T16:39:32.801Z",
+  "method": "Read-only production page in an isolated browser with model response override; no asset uploaded, no node configuration changed, not a deployment",
+  "scripts": [
+    "https://cowcoming.world/assets/index-CaL9QDsu.js",
+    "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495"
+  ],
+  "replaced": [
+    "https://cowcoming.world/models/niulai-mouth.glb"
+  ],
+  "checks": [
+    "Production WORK renderer loads the substituted final GLB",
+    "bow plays and returns to idle",
+    "wave plays and returns to idle",
+    "No runtime errors in desktop and mobile WORK rendering"
+  ],
+  "errors": []
+}
