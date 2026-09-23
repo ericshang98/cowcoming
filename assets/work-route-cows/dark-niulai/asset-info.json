@@ -1,0 +1,61 @@
+{
+  "name": "暗黑牛",
+  "sourceFile": "暗黑牛.glb",
+  "sourceSha256": "daa1579dc3ecc10a772bfd396a68b502886ec23bab59e136ba00ddcf2ad8d3fa",
+  "sourceTriangles": 1479956,
+  "webTriangles": 80000,
+  "webVertices": 39994,
+  "bones": [
+    "Root",
+    "Hips",
+    "Spine",
+    "Chest",
+    "Neck",
+    "Head",
+    "Shoulder.L",
+    "UpperArm.L",
+    "Forearm.L",
+    "Hand.L",
+    "Thigh.L",
+    "Shin.L",
+    "Foot.L",
+    "Shoulder.R",
+    "UpperArm.R",
+    "Forearm.R",
+    "Hand.R",
+    "Thigh.R",
+    "Shin.R",
+    "Foot.R",
+    "Wing.L",
+    "WingTip.L",
+    "Wing.R",
+    "WingTip.R",
+    "Tail.01",
+    "Tail.02",
+    "Tail.03"
+  ],
+  "animations": {
+    "idle": 4.0,
+    "look": 2.0,
+    "bow": 2.2,
+    "nod": 2.2,
+    "tilt": 2.5,
+    "reflect": 3.6,
+    "wave": 2.4
+  },
+  "texture": {
+    "resolution": [
+      2048,
+      2048
+    ],
+    "sourcePreserved": true,
+    "embedded": true
+  },
+  "mouth": false,
+  "walking": false,
+  "maxInfluences": 4,
+  "allVerticesWeighted": true,
+  "pageScope": "work",
+  "glbBytes": 3959492,
+  "sha256": "29c5be47b3a93ee9689a03abaab45a90ecf2c7e7cb25d478b3b35a10089952a7"
+}

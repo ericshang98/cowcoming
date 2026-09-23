@@ -1,0 +1,131 @@
+{
+  "results": [
+    {
+      "id": "fengge",
+      "action": "tap",
+      "maxPixelTravel": 69.05152088130161,
+      "jointDeltas": {
+        "Root": 0.005986915601283727,
+        "Head": 1.1248365159542857,
+        "HandL": 69.05152088130161,
+        "HandR": 1.3729758551263143
+      }
+    },
+    {
+      "id": "fengge",
+      "action": "signature",
+      "maxPixelTravel": 199.1245494747773,
+      "jointDeltas": {
+        "Root": 1.1368683772161603e-13,
+        "Head": 2.0011146585413035,
+        "HandL": 191.6195869002032,
+        "HandR": 199.1245494747773
+      }
+    },
+    {
+      "id": "nailong",
+      "action": "tap",
+      "maxPixelTravel": 62.502004140871016,
+      "jointDeltas": {
+        "Root": 0.006652562320141442,
+        "LeftHand": 49.71775821101014,
+        "Head": 17.95186680151068,
+        "RightHand": 62.502004140871016
+      }
+    },
+    {
+      "id": "nailong",
+      "action": "signature",
+      "maxPixelTravel": 119.903772207226,
+      "jointDeltas": {
+        "Root": 24.055109498333877,
+        "LeftHand": 119.903772207226,
+        "Head": 40.121759807845976,
+        "RightHand": 108.35455055745597
+      }
+    },
+    {
+      "id": "toothless",
+      "action": "tap",
+      "maxPixelTravel": 45.7860173226198,
+      "jointDeltas": {
+        "Root": 0.007113116157029253,
+        "Head": 21.353916920543863,
+        "HandL": 31.743274885083157,
+        "HandR": 5.685297034915786,
+        "WingTipL": 22.567191354738565,
+        "WingTipR": 45.7860173226198
+      }
+    },
+    {
+      "id": "toothless",
+      "action": "signature",
+      "maxPixelTravel": 74.97170620949574,
+      "jointDeltas": {
+        "Root": 2.8421709430404007e-12,
+        "Head": 7.60779044944253,
+        "HandL": 25.30673858178684,
+        "HandR": 23.241838887656847,
+        "WingTipL": 72.46938410933113,
+        "WingTipR": 74.97170620949574
+      }
+    },
+    {
+      "id": "spiderman",
+      "action": "tap",
+      "maxPixelTravel": 180.33599678831533,
+      "jointDeltas": {
+        "Root": 0.006717450518522128,
+        "LeftHand": 180.33599678831533,
+        "Head": 34.31633463595946,
+        "RightHand": 134.8525826162257
+      }
+    },
+    {
+      "id": "spiderman",
+      "action": "signature",
+      "maxPixelTravel": 475.6644032623463,
+      "jointDeltas": {
+        "Root": 76.27799632470314,
+        "LeftHand": 138.0110213167891,
+        "Head": 163.63552525455628,
+        "RightHand": 475.6644032623463
+      }
+    }
+  ],
+  "errors": [],
+  "scope": "Authored HOME IP motion and compact portrait picker",
+  "nodeTestsPassed": 70,
+  "workBrowser": {
+    "checks": [
+      "Celestial route loads the real skinned model; bow and wave return to idle",
+      "Dark route loads its model and supports gaze and greeting",
+      "HOME choice and WORK form persist independently; WORK reset only resets evolution",
+      "HOME picker and WORK available-model states follow the English language setting",
+      "Both route models render in the 390px mobile WORK layout without horizontal overflow",
+      "No runtime errors",
+      "Failed WORK asset is marked unavailable and switching to calf recovers the stage"
+    ],
+    "errors": []
+  },
+  "sourceModelsModified": false,
+  "releaseStatus": "verified locally; production commit verified separately after merge",
+  "ipBrowser": {
+    "passed": 11,
+    "checks": [
+      "second header icon replaces CV with five-IP dialog; Escape restores focus",
+      "loading keeps Niulai visible; complete model/audio load commits Fengge",
+      "fengge: actual GLB, mesh click + tap voice, L + signature voice, interruption and Escape",
+      "nailong: actual GLB, mesh click + tap voice, L + signature voice, interruption and Escape",
+      "toothless: actual GLB, mesh click + tap voice, L + signature voice, interruption and Escape",
+      "spiderman: actual GLB, mesh click + tap voice, L + signature voice, interruption and Escape",
+      "opening switcher stops prior voice; saved IP restores after reload",
+      "muted interactions still animate; pause stops audio",
+      "switching preserves evolution session; Work disables the selector; returning Home enables it",
+      "English, outside dismissal, mobile IP switch and layout",
+      "failed GLB preserves previous IP; retry loads and switches"
+    ],
+    "pageErrors": [],
+    "baseUrl": "http://127.0.0.1:42911/"
+  }
+}

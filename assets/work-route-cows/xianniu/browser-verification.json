@@ -1,0 +1,13 @@
+{
+  "method": "Self-contained offline preview of final GLB; not a production deployment",
+  "checks": [
+    "look animates and returns to idle",
+    "bow animates and returns to idle",
+    "nod animates and returns to idle",
+    "tilt animates and returns to idle",
+    "reflect animates and returns to idle",
+    "wave animates and returns to idle",
+    "Desktop and 390px preview; no runtime errors"
+  ],
+  "errors": []
+}

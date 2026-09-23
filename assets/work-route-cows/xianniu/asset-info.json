@@ -1,0 +1,54 @@
+{
+  "name": "仙牛",
+  "sourceFile": "仙牛.glb",
+  "sourceSha256": "6e092aa2d0476a783452bf40b5753cffbf0fa0fe200c49d35841c56d9f06a296",
+  "sourceTriangles": 1474604,
+  "webTriangles": 80000,
+  "webVertices": 39992,
+  "bones": [
+    "Root",
+    "Hips",
+    "Spine",
+    "Chest",
+    "Neck",
+    "Head",
+    "Shoulder.L",
+    "UpperArm.L",
+    "Forearm.L",
+    "Hand.L",
+    "Thigh.L",
+    "Shin.L",
+    "Foot.L",
+    "Shoulder.R",
+    "UpperArm.R",
+    "Forearm.R",
+    "Hand.R",
+    "Thigh.R",
+    "Shin.R",
+    "Foot.R"
+  ],
+  "animations": {
+    "idle": 4.0,
+    "look": 2.0,
+    "bow": 2.2,
+    "nod": 2.2,
+    "tilt": 2.5,
+    "reflect": 3.6,
+    "wave": 2.4
+  },
+  "texture": {
+    "resolution": [
+      2048,
+      2048
+    ],
+    "sourcePreserved": true,
+    "embedded": true
+  },
+  "mouth": false,
+  "walking": false,
+  "maxInfluences": 4,
+  "allVerticesWeighted": true,
+  "pageScope": "work",
+  "glbBytes": 3815024,
+  "sha256": "af2521e418ad066942c0767b7d5e4e557e2e285a9d3a3d0c7ddca9f896ab3d44"
+}
