@@ -13,7 +13,7 @@ class _Adapter:
     @property
     def simulation(self): return self.owner.get_status().get('simulation', True)
     async def status(self): return self.owner.get_status()
-    async def apply_profile(self, profile): await self.owner.apply_profile(profile)
+    async def apply_profile(self, profile): return await self.owner.apply_profile(profile)
     async def stop(self): return {'confirmed': True}  # Transport has no hardware ownership.
 
 

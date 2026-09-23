@@ -6,6 +6,14 @@ from test_client import FakeSocket
 from adapter import ExampleAdapter
 
 class PublisherTests(unittest.IsolatedAsyncioTestCase):
+    async def test_adapter_returns_actual_profile_receipt(self):
+        receipt = {'formId':'normal','personaVersion':'loaded-version'}
+        async def apply(_): return receipt
+        async def noop(*_): pass
+        p=EventPublisher('http://127.0.0.1:1','cw1.device.test.'+'a'*64,
+            apply_profile=apply,status=lambda:{},command=noop)
+        self.assertIs(await p.adapter.apply_profile({}), receipt)
+
     async def test_ordered_batches_and_disconnect_drop(self):
         async def noop(*_): pass
         p=EventPublisher('http://127.0.0.1:1','cw1.device.test.'+'a'*64,apply_profile=noop,status=lambda:{},command=noop)

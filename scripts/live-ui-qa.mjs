@@ -116,7 +116,7 @@ try {
           d = window.device;
         if (m.type === "profile") {
           d.profile = m.profile;
-          emit("profile.applied", { revision: m.profile.revision });
+          emit("profile.applied", { revision: m.profile.revision, formId: m.profile.formId, personaVersion: m.profile.personaVersion });
         }
         if (m.type === "command") {
           d.commands.push(m);

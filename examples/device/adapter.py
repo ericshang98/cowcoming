@@ -3,6 +3,8 @@
 No motor commands are included. ExampleAdapter is explicitly a simulation.
 """
 import asyncio
+import json
+from pathlib import Path
 from action_contract import ACTION_CONTRACT_VERSION, ACTION_IDS, validate_profile
 
 
@@ -14,7 +16,15 @@ class ExampleAdapter:
 
     async def apply_profile(self, profile):
         validate_profile(profile)
+        data_path = Path(__file__).with_name('niulai-personas.json')
+        if not data_path.exists():
+            data_path = Path(__file__).resolve().parents[2] / 'shared/niulai-personas.json'
+        catalog = json.loads(data_path.read_text())
+        if profile.get('personaVersion') and profile['personaVersion'] != catalog['prompt_version']:
+            raise ValueError('Persona version mismatch')
+        self.persona = catalog['forms'][profile['formId']]
         self.profile = profile
+        return {'formId': profile['formId'], 'personaVersion': catalog['prompt_version']}
 
     async def decide(self, user_input, requested_action=None, *, allowed_actions=None):
         allowed = allowed_actions if allowed_actions is not None else self.profile["allowedActions"]

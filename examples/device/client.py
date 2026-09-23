@@ -36,6 +36,8 @@ class DeviceClient:
     async def emit(self, event_type, **data):
         if self.ws is None or self.ws.closed:
             raise ConnectionError("Relay disconnected")
+        if event_type.startswith("language.") and self.profile:
+            data.setdefault("profileRevision", self.profile["revision"])
         await self.ws.send_json({"type": event_type, "eventId": event_id(), **data})
 
     async def send_signal(self, data):
@@ -179,7 +181,10 @@ class DeviceClient:
                                     continue
                                 try:
                                     validate_profile(message['profile'])
-                                    await self.adapter.apply_profile(message['profile'])
+                                    receipt = await self.adapter.apply_profile(message['profile'])
+                                    if message['profile'].get('personaVersion'):
+                                        if not isinstance(receipt, dict) or any(receipt.get(k) != message['profile'][k] for k in ('formId', 'personaVersion')):
+                                            raise ValueError('Adapter did not apply the requested persona')
                                     status=await self.adapter.status()
                                     if status.get('actionContractVersion') != ACTION_CONTRACT_VERSION:
                                         raise ValueError('Adapter action contract is not ready')
@@ -189,7 +194,7 @@ class DeviceClient:
                                     await self.emit('log',text='Profile not applied: '+type(error).__name__)
                                     continue
                                 self.profile = message['profile']
-                                await self.emit('profile.applied', revision=self.profile['revision'])
+                                await self.emit('profile.applied', revision=self.profile['revision'], **(receipt or {}))
                                 self.ready = True
                             elif message['type'] == 'command':
                                 await self.command(message)

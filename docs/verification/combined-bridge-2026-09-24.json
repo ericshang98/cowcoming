@@ -1,0 +1,14 @@
+{
+  "synthetic": true,
+  "checks": [
+    "Same local JEV turn produces exactly one NOD and actual normal GLB animation; timed end is sent, never physical completed.",
+    "Duplicate local request does not replay animation or execute another turn.",
+    "Local stop updates hardware receipt while the accepted software clip completes, preserving current main behavior.",
+    "Web stop reaches the existing local controller and returns its stop acknowledgement.",
+    "Device disconnect marks offline; accepted clip completes and reconnect skips the in-flight/old turn.",
+    "A new turn after reconnect works normally.",
+    "Unsupported web interaction is explicitly rejected instead of invoking a second JEV.",
+    "All six webpage forms reach the real local controller and return matching persona-version acknowledgements without any motor command."
+  ],
+  "pageErrors": []
+}
