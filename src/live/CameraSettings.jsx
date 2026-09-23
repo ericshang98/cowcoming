@@ -67,6 +67,7 @@ export default function CameraSettings({ camera, onClose }) {
       ref={dialog}
       className="live-dialog camera-settings"
       onCancel={onClose}
+      onKeyDown={(e) => e.stopPropagation()}
       onClick={(e) => {
         if (e.target === dialog.current) {
           const r = dialog.current.getBoundingClientRect();
