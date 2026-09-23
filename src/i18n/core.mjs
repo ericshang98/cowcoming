@@ -17,8 +17,8 @@ export function saveLanguage(storage,language) {
 export function translateText(value, language='zh') {
   if(typeof value!=='string' || !value.trim()) return value;
   const locale=normalizeLanguage(language), text=value.trim();
-  if(text.includes(' → ')) return text.split(' → ').map(part=>translateText(part,locale)).join(' → ');
   const pair=dictionary.get(normalizeText(text));
+  if(!pair && text.includes(' → ')) return text.split(' → ').map(part=>translateText(part,locale)).join(' → ');
   let translated=pair?.[locale];
   if(!pair && text.startsWith('Preview ') && dictionary.has(text.slice(8))) return `${locale==='zh'?'预览':'Preview'} ${translateText(text.slice(8),locale)}`;
   if(!translated) {
