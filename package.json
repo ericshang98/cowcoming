@@ -23,6 +23,7 @@
     "device:create": "node scripts/create-device.mjs",
     "test:relay": "node scripts/test-live.mjs",
     "qa:live": "node scripts/live-ui-qa.mjs",
+    "qa:camera": "node scripts/local-camera-qa.mjs",
     "qa:device": "node scripts/live-python-qa.mjs",
     "test:relay:running": "node scripts/live-relay-check.mjs",
     "prebuild": "node scripts/export-device-kit.mjs",
