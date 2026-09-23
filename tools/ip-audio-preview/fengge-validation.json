@@ -1,0 +1,41 @@
+{
+  "passed": 10,
+  "checks": [
+    "actual GLB renders 119990-triangle mesh and seven clips",
+    "clicking actual model triggers nod + speech on shared audio clock",
+    "completed response returns to idle",
+    "L plays reflect with actual changing head pose and synchronized recording",
+    "tap interrupts L; Escape returns to idle",
+    "mute stops current interaction; new interaction still animates silently",
+    "character switch and pagehide cancel model action without leaking other voices",
+    "drag does not trigger tap",
+    "desktop and mobile render without horizontal overflow",
+    "model failure disables actions; retry restores actual model"
+  ],
+  "pageErrors": [],
+  "sampledHeadQuaternions": {
+    "idle": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "nod": [
+      -0.0340963820734887,
+      0,
+      0,
+      0.999418549322304
+    ],
+    "reflect": [
+      -0.0013356763561939691,
+      -0.0000936105947205481,
+      0.06993754093190802,
+      0.9975504736975096
+    ]
+  },
+  "audioClockSyncVerified": true,
+  "mouthSyncSupported": false,
+  "humanListeningVerified": false,
+  "productionDeployed": false,
+  "modelSha256": "0b028be4f3e4f7437206fed1b46f0fa7abb1ac583a53c8111461e30000f85c30"
+}
