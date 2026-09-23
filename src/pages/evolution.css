@@ -132,3 +132,25 @@
   .atlas-footer-actions > span { max-width: 135px; text-align: right; font-size: 8px; }
   .atlas-preview { padding: 11px 13px; font-size: 10px; gap: 6px; }
 }
+
+.evolution-settings-trigger { position: relative; color: #78959f; padding: 6px; display: flex; align-items: center; }
+.evolution-settings-trigger i { position: absolute; top: 2px; right: 1px; width: 4px; height: 4px; border-radius: 50%; background: #258d94; }
+.evolution-settings-trigger i.needs-setup { background: #b19259; }
+.evolution-settings { color: #243d43; border: 1px solid #fff; border-radius: 24px; padding: 26px; width: min(450px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); overflow: auto; background: #f3f8faf5; box-shadow: 0 24px 90px #24475430; }
+.evolution-settings::backdrop { background: #c2d1d966; backdrop-filter: blur(9px); }
+.evolution-settings header { display: flex; justify-content: space-between; align-items: center; }
+.evolution-settings h2 { font-size: 24px; font-weight: 500; margin: 8px 0; }
+.evolution-settings .eyebrow { font: 9px var(--mono); letter-spacing: .18em; color: #14828c; }
+.evolution-settings p { font-size: 13px; line-height: 1.7; color: #667e85; }
+.evolution-settings label { display: grid; gap: 8px; margin-top: 18px; font-size: 12px; }
+.evolution-settings input, .evolution-settings select { box-sizing: border-box; width: 100%; border: 1px solid #cbdce1; border-radius: 10px; background: #ffffffb0; color: #233f46; padding: 11px 12px; font: inherit; }
+.evolution-settings .evolution-rule { font-size: 11px; line-height: 1.8; }
+.evolution-presets { display: flex; gap: 8px; margin-top: 8px; }
+.evolution-presets button, .evolution-settings footer button, .evolution-evaluation-status button { padding: 8px 15px; border-radius: 16px; border: 1px solid #c7dce1; font-size: 12px; }
+.evolution-presets button[aria-pressed=true], .evolution-settings button[type=submit] { background: #d0e7eb; color: #087b86; }
+.evolution-evaluation-status { background: #e6eff2; border-radius: 12px; padding: 14px; font-size: 12px; line-height: 1.7; }
+.evolution-evaluation-status strong, .evolution-evaluation-status span { display: block; }
+.evolution-evaluation-status strong { font-weight: 500; }
+.evolution-evaluation-status span { color: #6e8890; }
+.evolution-settings footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.evolution-settings :focus-visible, .evolution-settings-trigger:focus-visible { outline: 2px solid #168e9b; outline-offset: 3px; }

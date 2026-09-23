@@ -1,6 +1,9 @@
 // Each entry is [Chinese, English]. Canonical source text stays unchanged in
 // components and data; only rendered copy and accessible labels are localized.
 export const messages = [
+['重置为小牛','Reset to calf'],['选择你的形态。','Choose your next form.'],
+['点击任意形态，切换到手动进化。','Select any form to switch to manual evolution.'],
+['返回舞台','Return to stage'],['进化路线','Evolution paths'],
 ['首页','HOME'],['进化','WORK'],['关于','ABOUT'],['支持我们','VOTE US'],
 ['牛来','Niulai'],['和牛来玩','Play with Niulai'],['为牛来投一票','Vote for Niulai'],
 ['牛来 IP · 由 Cowcoming 承载','Niulai · Powered by Cowcoming'],['牛来 IP · Powered by Cowcoming','Niulai · Powered by Cowcoming'],
