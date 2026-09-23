@@ -161,6 +161,7 @@ export default function useLiveDevice(controller, active) {
               }
               snapshotRef.current = m;
               setSnapshot(m);
+              if (!m.deviceOnline) conversationCommands.current.clear();
               for (const [commandId, context] of conversationCommands.current) {
                 const completion = completedEvolutionTurn(m, commandId, context, softwareResults.current.get(commandId));
                 if (completion.terminal) { conversationCommands.current.delete(commandId); softwareResults.current.delete(commandId); }
@@ -209,6 +210,7 @@ export default function useLiveDevice(controller, active) {
           ws.onclose = (event) => {
             if (generation.current !== gen) return;
             clearInterval(heartbeat.current);
+            conversationCommands.current.clear();
             setClientId(null);
             current.current.controller.responsePlayer?.stop();
             conversationCommands.current.clear(); softwareResults.current.clear();
@@ -261,6 +263,13 @@ export default function useLiveDevice(controller, active) {
         current.current.controller.responsePlayer?.stop();current.current.controller.queue.clear();conversationCommands.current.clear();
       }
       setError("");
+      if (!snapshotRef.current?.deviceOnline || socket.current?.readyState !== WebSocket.OPEN) {
+        setError("Device offline. Connect your computer first.");
+        return false;
+      }
+      if(data.command!=='stop' && current.current.controller.responsePlayer?.busy){
+        setError('Animation is busy. Stop the preview or wait for completion.');return false;
+      }
       const commandId = crypto.randomUUID();
       const profile = snapshotRef.current?.profile;
       if(data.command!=='stop' && (!current.current.active || current.current.controller.responseForm!==profile?.formId)){

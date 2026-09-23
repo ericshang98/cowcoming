@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "characterId": "fengge",
+  "version": "2026-09-23-v1",
+  "stage": "local-preview",
+  "model": {
+    "src": "models/fengge/v1/model.glb",
+    "sha256": "0b028be4f3e4f7437206fed1b46f0fa7abb1ac583a53c8111461e30000f85c30",
+    "bytes": 5599520
+  },
+  "idleClip": "idle",
+  "actions": {
+    "tap": { "clip": "nod", "audio": "audio/fengge-tap.mp3", "duration": 1.25 },
+    "signature": { "clip": "reflect", "audio": "audio/fengge-signature.mp3", "duration": 3.38 }
+  },
+  "timing": "animation-normalized-to-audio-clock",
+  "capabilities": { "skinned": true, "mouthShapes": false, "walking": false, "fingerJoints": false },
+  "source": "Eric supplied 峰哥-Blender-GLB.zip; audio provenance is in README.md"
+}

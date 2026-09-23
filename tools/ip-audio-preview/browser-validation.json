@@ -1,0 +1,23 @@
+{
+  "passed": 15,
+  "checks": [
+    "spiderman-tap: actual MP3 playback and stop",
+    "spiderman-signature: actual MP3 playback and stop",
+    "nailong-tap: actual MP3 playback and stop",
+    "nailong-signature: actual MP3 playback and stop",
+    "fengge-tap: actual MP3 playback and stop",
+    "fengge-signature: actual MP3 playback and stop",
+    "toothless-tap: actual MP3 playback and stop",
+    "toothless-signature: actual MP3 playback and stop",
+    "L plays signature; Escape stops",
+    "rapid actions replace the previous source",
+    "character switch stops previous sound",
+    "mute and pagehide stop playback",
+    "completed clip returns to an ended state",
+    "desktop and mobile render without horizontal overflow",
+    "failed sound displays error and can be retried"
+  ],
+  "pageErrors": [],
+  "humanListeningVerified": false,
+  "modelSyncVerified": false
+}

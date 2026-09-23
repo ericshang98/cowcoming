@@ -15,6 +15,11 @@ import ideas from "./ideas.json";
 import { makeController } from "./scene/motion.mjs";
 import { useWorldCollection } from "./useWorldCollection";
 import { useNiulaiVoice } from "./useNiulaiVoice";
+import { useIpVoice } from "./useIpVoice";
+import { useIpSelection } from "./useIpSelection";
+import { getIp } from "./ip-catalog.mjs";
+import IpSwitcher from "./components/IpSwitcher";
+import IpAssetProbe, { IpLoadBoundary } from "./components/IpAssetProbe";
 import { isWaveShortcut } from "./voice-interactions.mjs";
 import Character from "./scene/Character";
 import Evolution from "./pages/Evolution";
@@ -67,7 +72,7 @@ export default function App() {
   const [mobile, setMobile] = useState(innerWidth <= 768),
     [ready, setReady] = useState(false),
     [bootDone, setBootDone] = useState(() =>
-      ["blog", "about"].includes(route().mode),
+      ["blog", "about", "work"].includes(route().mode),
     ),
     [chat, setChat] = useState("closed"),
     [cv, setCv] = useState("closed"),
@@ -79,11 +84,15 @@ export default function App() {
     [search, setSearch] = useState(false),
     [wordle, setWordle] = useState(false),
     [worldEntered, setWorldEntered] = useState(false);
+  const [ipOpen, setIpOpen] = useState(false);
+  const selection = useIpSelection(() => { setIpOpen(false); navigate('home'); });
+  const homeIp = getIp(selection.active);
+  const otherIpHome = mode === 'home' && selection.active !== 'niulai';
   const controller = useMemo(makeController, []),
     sound = useRef(null),
     viewRef = useRef();
-  const evolutionSession = useEvolutionSession();
   const live = useLiveDevice(controller, mode === "work");
+  const evolutionSession = useEvolutionSession({ enabled: live.online, roomId: live.snapshot?.roomId, form: live.snapshot?.profile.formId });
   const deviceFormReady = useEvolutionDeviceSync(evolutionSession, live);
   const [evolutionRoute, setEvolutionRoute] = useState('celestial');
   useEffect(() => {
@@ -97,19 +106,20 @@ export default function App() {
   }, [controller, evolutionSession.context, evolutionSession.recordTurn, deviceFormReady]);
   const [previewModelState, setPreviewModelState] = useState({ model: null, status: 'loading' });
   const evolutionPreview = resolvePreview(forms[evolutionSession.state.form].branch || evolutionRoute, evolutionSession.state.form, Object.keys(forms));
-  const activeModel = mode === 'work' ? evolutionPreview.model : NIULAI_ASSET;
+  const activeModel = mode === 'home' ? homeIp.model : mode === 'work' ? evolutionPreview.model : NIULAI_ASSET;
   const evolutionPage = <Evolution
     live={live}
     preview={evolutionPreview}
     controller={controller}
     modelStatus={previewModelState.model === evolutionPreview.model ? previewModelState.status : 'loading'}
     session={{ ...evolutionSession, reset: () => {
-      if (live.online) live.command({ command: "stop" });
+      if (!live.online) return;
+      live.command({ command: "stop" });
       evolutionSession.reset();
     } }}
     browseRoute={evolutionRoute}
     onSelectRoute={setEvolutionRoute}
-    onSelectForm={form => evolutionSession.dispatch({ type: 'select', form })}
+    onSelectForm={form => { if (live.online) evolutionSession.dispatch({ type: 'select', form }); }}
   />;
   const change = useCallback(
     (next) => {
@@ -126,6 +136,7 @@ export default function App() {
   );
   const navigate = useCallback(
     (m) => {
+      setIpOpen(false); selection.cancel();
       setChat("closed");
       setSearch(false);
       change({
@@ -134,7 +145,7 @@ export default function App() {
         idea: null,
       });
     },
-    [change],
+    [change, selection.cancel],
   );
   const openProject = (id) => change({ mode: "work", project: id, idea: null });
   const openIdea = (id) => change({ mode: "blog", project: null, idea: id });
@@ -145,11 +156,19 @@ export default function App() {
     setCv((v) => (v === "open" ? "minimized" : v));
   };
   const collection = useWorldCollection();
-  const worldBlocked = chat === "open" || cv === "open" || search || wordle || voiceOpen;
+  const worldBlocked = ipOpen || chat === "open" || cv === "open" || search || wordle || voiceOpen;
   const voice = useNiulaiVoice({
     controller, muted, paused, mode, collected: collection.collected,
-    enabled: (mode === "home" || (mode === "blog" && worldEntered)) && bootDone && chat !== "open" && cv !== "open" && !search && !wordle,
+    enabled: !otherIpHome && !ipOpen && (mode === "home" || (mode === "blog" && worldEntered)) && bootDone && chat !== "open" && cv !== "open" && !search && !wordle,
   });
+  const ipVoice = useIpVoice({ controller, ipId: selection.active, muted, paused,
+    enabled: otherIpHome && bootDone && !worldBlocked });
+  const currentVoice = otherIpHome ? ipVoice : voice;
+  const closeIp = () => { setIpOpen(false); selection.cancel(); };
+  const openIp = () => { voice.stopVoice(); ipVoice.stopVoice(); controller.queue.clear(); setChat('closed'); setCv('closed'); setSearch(false); setVoiceOpen(false); setIpOpen(true); };
+  useEffect(() => {
+    controller.queue.clear(); controller.gaze = null; controller.dragYaw = 0;
+  }, [selection.active, controller]);
   useEffect(() => {
     controller.queue.clear();
     controller.gaze = null;
@@ -159,6 +178,7 @@ export default function App() {
   useEffect(() => {
     const resize = () => setMobile(innerWidth <= 768),
       pop = () => {
+        setIpOpen(false); selection.cancel();
         setLocationState(route());
         setChat("closed");
       };
@@ -168,7 +188,7 @@ export default function App() {
       removeEventListener("resize", resize);
       removeEventListener("popstate", pop);
     };
-  }, []);
+  }, [selection.cancel]);
   useEffect(() => {
     controller.tracking = tracking;
     controller.paused = mode === "work" ? false : paused;
@@ -185,13 +205,15 @@ export default function App() {
   useEffect(() => {
     const title = mode === "about"
       ? "Cowcoming — 基于 JEV 决策模型的可进化 AI 宠物"
-      : `牛来 — ${mode === "home" ? "和牛来玩" : mode === "blog" ? "WORLD" : mode === "contact" ? "为牛来投一票" : mode.toUpperCase()}`;
-    document.title = translateText(title, language);
-  }, [mode, language]);
+      : `${mode === 'home' ? homeIp.name : '牛来'} — ${mode === "home" ? `和${homeIp.name}玩` : mode === "blog" ? "WORLD" : mode === "contact" ? "为牛来投一票" : mode.toUpperCase()}`;
+    document.title = mode === 'home' && language === 'en' ? `${homeIp.nameEn} — Play with ${homeIp.nameEn}` : translateText(title, language);
+  }, [mode, language, homeIp]);
   useEffect(() => {
     const key = (e) => {
+      if (ipOpen) return;
       if (wordle) return;
       if (e.key === "Escape") {
+        ipVoice.stopVoice();
         setSearch(false);
         setVoiceOpen(false);
         setWordle(false);
@@ -207,7 +229,7 @@ export default function App() {
       }
       if (mode === "home" && isWaveShortcut(e)) {
         e.preventDefault();
-        voice.wave();
+        currentVoice.wave();
         return;
       }
       if (
@@ -226,7 +248,7 @@ export default function App() {
     };
     addEventListener("keydown", key);
     return () => removeEventListener("keydown", key);
-  }, [mode, chat, cv, project, idea, voice.wave, wordle]);
+  }, [mode, chat, cv, project, idea, currentVoice.wave, ipVoice.stopVoice, ipOpen, wordle]);
   useEffect(() => {
     const down = (e) => {
       if (muted) return;
@@ -264,6 +286,9 @@ export default function App() {
     portfolio,
     ideas,
     controller,
+    activeIp: homeIp,
+    ipOpen,
+    openIp,
     bootDone,
     navigate,
     openProject,
@@ -282,7 +307,7 @@ export default function App() {
     setMuted,
     paused,
     setPaused,
-    ...voice,
+    ...currentVoice,
     collection,
     worldBlocked,
     voiceOpen,
@@ -303,6 +328,9 @@ export default function App() {
         tracking,
         paused,
         voice: voice.voiceState,
+        activeIp: selection.active,
+        pendingIp: selection.pending?.ip.id || null,
+        ipVoice: ipVoice.voiceState,
       }),
     };
     return () => delete window.__replica;
@@ -311,17 +339,22 @@ export default function App() {
   return (
     <Localized><AppContext.Provider value={ctx}>
       <div
-        className={`app ${mobile ? "mobile" : "desktop"} route-${mode} ${bootDone ? "boot-complete" : "booting"}`}
+        className={`app ${mobile ? "mobile" : "desktop"} route-${mode} ${mode === "work" && !live.online ? "binding-required" : ""} ${bootDone ? "boot-complete" : "booting"}`}
       >
+        {selection.pending && <IpLoadBoundary key={selection.pending.request} onError={selection.fail}>
+          <Suspense fallback={null}><IpAssetProbe ip={selection.pending.ip} onReady={selection.complete} onError={selection.fail} /></Suspense>
+        </IpLoadBoundary>}
         <Ambient />
         {mode !== "blog" && mode !== "about" && (
           <Character
-            key={mode === "work" ? `${evolutionSession.state.sessionId}:${evolutionSession.state.form}` : "default-character"}
+            key={mode === "work" ? "work-character" : "default-character"}
             controller={controller}
             mode={mode}
             mobile={mobile}
             ready={ready}
             modelAsset={activeModel}
+            characterId={otherIpHome ? selection.active : 'niulai'}
+            onTap={otherIpHome ? ipVoice.tap : undefined}
             onReady={() => {
               setReady(true);
               setPreviewModelState({ model: activeModel, status: 'ready' });
@@ -391,6 +424,11 @@ export default function App() {
         {cv === "open" && <Resume />}
         {search && <SearchDialog />}
         {wordle && <Wordle />}
+        {ipOpen && <IpSwitcher selection={selection} onClose={closeIp} />}
+        {selection.error && !ipOpen && <div className="ip-restore-notice" role="alert">
+          {language === 'en' ? 'Could not restore your character. Niulai is ready.' : '上次的角色暂时无法载入，先和牛来玩吧。'}
+          <button onClick={openIp}>{language === 'en' ? 'Choose IP' : '选择 IP'}</button>
+        </div>}
 
       </div>
     </AppContext.Provider></Localized>

@@ -14,8 +14,8 @@ export default function MotionPreview({controller,formId,ready,connected}) {
     setBusy(false);setStatus(result.status==='completed'?(zh?'软件演示完成':'Software preview complete'):result.status==='interrupted'?(zh?'已停止':'Stopped'):(zh?'动画暂不可用':'Animation unavailable'));
   }
   return <details className="motion-preview"><summary>{zh?'动作预览 · 仅软件':'Motion preview · software only'}</summary>
-    <div className="motion-preview-actions">{Object.entries(ACTION_CATALOG).map(([id,a])=><button key={id} data-motion={id} disabled={!ready||busy||connected} onClick={()=>play(id)}>{zh?a.label:a.en}</button>)}</div>
+    <div className="motion-preview-actions">{Object.entries(ACTION_CATALOG).map(([id,a])=><button key={id} data-motion={id} disabled={!ready||busy} onClick={()=>play(id)}>{zh?a.label:a.en}</button>)}</div>
     <button disabled={!busy} onClick={()=>controller.responsePlayer?.stop()}>{zh?'停止预览':'Stop preview'}</button>
-    <small role="status">{connected?(zh?'已连接设备，请在设备调试中测试联动。':'Connected: use Device lab to test both endpoints.'):status||(!ready?(zh?'模型或动作资源未就绪':'Model or animations not ready'):(zh?'不控制机械臂，不记录进化。':'No hardware control or evolution record.'))}</small>
+    <small role="status">{status||(!ready?(zh?'模型或动作资源未就绪':'Model or animations not ready'):(zh?'不控制机械臂，不记录进化。':'No hardware control or evolution record.'))}</small>
   </details>;
 }

@@ -1,0 +1,18 @@
+{
+  "passed": 11,
+  "checks": [
+    "second header icon replaces CV with five-IP dialog; Escape restores focus",
+    "loading keeps Niulai visible; complete model/audio load commits Fengge",
+    "fengge: actual GLB, mesh click + tap voice, L + signature voice, interruption and Escape",
+    "nailong: actual GLB, mesh click + tap voice, L + signature voice, interruption and Escape",
+    "toothless: actual GLB, mesh click + tap voice, L + signature voice, interruption and Escape",
+    "spiderman: actual GLB, mesh click + tap voice, L + signature voice, interruption and Escape",
+    "opening switcher stops prior voice; saved IP restores after reload",
+    "muted interactions still animate; pause stops audio",
+    "switching preserves evolution session; selection from Work enters Home",
+    "English, outside dismissal, mobile IP switch and layout",
+    "failed GLB preserves previous IP; retry loads and switches"
+  ],
+  "pageErrors": [],
+  "productionDeployed": false
+}

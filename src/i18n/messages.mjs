@@ -1,6 +1,7 @@
 // Each entry is [Chinese, English]. Canonical source text stays unchanged in
 // components and data; only rendered copy and accessible labels are localized.
 export const messages = [
+['声音暂时无法播放，请再试一次。','Sound could not play. Please try again.'],
 ['重置为小牛','Reset to calf'],['选择你的形态。','Choose your next form.'],
 ['点击任意形态，切换到手动进化。','Select any form to switch to manual evolution.'],
 ['返回舞台','Return to stage'],['进化路线','Evolution paths'],

@@ -25,7 +25,7 @@ const gestures = {
   spin: "bow",
   curious: "bow",
 };
-function Rig({ human, modelAsset = MASCOT, controller, placement, visible, onReady, entrance, onTap }) {
+function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, visible, onReady, entrance, onTap }) {
   const gltf = useGLTF(human ? HUMAN : modelAsset),
     { camera, gl } = useThree(),
     root = useRef();
@@ -174,7 +174,28 @@ function Rig({ human, modelAsset = MASCOT, controller, placement, visible, onRea
     if (moving) st.time += dt;
     for (const [bone, q] of st.base) bone.quaternion.copy(q);
     st.base.clear();
-    if (moving) {
+    if (moving && characterId !== 'niulai') {
+      const playback = controller.ipPlayback;
+      if (st.ipPlayback !== playback) {
+        st.active?.stop(); st.active = null;
+        actions.idle?.reset().setEffectiveWeight(1).play();
+        st.ipPlayback = playback;
+        if (playback && actions[playback.clip]) {
+          st.active = actions[playback.clip];
+          st.active.reset().setLoop(THREE.LoopOnce, 1).setEffectiveWeight(1).play();
+          st.active.clampWhenFinished = true;
+        }
+      }
+      controller.queue.clear();
+      if (st.active && playback) {
+        st.active.time = Math.min(st.active.getClip().duration - .001,
+          playback.audio.currentTime / playback.duration * st.active.getClip().duration);
+        const weight = Math.min(1, playback.audio.currentTime / .12,
+          Math.max(0, playback.duration - playback.audio.currentTime) / .16);
+        st.active.setEffectiveWeight(weight); actions.idle?.setEffectiveWeight(1 - weight);
+        mixer.update(0);
+      } else mixer.update(dt);
+    } else if (moving) {
       if (!st.started) {
         st.started = true;
         if (entrance && play(human ? "walk" : "walking", st.time)) {
@@ -303,6 +324,8 @@ function Rig({ human, modelAsset = MASCOT, controller, placement, visible, onRea
     }
     controller.rig = {
       asset: human ? HUMAN : modelAsset,
+      characterId,
+      animationTime: st.active?.time || 0,
       animation: responsePlayer.current?.clip || st.liveMotion?.name || st.active?.getClip().name || "idle",
       animations: Object.keys(actions),
       mouth: mouths.map(mesh => ({
@@ -362,6 +385,7 @@ export default function Character({
   modelAsset = MASCOT,
   onError,
   onTap,
+  characterId = 'niulai',
 }) {
   // All project pages show Niulai, including About's contained model stage.
   const stageRef = useRef();
@@ -478,7 +502,7 @@ export default function Character({
     <div
       ref={stageRef}
       className={`character-stage ${mobile ? "mobile-character" : ""} mode-${mode} ${ready ? "ready" : ""}`}
-      aria-label="Interactive 3D Niulai"
+      aria-label={characterId !== 'niulai' ? `Interactive 3D ${characterId}` : 'Interactive 3D Niulai'}
       aria-disabled={mode === "about" && overlay ? true : undefined}
     >
       <div
@@ -513,6 +537,7 @@ export default function Character({
             <Rig
               key={modelAsset}
               modelAsset={modelAsset}
+              characterId={characterId}
               human={false}
               onTap={onTap}
               controller={controller}
