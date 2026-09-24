@@ -5,13 +5,15 @@ import { spawn } from "node:child_process";
 import { chromium } from "playwright";
 const base = process.env.QA_BASE_URL || "http://127.0.0.1:4352";
 fs.mkdirSync(".pwc", { recursive: true });
+// Keep the public harness out of .pwc, which Vite correctly blocks for secrets.
+const harness = fs.mkdtempSync("tests/camera-qa-");
 fs.writeFileSync(
-  ".pwc/camera-harness.html",
-  `<html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="root"></div><script type="module" src="/.pwc/camera-harness.jsx"></script></body></html>`,
+  `${harness}/camera-harness.html`,
+  `<html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="root"></div><script type="module" src="/${harness}/camera-harness.jsx"></script></body></html>`,
 );
 // Vite injects the React refresh preamble when serving this HTML.
 fs.writeFileSync(
-  ".pwc/camera-harness.jsx",
+  `${harness}/camera-harness.jsx`,
   `import React,{useState} from 'react';import{createRoot}from'react-dom/client';import{LanguageProvider,useLanguage}from'/src/i18n/Language';import useLocalCamera from'/src/live/useLocalCamera';import CameraView from'/src/live/CameraView';import'/src/live/live.css';import'/src/live/camera.css';
 const subscribeSignal=()=>()=>{};const send=()=>{window.signalCount=(window.signalCount||0)+1};
 function App(){const[online,onlineSet]=useState(true),[room,roomSet]=useState('qa');const{setLanguage}=useLanguage();window.qaOnline=onlineSet;window.qaRoom=roomSet;window.qaLanguage=setLanguage;const camera=useLocalCamera({online,snapshot:{roomId:room},subscribeSignal,send,clientId:'qa'});window.camera=camera;return <main style={{maxWidth:520,margin:'20px auto',padding:12,fontFamily:'Arial',background:'#eef5f7'}}><CameraView camera={camera} online={online}/></main>};createRoot(document.getElementById('root')).render(<LanguageProvider><App/></LanguageProvider>);`,
@@ -99,7 +101,7 @@ try {
   });
   const page = await context.newPage();
   page.on("pageerror", (e) => errors.push(e.stack));
-  await page.goto(base + "/.pwc/camera-harness.html");
+  await page.goto(base + `/${harness}/camera-harness.html`);
   await page.waitForFunction(() => window.camera);
   await page.evaluate(() => window.qaLanguage("en"));
   assert.equal(await page.evaluate(() => window.camera.config.source), "local");
@@ -231,15 +233,30 @@ try {
   await edit();
   await page.getByLabel("Source type").selectOption("local");
   await page.getByLabel("Local snapshot URL").fill(endpoint);
+  await page.getByLabel("Local preview access key").fill("");
+  await save();
+  const beforeMissing = received;
+  await start();
+  await page.getByRole("alert").filter({ hasText: "key is missing" }).waitFor();
+  assert.equal(received, beforeMissing);
+  await edit();
   await page.getByLabel("Local preview access key").fill("wrong");
+  await page.getByLabel("Remember key in this tab").check();
   await save();
   await start();
   await page
     .getByRole("alert")
     .filter({ hasText: "key is incorrect" })
     .waitFor();
+  assert.equal(
+    await page.evaluate(() =>
+      sessionStorage.getItem("cowcoming.camera.session.v1"),
+    ),
+    null,
+  );
   await edit();
   await page.getByLabel("Local preview access key").fill(key);
+  await page.getByLabel("Remember key in this tab").check();
   await save();
   await start();
   await page.locator(".camera-stage.is-live .live-cv-box").waitFor();
@@ -251,6 +268,29 @@ try {
     false,
   );
   assert.equal(await page.evaluate(() => window.signalCount || 0), 0);
+  await page.reload();
+  await page.waitForFunction(() => window.camera?.token);
+  assert.equal(await page.evaluate(() => window.camera.token), key);
+  assert.equal(await page.evaluate(() => window.camera.status), "idle");
+  const afterReload = received;
+  await page.waitForTimeout(350);
+  assert.equal(received, afterReload, "refresh must not start capture");
+  await page.evaluate(() => window.qaLanguage("en"));
+  await start();
+  await page.locator(".camera-stage.is-live .live-cv-box").waitFor();
+  await edit();
+  await page.getByLabel("Remember key in this tab").uncheck();
+  await save();
+  assert.equal(
+    await page.evaluate(() =>
+      sessionStorage.getItem("cowcoming.camera.session.v1"),
+    ),
+    null,
+  );
+  // Opt in again to exercise room isolation with an actually saved credential.
+  await edit();
+  await page.getByLabel("Remember key in this tab").check();
+  await save();
   await page.screenshot({ path: ".pwc/local-camera-mobile.png" });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.screenshot({ path: ".pwc/local-camera-desktop.png" });
@@ -281,16 +321,40 @@ try {
   });
   await page.waitForFunction(() => window.camera.config.title === "");
   assert.equal(await page.evaluate(() => window.camera.token), "");
+  assert.equal(await page.evaluate(() => window.camera.rememberToken), false);
+  await page.evaluate(() => window.qaRoom("qa"));
+  await page.waitForFunction(() => window.camera.token !== "");
+  await edit();
+  await page
+    .getByLabel("Local snapshot URL")
+    .fill("http://127.0.0.1:9999/snapshot");
+  // A different endpoint cannot read the credential saved for the old endpoint.
+  assert.equal(
+    await page.evaluate(async () => {
+      const { readCameraSession } =
+        await import("/src/live/camera-session.mjs");
+      return readCameraSession("qa", "http://127.0.0.1:9999/snapshot");
+    }),
+    "",
+  );
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await edit();
+  await page.getByLabel("Remember key in this tab").uncheck();
+  await save();
+  await page.reload();
+  await page.waitForFunction(() => window.camera);
+  assert.equal(await page.evaluate(() => window.camera.token), "");
   await page.evaluate(() => window.qaLanguage("zh"));
   await page.getByRole("button", { name: "编辑视觉窗口", exact: true }).click();
   await page.getByRole("heading", { name: "编辑视觉窗口" }).waitFor();
   await page.keyboard.press("Escape");
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: local/browser sources, real synthetic capture, settings save/cancel, actual specs, mobile, permissions, late capture cleanup, auth, CV transforms, no relay frames, stale/malformed frames, offline cleanup and room isolation",
+    "PASS: local/browser sources, real synthetic capture, settings save/cancel, actual specs, mobile, permissions, late capture cleanup, auth, CV transforms, no relay frames, stale/malformed frames, offline cleanup, opt-in key persistence across reload, missing-key detection, forget, auth invalidation and room/endpoint isolation",
   );
 } finally {
   await browser.close();
+  fs.rmSync(harness, { recursive: true, force: true });
   bridge.kill("SIGTERM");
   await new Promise((r) => local.close(r));
 }
