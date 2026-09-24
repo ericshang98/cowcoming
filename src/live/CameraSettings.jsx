@@ -7,6 +7,7 @@ export default function CameraSettings({ camera, onClose }) {
     t = (zh, en) => (language === "zh" ? zh : en);
   const [draft, setDraft] = useState({ ...camera.config }),
     [token, setToken] = useState(camera.token),
+    [rememberToken, setRememberToken] = useState(camera.rememberToken),
     [error, setError] = useState("");
   const dialog = useRef(null),
     patch = (key, value) => setDraft((d) => ({ ...d, [key]: value }));
@@ -98,7 +99,7 @@ export default function CameraSettings({ camera, onClose }) {
               return;
             }
           }
-          camera.apply(draft, token);
+          camera.apply(draft, token, rememberToken);
           onClose();
         }}
       >
@@ -156,10 +157,18 @@ export default function CameraSettings({ camera, onClose }) {
                   onChange={(e) => setToken(e.target.value)}
                 />
               </label>
+              <label className="live-checkbox">
+                <input
+                  type="checkbox"
+                  checked={rememberToken}
+                  onChange={(e) => setRememberToken(e.target.checked)}
+                />
+                {t("在当前标签页记住密钥", "Remember key in this tab")}
+              </label>
               <p>
                 {t(
-                  "由本地程序提供，留在本次页面内存中。它与绑定房间的 Browser Key 不同。电脑需允许浏览器访问本地网络。",
-                  "Provided by the local program; kept only in page memory. This is separate from the room Browser Key. Allow local network access when prompted.",
+                  "勾选后刷新无需重新填写；取消勾选并保存可清除。密钥不上传云端，与房间 Browser Key 不同。刷新后仍需手动开启画面。",
+                  "Remember across refreshes in this tab. Uncheck and save to forget. Never uploaded; separate from the room Browser Key. Start video manually after refreshing.",
                 )}
               </p>
               {select("refresh", t("画面刷新上限", "Preview refresh limit"), [
@@ -347,6 +356,7 @@ export default function CameraSettings({ camera, onClose }) {
             onClick={() => {
               setDraft({ ...CAMERA_DEFAULTS });
               setToken("");
+              setRememberToken(false);
               setError("");
             }}
           >

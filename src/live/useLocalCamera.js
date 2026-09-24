@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import usePeerCamera from "./usePeerCamera";
+import { readCameraSession, writeCameraSession } from "./camera-session.mjs";
 import {
   CAMERA_DEFAULTS,
   normalizeCameraConfig,
@@ -33,7 +34,8 @@ export default function useLocalCamera(live) {
   const [config, setConfig] = useState(() => saved(room)),
     [state, setState] = useState(empty),
     [devices, setDevices] = useState([]),
-    [token, setToken] = useState("");
+    [token, setToken] = useState(""),
+    [rememberToken, setRememberToken] = useState(false);
   const latest = useRef({}),
     resources = useRef({ generation: 0 }),
     mounted = useRef(true);
@@ -82,14 +84,18 @@ export default function useLocalCamera(live) {
   }, [enumerate, release]);
   useEffect(() => {
     stop();
-    setToken("");
-    setConfig(saved(room));
+    const next = saved(room);
+    const secret = readCameraSession(room, next.url);
+    setToken(secret);
+    setRememberToken(Boolean(secret));
+    setConfig(next);
   }, [room, stop]);
   useEffect(() => {
     if (!live.online) stop();
   }, [live.online, stop]);
   const apply = useCallback(
-    (next, nextToken) => {
+    (next, nextToken, remember = false) => {
+      nextToken = nextToken.trim();
       const clean = normalizeCameraConfig(next),
         old = latest.current.config;
       if (
@@ -101,6 +107,13 @@ export default function useLocalCamera(live) {
         stop();
       setConfig(clean);
       setToken(nextToken);
+      setRememberToken(remember);
+      writeCameraSession(
+        latest.current.live.snapshot?.roomId,
+        clean.url,
+        nextToken,
+        remember && clean.source === "local",
+      );
       try {
         localStorage.setItem(
           preferenceKey(latest.current.live.snapshot?.roomId),
@@ -130,6 +143,10 @@ export default function useLocalCamera(live) {
     const fail = (code) => {
       if (current()) {
         release();
+        if (code === "local_auth") {
+          writeCameraSession(null, "", "", false);
+          setRememberToken(false);
+        }
         setState({ ...empty(), status: "failed", error: code });
       }
     };
@@ -175,6 +192,10 @@ export default function useLocalCamera(live) {
       url = localCameraUrl(c.url);
     } catch {
       fail("local_url");
+      return;
+    }
+    if (!secret.trim()) {
+      fail("local_auth_missing");
       return;
     }
     let previous = null,
@@ -262,6 +283,7 @@ export default function useLocalCamera(live) {
     config,
     devices,
     token,
+    rememberToken,
     apply,
     enumerate,
     start,

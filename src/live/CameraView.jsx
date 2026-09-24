@@ -6,6 +6,10 @@ import { mediaLayout } from "./camera-config.mjs";
 import "./camera.css";
 const errors = {
   local_url: ["请输入本机画面接口地址。", "Enter a loopback snapshot URL."],
+  local_auth_missing: [
+    "尚未填写本地画面密钥。请在编辑中填写，并可勾选在当前标签页记住。",
+    "Local preview key is missing. Enter it in settings; optionally remember it in this tab.",
+  ],
   local_auth: [
     "本地画面密钥不正确，请在窗口设置中更新。",
     "The local preview key is incorrect. Update it in settings.",

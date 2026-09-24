@@ -1,3 +1,9 @@
+## 2026-09-24：本地预览密钥刷新丢失修复（待发布）
+
+现场连续出现“本地画面密钥不正确”，实际密钥输入为空：旧版密钥仅存页面内存，刷新或 WORK 面板重新挂载后丢失。新增默认关闭的“在当前标签页记住密钥”，用户勾选后按房间和 loopback 接口保存到 sessionStorage；取消并保存、恢复默认并保存或 401 会清除。刷新仍不自动开启预览，密钥与画面不进入云端或 localStorage。缺失密钥单独提示，避免无凭据发请求。
+
+基于产品快照修订 212 与现场问题；未读取范围外飞书文档。116 项 Node 测试、生产构建与合成画面浏览器回归通过；回归覆盖刷新恢复、手动开启、取消记忆、401 清除和房间／接口隔离。测试入口从受保护的 .pwc 移到无密钥临时目录，保持 Vite 的凭据目录禁止访问规则。此记录表示补丁验证完成，不表示 Pages 已发布；队友只需发布网页，不涉及 Worker、本机预览桥或机械臂重启。
+
 # Final integration entry (2026-09-24)
 
 Current checks, release boundaries and on-site acceptance: [submission checklist](submission-checklist.md). JEV parallel scheduling is a local controller option; Worker protocol remains unchanged.
