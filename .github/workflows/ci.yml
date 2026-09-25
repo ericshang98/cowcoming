@@ -24,6 +24,7 @@ jobs:
       - run: npm run test:harness:bridge
       - run: npx playwright install --with-deps chromium
       - run: npm run qa:harness
+      - run: npm run qa:pet
       - run: python3 -m unittest discover -s examples/device -p test_local_preview.py
       - run: npm run test:relay
       - run: npm run build

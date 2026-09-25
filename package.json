@@ -36,7 +36,8 @@
     "build:harness": "vite build --config harness/vite.config.mjs",
     "demo:harness": "node harness/examples/simulator-demo.mjs",
     "test:harness:bridge": "python3 -m unittest discover -s harness/tests -p \"test_*.py\"",
-    "qa:harness": "node harness/scripts/qa.mjs"
+    "qa:harness": "node harness/scripts/qa.mjs",
+    "qa:pet": "node harness/scripts/qa-pet.mjs"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
