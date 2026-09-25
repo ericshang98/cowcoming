@@ -1,3 +1,41 @@
+# 2026-09-25：JEV 软件宠物与标准机器人动作（v0.2）
+
+发行已完成：[独立仓库 v0.2.0](https://github.com/ericshang98/cowcoming-harness/releases/tag/v0.2.0)，[PR #1](https://github.com/ericshang98/cowcoming-harness/pull/1) 在 CI 通过后合入 `main`。发行提交 `8620ae79686255fc7af074136de3177418eb8189` 与本仓库 `d57430d:harness` 的树均为 `46ca7dd9b1edce5037aa6eba36a6d94d66094a31`。Release 附静态试玩 ZIP（264,975 字节）与 SHA-256，服务端/网页源码由 tag 提供。独立检出的 `npm ci`、39+9 测试、示例、构建和 13 项宠物浏览器验收通过；本仓库代码 PR #40 的 GitHub CI 也通过。主站 PR 保持开放，未部署生产。
+
+按 Eric 最新要求完成软件优先的体验。开工时 `npm run docs:sync` 只读核对飞书仍为修订 **212**；关注 §5 的人格、分支进化、动作与开源范围。原独立包只有通用实验室，本轮增加默认宠物页，保留 `?view=lab`。不改原站 3D 素材或实机培养合同。
+
+用户先试玩六种程序牛形态、18 项动作（每项鲜明/轻柔两个变体），再填写 JEV Key 输入一句话，看到所选动作、情绪、置信度与实测请求往返耗时。形态沿用原人格提示词；形态开放 10/14/18 项动作，并调整动作节奏。新增六种可编辑情绪为示例：上游没有独立情绪枚举，不冒称历史产品定义。台词是标注的预设展示，没有加入聊天生成/TTS。
+
+本地模型设置把 Key 暂存服务端内存，保留 Host/Origin/CSRF；静态包不出现密码输入框。软件培养仅计 JEV 选择且浏览器实际播完的动作；试玩、WAIT、失败与取消不计轮。可另配进化评估 LLM，按 N 轮读取完整历史，合法直接后继或保持。切换/重置取消旧评估，自动进化结束旧形态未完动作，防止迟到结果混入。会话最多 100 轮，可导出，刷新不保留。
+
+标准动作包含九个逻辑轴、归一化关键帧、动作 ID、变体与请求 ID；机器人配置负责舵机 ID、中位、方向、角度范围、幅度与速度。可导入配置、检查缺轴/限位/超速并导出轨迹。SDK 提供取消、并发互斥和驱动接口：无传感器证据只记已发送，读回到位才记物理完成。默认映射未标定；新动作不会直接下发 BenBen，具体硬件驱动、逆运动学、碰撞和现场调试由接入者完成。
+
+修复此前审计发现的明确点头被挥手替换：宿主保留动作约束，不支持则拒绝，抽象“表示同意”才可按不同能力表达。主仓库 `harness/` 为发行真源，独立仓库通过提交子树导出和树哈希比对保持一致；见 [发行同步](../harness/docs/releasing.md)。实现说明见 [软件宠物与机器人动作](../harness/docs/pet-playground.md)。
+
+验证：Node 24 下主站 **116** 项、Harness **39** 项、Python 原预览 **4** 项与桥接 **9** 项通过；隔离 Worker 通信回归通过（首次环境代理导致启动超时，用已有 `clash-run` 单命令重试通过，未改系统网络）。新宠物浏览器 **13** 项、其静态构建 **8** 项检查通过；旧实验室本地 **12** 项、静态 **11** 项通过；主站及独立包构建成功。JEV/进化浏览器用固定响应，机械接口用假驱动；没有真实模型 Key 的在线效果/性能评测，也没有实机动作、设备安装或服务替换。主站仍通过 PR #40 交付，不代表生产已更新。
+
+# 2026-09-25：旧会话与开源需求覆盖核对（v0.1 时点）
+
+已核对 Grok 的主页/快照讨论、进化预览发布会话，以及后者通过截图接续的《设计模型特殊动作方案》。[需求覆盖记录](open-source-requirements-audit.md) 区分用户要求、既有实现和独立 Harness 的新增部分。Grok 已补过未绑定六形态预览；本次通用实验室不是首次实现无设备预览。原站进化状态机、阶段提示词、同轮设备/动画关联尚未整合进独立包，多衍生动画候选也未完整交付；当前 Mock 把明确点头映射为抽象 approval，换挥手 profile 会替换动作，已列待修。此次仅核对历史与源码，未重新验收实机或修改运行代码。
+
+# 2026-09-25：开放 Harness 与独立交互实验室
+
+本轮依据飞书产品修订 **212**（已只读核对）和 Eric 最新要求：完整实现可开源的模型—能力—执行器模块，让其他人能用自己的机器人动作与角色资源。没有手改上游产品快照。
+
+`harness/` 现在可独立运行与发布，默认 Mock + 软件预演，无需模型权重、API Key 或机械臂。默认 3D 角色由代码生成，支持本地 GLB 导入、逐能力动画绑定、仅决策沙盒和双端独立记录。`simulator` 七项表达、`waving-robot` 自定义挥手和 BenBen 五项回应共用同一协议；不支持的语义或未实现的 track/speak 不下发动作。参数、过期、去重、忙碌、取消和实机租约由确定性逻辑检查。
+
+模型适配包含 Ollama、兼容 Chat Completions 的服务、Cloudflare JEV、Laya 与用户函数。凭据只在本地 Node 服务。模型请求合同经固定响应测试，未进行在线模型效果评估或权重下载。AI 权重和第三方 3D 资源不纳入包的代码许可证；本次未重新授权旧网站素材或模板。
+
+BenBen 参考仓库已核对为 `Mark10667/benben`，代码基线 `ac1aeb5b9ec725df81441ab5c921eac8b2e8daa5`。原 `/run` 不接受任意五舵机直发动作；本包以可选 Python 入口在同一原控制器进程中扩展接口，沿用原串口 owner、示教轨迹与停止合同。正常完成持位；显式停止卸力；拒绝接管已存在的 live 会话。回执只证明 timed commands，不代表传感器到位。页面实机模式在回执后播放同义动画，不声称实时同步。
+
+根命令：`npm run harness:dev`、`npm run test:harness`、`npm run test:harness:bridge`、`npm run qa:harness`、`npm run build:harness`。主站 `npm run build` 同时产出 `dist/harness/`；静态版只提供浏览器内示例。独立包文档、许可证和 CI 见 [Harness README](../harness/README.md)。原网站控制逻辑与角色素材未改。
+
+验证结果：Node 24 下原站 **116** 项、Harness **28** 项、原 Python 预览 **4** 项与新桥接 **9** 项通过；原 Worker 实际通信回归通过。新实验室 **12** 项浏览器检查通过，包含 GLB、导出和会话创建时取消；生产构建的 `/harness/` 静态版 **11** 项检查通过。主站及独立 Harness 构建成功。
+
+独立仓库已公开为 [ericshang98/cowcoming-harness](https://github.com/ericshang98/cowcoming-harness)，约 200 KB 源码；原站集成提交在 [PR #40](https://github.com/ericshang98/cowcoming/pull/40)。独立检出后 `npm ci`、测试、构建与浏览器验收通过。静态构建随附本包与第三方运行依赖的许可证。
+
+所有开发和验证均在隔离工作区进行，未覆盖原工作区未提交内容，未安装设备软件、修改或重启现有 BenBen 服务、发送实机动作或部署生产站点。实体机械臂、持位、故障停止及真实推理效果留待 Eric 现场测试；这些边界不影响无需设备的演示。
+
 # Final integration entry (2026-09-24)
 
 Current checks, release boundaries and on-site acceptance: [submission checklist](submission-checklist.md). JEV parallel scheduling is a local controller option; Worker protocol remains unchanged.

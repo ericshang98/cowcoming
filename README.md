@@ -6,6 +6,7 @@
 
 | 你想做什么 | 从这里开始 |
 | --- | --- |
+| 不下载角色/权重，体验软件牛和 JEV | 阅读 [独立 Harness](harness/README.md)，或 `npm run harness:dev` 打开本地宠物页 |
 | 直接体验牛来 | 打开 [WORK 页面](https://cowcoming.world/?section=work)，无需克隆源码 |
 | 了解形态切换、自动进化和重置 | 阅读 [使用指南](docs/getting-started.md) |
 | 接入自己的 JEV、语言模型或机械臂 | 先读 [硬件开发交接](docs/hardware-handoff.md)，再按 [设备 API 指南](docs/live-device.md) 联调 |
@@ -13,6 +14,14 @@
 | 接收本次动作调试交付 | 阅读 [团队交接入口](docs/team-handoff.md)，使用交接包指定版本 |
 
 **本次分支交付：**六种形态已接入独立模型，每种包含五段回应动作，并支持网页自助调参。真实硬件驱动仍待接入；具体版本和验收边界见团队交接入口，本段不代表正式网站已发布这些更新。连接设备后支持调整进化周期、重置为小牛，以及密钥房间内的设备事件、视频与文本流接口。自动进化默认每 5 轮完整对话评估一次，必须接入真实会话并配置符合合同的评估网关；预设示例不计入进化轮数。
+
+## 开放 Harness
+
+独立发布仓库：[cowcoming-harness](https://github.com/ericshang98/cowcoming-harness)。本仓库的 `harness/` 是发行代码真源，采用 Apache-2.0；此许可不扩展到网站原有第三方 IP、模板或素材。它不携带任何 GLB、AI 权重或设备凭据。独立仓库按提交导出，校验方式见 [发行同步](harness/docs/releasing.md)。
+
+`npm run harness:dev` 默认打开软件宠物：六形态、18 项动作各两个变体、可编辑情绪、JEV Key 表单，以及可选的独立进化评估。动作按钮先试玩；模型选出的动作实际播完才计入软件培养。机器人映射可导入、检查和导出。原底层实验室保留在 `?view=lab`。
+
+`npm run build` 同时生成纯浏览器演示到 `dist/harness/`，发布后可访问 `/harness/`。静态页面只提供试玩，不出现密钥输入框。标准动作、舵机角度换算、驱动接口与实测边界见 [软件与硬件说明](harness/docs/pet-playground.md)。
 
 ## 项目资料
 

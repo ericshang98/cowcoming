@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "vite build && node scripts/write-build-info.mjs",
+    "build": "vite build && vite build --config harness/vite.config.mjs --outDir ../dist/harness && node scripts/write-build-info.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test tests/*.test.mjs",
     "qa": "node scripts/verify.cjs",
@@ -30,7 +30,14 @@
     "qa:work-models": "node scripts/work-models-qa.cjs",
     "motion:lab": "node scripts/motion-lab.mjs",
     "qa:release": "node scripts/final-release-check.mjs",
-    "qa:six-models": "node scripts/model-loading-qa.cjs"
+    "qa:six-models": "node scripts/model-loading-qa.cjs",
+    "harness:dev": "node --env-file-if-exists=harness/.env harness/scripts/dev.mjs",
+    "test:harness": "node --test harness/tests/*.test.mjs",
+    "build:harness": "vite build --config harness/vite.config.mjs",
+    "demo:harness": "node harness/examples/simulator-demo.mjs",
+    "test:harness:bridge": "python3 -m unittest discover -s harness/tests -p \"test_*.py\"",
+    "qa:harness": "node harness/scripts/qa.mjs",
+    "qa:pet": "node harness/scripts/qa-pet.mjs"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
