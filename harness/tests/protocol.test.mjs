@@ -26,6 +26,7 @@ test('rejects missing required fields and unknown states', () => {
   assert.throws(() => validateProfile({ profileId: 'p' }), /capabilities/);
   assert.throws(() => validatePlan({ intentId: 'r1', steps: [] }), /planId/);
   assert.throws(() => validateExecutionEvent({ eventId: 'e1', planId: 'p1', status: 'done' }), /status/);
+  assert.throws(() => validateIntent({ requestId: 'r1', type: 'express', semantic: 'approval', confidence: Number.NaN }), /confidence/);
 });
 
 test('returns frozen shallow copies without mutating input', () => {

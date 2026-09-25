@@ -16,7 +16,7 @@ export function validateIntent(value) {
   requireString(value.semantic, 'semantic');
   if (value.params !== undefined && !isRecord(value.params)) throw new TypeError('params must be an object');
   if (value.target !== undefined) requireString(value.target, 'target');
-  if (value.confidence !== undefined && (typeof value.confidence !== 'number' || value.confidence < 0 || value.confidence > 1)) {
+  if (value.confidence !== undefined && (typeof value.confidence !== 'number' || !Number.isFinite(value.confidence) || value.confidence < 0 || value.confidence > 1)) {
     throw new TypeError('confidence must be a number between 0 and 1');
   }
   if (value.expiresAt !== undefined && (typeof value.expiresAt !== 'number' || !Number.isFinite(value.expiresAt))) {
