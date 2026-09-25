@@ -1,3 +1,19 @@
+# 2026-09-25：开放 Harness 与独立交互实验室
+
+本轮依据飞书产品修订 **212**（已只读核对）和 Eric 最新要求：完整实现可开源的模型—能力—执行器模块，让其他人能用自己的机器人动作与角色资源。没有手改上游产品快照。
+
+`harness/` 现在可独立运行与发布，默认 Mock + 软件预演，无需模型权重、API Key 或机械臂。默认 3D 角色由代码生成，支持本地 GLB 导入、逐能力动画绑定、仅决策沙盒和双端独立记录。`simulator` 七项表达、`waving-robot` 自定义挥手和 BenBen 五项回应共用同一协议；不支持的语义或未实现的 track/speak 不下发动作。参数、过期、去重、忙碌、取消和实机租约由确定性逻辑检查。
+
+模型适配包含 Ollama、兼容 Chat Completions 的服务、Cloudflare JEV、Laya 与用户函数。凭据只在本地 Node 服务。模型请求合同经固定响应测试，未进行在线模型效果评估或权重下载。AI 权重和第三方 3D 资源不纳入包的代码许可证；本次未重新授权旧网站素材或模板。
+
+BenBen 参考仓库已核对为 `Mark10667/benben`，代码基线 `ac1aeb5b9ec725df81441ab5c921eac8b2e8daa5`。原 `/run` 不接受任意五舵机直发动作；本包以可选 Python 入口在同一原控制器进程中扩展接口，沿用原串口 owner、示教轨迹与停止合同。正常完成持位；显式停止卸力；拒绝接管已存在的 live 会话。回执只证明 timed commands，不代表传感器到位。页面实机模式在回执后播放同义动画，不声称实时同步。
+
+根命令：`npm run harness:dev`、`npm run test:harness`、`npm run test:harness:bridge`、`npm run qa:harness`、`npm run build:harness`。主站 `npm run build` 同时产出 `dist/harness/`；静态版只提供浏览器内示例。独立包文档、许可证和 CI 见 [Harness README](../harness/README.md)。原网站控制逻辑与角色素材未改。
+
+验证结果：Node 24 下原站 **116** 项、Harness **26** 项、原 Python 预览 **4** 项与新桥接 **9** 项通过；原 Worker 实际通信回归通过。新实验室 **12** 项浏览器检查通过，包含 GLB、导出和会话创建时取消；生产构建的 `/harness/` 静态版 **11** 项检查通过。主站及独立 Harness 构建成功。
+
+所有开发和验证均在隔离工作区进行，未覆盖原工作区未提交内容，未安装设备软件、修改或重启现有 BenBen 服务、发送实机动作或部署生产站点。实体机械臂、持位、故障停止及真实推理效果留待 Eric 现场测试；这些边界不影响无需设备的演示。
+
 # Final integration entry (2026-09-24)
 
 Current checks, release boundaries and on-site acceptance: [submission checklist](submission-checklist.md). JEV parallel scheduling is a local controller option; Worker protocol remains unchanged.

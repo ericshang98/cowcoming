@@ -20,6 +20,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: npm run test:harness
+      - run: npm run test:harness:bridge
+      - run: npx playwright install --with-deps chromium
+      - run: npm run qa:harness
       - run: python3 -m unittest discover -s examples/device -p test_local_preview.py
       - run: npm run test:relay
       - run: npm run build
@@ -72,7 +76,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: '4.58.0'
+          wranglerVersion: "4.58.0"
           command: pages deploy dist --project-name niulai-preview-20260922 --branch main --commit-hash ${{ github.sha }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
       - name: Verify the live domain serves this commit and these assets

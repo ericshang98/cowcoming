@@ -1,66 +1,87 @@
-import { EXECUTION_STATUSES, INTENT_TYPES } from './protocol.mjs';
-
-const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-const requireRecord = (value, name) => {
-  if (!isRecord(value)) throw new TypeError(`${name} must be an object`);
+import { EXECUTION_STATUSES, INTENT_TYPES } from "./protocol.mjs";
+export const isRecord = (v) =>
+  v !== null &&
+  typeof v === "object" &&
+  Object.getPrototypeOf(v) === Object.prototype;
+export const requireString = (v, name) => {
+  if (typeof v !== "string" || !v.trim() || v.length > 240)
+    throw new TypeError(`${name} must be a non-empty string (max 240)`);
 };
-const requireString = (value, field) => {
-  if (typeof value !== 'string' || value.length === 0) throw new TypeError(`${field} must be a non-empty string`);
+export const finite = (v, name) => {
+  if (!Number.isFinite(v)) throw new TypeError(`${name} must be finite`);
 };
-const copyAndFreeze = (value) => Object.freeze({ ...value });
-
-export function validateIntent(value) {
-  requireRecord(value, 'intent');
-  requireString(value.requestId, 'requestId');
-  if (!INTENT_TYPES.includes(value.type)) throw new TypeError(`type must be one of: ${INTENT_TYPES.join(', ')}`);
-  requireString(value.semantic, 'semantic');
-  if (value.params !== undefined && !isRecord(value.params)) throw new TypeError('params must be an object');
-  if (value.target !== undefined) requireString(value.target, 'target');
-  if (value.confidence !== undefined && (typeof value.confidence !== 'number' || !Number.isFinite(value.confidence) || value.confidence < 0 || value.confidence > 1)) {
-    throw new TypeError('confidence must be a number between 0 and 1');
+export const freezeDeep = (v) => {
+  if (v && typeof v === "object" && !Object.isFrozen(v)) {
+    Object.values(v).forEach(freezeDeep);
+    Object.freeze(v);
   }
-  if (value.expiresAt !== undefined && (typeof value.expiresAt !== 'number' || !Number.isFinite(value.expiresAt))) {
-    throw new TypeError('expiresAt must be a finite number');
+  return v;
+};
+function record(v, name) {
+  if (!isRecord(v)) throw new TypeError(`${name} must be a plain JSON object`);
+}
+export function validateIntent(v) {
+  record(v, "intent");
+  requireString(v.requestId, "requestId");
+  requireString(v.semantic, "semantic");
+  if (!INTENT_TYPES.includes(v.type))
+    throw new TypeError("invalid intent type");
+  if (v.params !== undefined) record(v.params, "params");
+  if (
+    v.confidence !== undefined &&
+    (!Number.isFinite(v.confidence) || v.confidence < 0 || v.confidence > 1)
+  )
+    throw new TypeError("confidence must be finite and between 0 and 1");
+  if (v.target !== undefined) requireString(v.target, "target");
+  if (v.expiresAt !== undefined) finite(v.expiresAt, "expiresAt");
+  return Object.freeze({ ...v });
+}
+export function validateProfile(v) {
+  record(v, "profile");
+  requireString(v.profileId, "profileId");
+  if (!Array.isArray(v.capabilities) || v.capabilities.length > 100)
+    throw new TypeError("capabilities must be an array (max 100)");
+  const ids = new Set();
+  for (const c of v.capabilities) {
+    record(c, "capability");
+    requireString(c.id, "capability.id");
+    if (ids.has(c.id)) throw new TypeError("duplicate capability id");
+    ids.add(c.id);
   }
-  return copyAndFreeze(value);
+  return Object.freeze({ ...v });
 }
-
-export function validateProfile(value) {
-  requireRecord(value, 'profile');
-  if (value.profileId !== undefined) requireString(value.profileId, 'profileId');
-  if (!Array.isArray(value.capabilities)) throw new TypeError('capabilities must be an array');
-  value.capabilities.forEach((capability, index) => {
-    requireRecord(capability, `capabilities[${index}]`);
-    requireString(capability.id, `capabilities[${index}].id`);
-  });
-  return copyAndFreeze(value);
-}
-
-export function validatePlan(value) {
-  requireRecord(value, 'plan');
-  requireString(value.planId, 'planId');
-  requireString(value.intentId, 'intentId');
-  if (!Array.isArray(value.steps)) throw new TypeError('steps must be an array');
-  value.steps.forEach((step, index) => {
-    if (!isRecord(step) && typeof step !== 'string') throw new TypeError(`steps[${index}] must be an object or string`);
-    if (isRecord(step)) {
-      const capabilityId = step.capabilityId ?? step.id;
-      if (capabilityId !== undefined) requireString(capabilityId, `steps[${index}].capabilityId`);
-    }
-  });
-  return copyAndFreeze(value);
-}
-
-export function validateExecutionEvent(value) {
-  requireRecord(value, 'execution event');
-  if (value.eventId !== undefined) requireString(value.eventId, 'eventId');
-  if (value.planId !== undefined) requireString(value.planId, 'planId');
-  if (!EXECUTION_STATUSES.includes(value.status)) {
-    throw new TypeError(`status must be one of: ${EXECUTION_STATUSES.join(', ')}`);
+export function validatePlan(v) {
+  record(v, "plan");
+  requireString(v.planId, "planId");
+  requireString(v.intentId, "intentId");
+  requireString(v.profileId, "profileId");
+  finite(v.expiresAt, "expiresAt");
+  finite(v.createdAt, "createdAt");
+  if (!Array.isArray(v.steps) || v.steps.length !== 1)
+    throw new TypeError("v1 plan must have exactly one step");
+  for (const s of v.steps) {
+    record(s, "step");
+    requireString(s.capabilityId, "capabilityId");
+    record(s.args, "args");
   }
-  if (value.simulated !== undefined && typeof value.simulated !== 'boolean') throw new TypeError('simulated must be a boolean');
-  if (value.sensorVerified !== undefined && typeof value.sensorVerified !== 'boolean') throw new TypeError('sensorVerified must be a boolean');
-  if (value.result !== undefined && !isRecord(value.result)) throw new TypeError('result must be an object');
-  if (value.error !== undefined && !isRecord(value.error) && typeof value.error !== 'string') throw new TypeError('error must be an object or string');
-  return copyAndFreeze(value);
+  if (
+    !Number.isFinite(v.durationMs) ||
+    v.durationMs <= 0 ||
+    v.durationMs > 60000
+  )
+    throw new TypeError("durationMs must be within (0,60000]");
+  return Object.freeze({ ...v });
+}
+export function validateExecutionEvent(v) {
+  record(v, "execution event");
+  if (!EXECUTION_STATUSES.includes(v.status))
+    throw new TypeError("invalid execution status");
+  requireString(v.eventId, "eventId");
+  requireString(v.planId, "planId");
+  if (typeof v.simulated !== "boolean" || typeof v.sensorVerified !== "boolean")
+    throw new TypeError("simulated and sensorVerified must be boolean");
+  finite(v.timestamp, "timestamp");
+  if (v.simulated && v.sensorVerified)
+    throw new TypeError("simulation cannot verify physical position");
+  return Object.freeze({ ...v });
 }

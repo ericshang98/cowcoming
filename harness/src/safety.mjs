@@ -1,20 +1,56 @@
-const freezeDeep = (v) => { if (v && typeof v === 'object' && !Object.isFrozen(v)) { Object.values(v).forEach(freezeDeep); Object.freeze(v); } return v; };
-export function createSafetyArbiter({ clock = Date.now } = {}) {
-  let stopped = false; let stopReason;
-  const now = () => typeof clock === 'function' ? clock() : (clock?.now?.() ?? Date.now());
+import { validatePlan } from "./validation.mjs";
+import { normalizeProfile, normalizeArgs } from "./capabilities.mjs";
+export function createSafetyArbiter({ clock = Date.now, profile } = {}) {
+  const p = profile ? normalizeProfile(profile) : null;
+  let stopped = false,
+    stopReason = "stopped";
   return {
-    accept(plan, deviceState = {}) {
-      if (!plan || typeof plan !== 'object') return { status: 'rejected', reason: 'invalid plan' };
-      if (stopped) return { status: 'rejected', reason: stopReason ?? 'stopped' };
-      if (deviceState.online === false || deviceState.status === 'offline') return { status: 'rejected', reason: 'offline' };
-      const current = now();
-      if (plan.expiresAt !== undefined && current >= plan.expiresAt) return { status: 'rejected', reason: 'stale' };
-      const maxDuration = Math.min(...(plan.steps ?? []).map((s) => Number(s.maxDurationMs ?? plan.maxDurationMs ?? Infinity)));
-      if (Number.isFinite(maxDuration) && Number(plan.durationMs ?? 0) > maxDuration) return { status: 'rejected', reason: 'exceeds maximum duration' };
-      if (plan.createdAt !== undefined && Number(plan.durationMs) > 0 && current - plan.createdAt > Number(plan.durationMs)) return { status: 'rejected', reason: 'exceeds maximum duration' };
-      return freezeDeep({ status: 'accepted', context: { acceptedAt: current, planId: plan.planId } });
+    accept(plan, state = {}) {
+      const reject = (reason) => ({ status: "rejected", reason });
+      try {
+        validatePlan(plan);
+        if (stopped) return reject(stopReason);
+        if (state.online !== true) return reject("offline");
+        if (state.busy) return reject("device busy");
+        if (state.fault) return reject("device fault");
+        if (
+          state.hardware &&
+          (state.authorized !== true ||
+            state.leaseExpiresAt <= clock() ||
+            !Number.isFinite(state.leaseExpiresAt))
+        )
+          return reject("hardware lease required");
+        if (clock() >= plan.expiresAt) return reject("stale");
+        if (
+          !p ||
+          plan.profileId !== p.profileId ||
+          plan.profileVersion !== p.version
+        )
+          return reject("profile mismatch");
+        for (const step of plan.steps) {
+          const c = p.capabilities.find((c) => c.id === step.capabilityId);
+          if (!c) return reject("unknown capability");
+          normalizeArgs(step.args, c.parameters, { clamp: false });
+          if (plan.durationMs > c.maxDurationMs)
+            return reject("exceeds maximum duration");
+        }
+        return {
+          status: "accepted",
+          context: Object.freeze({ acceptedAt: clock(), planId: plan.planId }),
+        };
+      } catch (e) {
+        return reject(e.message);
+      }
     },
-    stop(reason = 'stopped') { stopped = true; stopReason = reason; return { status: 'stopped', reason }; },
-    reset() { stopped = false; stopReason = undefined; return { status: 'ready' }; }
+    stop(reason = "stopped") {
+      stopped = true;
+      stopReason = reason;
+      return { status: "stopped", reason };
+    },
+    reset() {
+      stopped = false;
+      stopReason = "stopped";
+      return { status: "ready" };
+    },
   };
 }

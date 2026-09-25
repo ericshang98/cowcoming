@@ -1,5 +1,8 @@
 # Cowcoming Harness：模型、能力与真实设备解耦设计
 
+> **2026-09-25 实施修订**：下文保留最初架构意图；本版本准确接口、运行范围与证据边界以 [harness/docs/protocol.md](../../../harness/docs/protocol.md) 和 [harness/README.md](../../../harness/README.md) 为准。已实现独立网页实验室、本地模型服务、GLB 导入与原进程 BenBen 扩展。v0.1 只执行单步 express；track/speak 拒绝，不承诺连续控制或语音。JEV/Laya 共用 typed decision 适配器，BenBen executor 需注入 send/stop/getState 三项。AI 权重和 3D 角色资源独立可选，Apache-2.0 仅覆盖本包原创代码。硬件尚未现场验收。
+
+
 日期：2026-09-25
 状态：已批准进入实现
 
@@ -52,7 +55,7 @@ Cowcoming 的网站负责角色展示和交互；BenBen 私有仓库负责本机
 
 ### CapabilityProfile
 
-设备或模拟器声明的能力集合。每项能力包含语义标签、参数约束和可打断性。profile 可以描述 BenBen 的 `nod`、`shake_head`、`look_horizontal`，也可以描述另一台机器人的 `wave_hand` 或 `dance`。
+设备或模拟器声明的能力集合。每项能力包含语义标签、参数约束和可打断性。profile 可以描述 BenBen 的 `nod`、`nod_double`、`shake_head`、`tilt_left`、`tilt_right`，也可以描述另一台机器人的 `wave_hand` 或 `dance`。
 
 ### ActionPlan
 
