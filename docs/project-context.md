@@ -10,7 +10,9 @@ BenBen 参考仓库已核对为 `Mark10667/benben`，代码基线 `ac1aeb5b9ec72
 
 根命令：`npm run harness:dev`、`npm run test:harness`、`npm run test:harness:bridge`、`npm run qa:harness`、`npm run build:harness`。主站 `npm run build` 同时产出 `dist/harness/`；静态版只提供浏览器内示例。独立包文档、许可证和 CI 见 [Harness README](../harness/README.md)。原网站控制逻辑与角色素材未改。
 
-验证结果：Node 24 下原站 **116** 项、Harness **26** 项、原 Python 预览 **4** 项与新桥接 **9** 项通过；原 Worker 实际通信回归通过。新实验室 **12** 项浏览器检查通过，包含 GLB、导出和会话创建时取消；生产构建的 `/harness/` 静态版 **11** 项检查通过。主站及独立 Harness 构建成功。
+验证结果：Node 24 下原站 **116** 项、Harness **28** 项、原 Python 预览 **4** 项与新桥接 **9** 项通过；原 Worker 实际通信回归通过。新实验室 **12** 项浏览器检查通过，包含 GLB、导出和会话创建时取消；生产构建的 `/harness/` 静态版 **11** 项检查通过。主站及独立 Harness 构建成功。
+
+独立仓库已公开为 [ericshang98/cowcoming-harness](https://github.com/ericshang98/cowcoming-harness)，约 200 KB 源码；原站集成提交在 [PR #40](https://github.com/ericshang98/cowcoming/pull/40)。独立检出后 `npm ci`、测试、构建与浏览器验收通过。静态构建随附本包与第三方运行依赖的许可证。
 
 所有开发和验证均在隔离工作区进行，未覆盖原工作区未提交内容，未安装设备软件、修改或重启现有 BenBen 服务、发送实机动作或部署生产站点。实体机械臂、持位、故障停止及真实推理效果留待 Eric 现场测试；这些边界不影响无需设备的演示。
 
