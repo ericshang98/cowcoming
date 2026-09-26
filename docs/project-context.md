@@ -8,6 +8,8 @@ Current checks, release boundaries and on-site acceptance: [submission checklist
 
 可选的语言模型区域使用用户填写的 endpoint 和 API Key 直连第三方，密钥只留在当前页面内存，不经 Cowcoming 服务端，也不参与 GEV 动作决策。接口合同和部署边界见 [GEV 云端试玩](gev-cloud-preview.md)。本次修正撤回独立程序化牛作为默认展示的方向，独立 Harness 仍是开发者工具，不是原站视觉或模型资产的替代品。
 
+正常 WORK 页面只展示 JEV 的当前动作决策和对话输入；五个基础动作的按钮与调参控件仅在左下角“调试模式”图鉴中出现。`src/live/motion-variants.mjs` 为软件动画增加按形态选择的预编排表现变体，基础动作 ID 和机械端合同保持不变。自动进化仍按完整互动轮数触发独立评估：默认每 5 轮，读取本次培养的完整会话，只允许保持当前形态或沿直接后继前进一步。
+
 # 项目现状与交接
 
 ## 2026-09-24：六模型图鉴与可点击调试按钮

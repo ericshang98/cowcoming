@@ -11,6 +11,7 @@ export function createResponsePlayer({
   bones,
   onStart = () => {},
   getTuning = () => DEFAULT_TUNING,
+  getSoftwareVariant = () => null,
 }) {
   const seen = new Map();
   const queue = [];
@@ -31,9 +32,10 @@ export function createResponsePlayer({
     done.resolve({
       status,
       tuning: done.tuning,
-      clip: done.clip,
+      clip: done.baseClip,
       eventId: done.eventId,
       formId: manifest.formId,
+      softwareVariant: done.softwareVariant?.id || null,
     });
   }
   function recover(status) {
@@ -41,6 +43,23 @@ export function createResponsePlayer({
     if (incoming) incoming.crossFadeFrom(current.action, 0.35, false);
     else current.action.fadeOut(0.35);
     recovery = { remaining: 0.35, status };
+  }
+  function startStep(state) {
+    if (state.tunedClip) mixer.uncacheClip(state.tunedClip);
+    state.tunedClip = null;
+    mixer.stopAllAction();
+    const incoming = idle();
+    const step = state.steps[state.stepIndex];
+    const tuning = step.tuning;
+    const tunedClip = tuning.amplitude === 1 ? null : tuneClip(actions[step.clip].getClip(), tuning.amplitude);
+    const action = tunedClip ? mixer.clipAction(tunedClip) : actions[step.clip];
+    action.reset().setEffectiveWeight(1).setEffectiveTimeScale(tuning.speed).setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = true;
+    action.play();
+    if (incoming) action.crossFadeFrom(incoming, 0.18, false);
+    state.tunedClip = tunedClip;
+    state.action = action;
+    state.clip = step.clip;
   }
   function drain() {
     if (current || disposed) return;
@@ -53,19 +72,23 @@ export function createResponsePlayer({
       return;
     }
     onStart();
-    mixer.stopAllAction();
-    const incoming = idle();
-    const tunedClip = tuning.amplitude === 1 ? null : tuneClip(actions[variant.clip].getClip(), tuning.amplitude);
-    const action = tunedClip ? mixer.clipAction(tunedClip) : actions[variant.clip];
-    action.reset().setEffectiveWeight(1).setEffectiveTimeScale(tuning.speed).setLoop(THREE.LoopOnce, 1);
-    action.clampWhenFinished = true;
-    action.play();
-    if (incoming) action.crossFadeFrom(incoming, 0.18, false);
-    current = { action, tunedClip, tuning, resolve, clip: variant.clip, eventId: request.eventId };
+    const softwareVariant = job.softwareVariant;
+    const softwareStep = softwareVariant && softwareVariant.phase === "before" ? softwareVariant : null;
+    const afterStep = softwareVariant && softwareVariant.phase !== "before" ? softwareVariant : null;
+    const steps = [
+      ...(softwareStep ? [{ ...softwareStep, tuning: softwareStep.tuning }] : []),
+      { ...variant, tuning },
+      ...(afterStep ? [{ ...afterStep, tuning: afterStep.tuning }] : []),
+    ];
+    current = { action: null, tunedClip: null, steps, stepIndex: 0, tuning, resolve, baseClip: variant.clip, eventId: request.eventId, softwareVariant };
+    startStep(current);
   }
   const finished = (e) => {
-    if (current && e.action === current.action && !recovery)
-      recover("completed");
+    if (!current || e.action !== current.action || recovery) return;
+    if (current.stepIndex < current.steps.length - 1) {
+      current.stepIndex += 1;
+      startStep(current);
+    } else recover("completed");
   };
   mixer.addEventListener("finished", finished);
   return {
@@ -107,7 +130,10 @@ export function createResponsePlayer({
       seen.set(request.eventId, true);
       if (seen.size > 1000) seen.delete(seen.keys().next().value);
       return new Promise(resolve => {
-        queue.push({request, variant, tuning, resolve});
+        let softwareVariant = null;
+        try { softwareVariant = getSoftwareVariant(request, variant, { actions, bones }); } catch { /* Optional software accents fail closed. */ }
+        if (softwareVariant && (!actions[softwareVariant.clip] || !softwareVariant.tuning)) softwareVariant = null;
+        queue.push({request, variant, tuning, softwareVariant, resolve});
         drain();
       });
     },

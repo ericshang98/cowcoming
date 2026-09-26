@@ -5,12 +5,30 @@ import { Controls } from '../components/Chrome';
 import { PageLead } from './Portfolio';
 import { evolutionRoutes, forms } from '../evolution.mjs';
 import EvolutionTree from './EvolutionTree';
-import MotionPreview from '../components/MotionPreview';
 import EvolutionSettings from '../components/EvolutionSettings';
 import { browserTuningStorage, loadTuning } from '../live/motion-tuning.mjs';
 import { SlidersHorizontal } from 'lucide-react';
 import BindingGate from '../live/BindingGate';
 import { evolutionStatus } from '../evolution-session.mjs';
+
+function growthStepLabel(state, status, t) {
+  if (status === 'manual') return t('手动选择形态', 'Manual form selection');
+  if (status === 'terminal') return t('当前形态已到终点', 'Current form is a terminal stage');
+  if (status === 'evaluating') return t('正在读取完整互动记录', 'Reading the completed interaction record');
+  if (status === 'error') return t('本轮评估未完成', 'This evaluation did not complete');
+  return t('积累互动，准备下一次评估', 'Collecting interactions for the next evaluation');
+}
+
+function growthStepDescription(state, status, t) {
+  const completed = Math.max(0, state.turns.length - state.checkpoint);
+  const interval = state.settings.interval;
+  if (status === 'manual') return t('正常对话仍由 JEV 选择基础动作；形态由你在图鉴中明确选择。', 'JEV still chooses the base action during normal conversation; you choose the form explicitly in the atlas.');
+  if (status === 'terminal') return t('仙牛和暗黑牛没有自动后继；重置后才会从小牛重新开始。', 'Celestial and dark have no automatic successor; reset starts again from calf.');
+  if (status === 'evaluating') return t(`已完成 ${completed} 次互动，评估器正在决定保持当前形态还是沿合法分支前进。`, `${completed} interactions are complete. The evaluator is deciding whether to stay or take one legal branch step.`);
+  if (status === 'error') return t('对话记录保留，进入设置重试不会重复计轮，也不会伪造进化。', 'The conversation record is kept. Retry in Settings without recounting turns or faking an evolution.');
+  if (status === 'unconfigured') return t(`已完成 ${completed} / ${interval} 次完整互动；配置评估网关后才会真正请求模型。`, `${completed} / ${interval} complete interactions; the evaluator is requested only after a gateway is configured.`);
+  return t(`已完成 ${completed} / ${interval} 次完整互动；达到周期后评估一次，不保证一定进化。`, `${completed} / ${interval} complete interactions; one evaluation runs at the interval and evolution is not guaranteed.`);
+}
 
 export default function Evolution({ controller, live, preview, onSelectRoute, onSelectForm, modelStatus, session, browseRoute }) {
   const { form, placeholder } = preview;
@@ -71,7 +89,11 @@ export default function Evolution({ controller, live, preview, onSelectRoute, on
           <small>{modelStatus === 'error' ? 'Model unavailable. Return to 小牛.' : modelStatus === 'loading' ? 'Loading form…' : placeholder ? 'Model pending. Showing a reference 牛来.' : 'Showing this form’s model.'}</small>
         </div>
         }
-        <MotionPreview controller={controller} formId={form.id} ready={modelStatus==='ready'&&!placeholder} />
+        <div className="evolution-step" aria-live="polite">
+          <span className="eyebrow">{t('当前进化步骤', 'CURRENT GROWTH STEP')}</span>
+          <strong>{growthStepLabel(session.state, status, t)}</strong>
+          <p>{growthStepDescription(session.state, status, t)}</p>
+        </div>
       </aside>
 
       <ObservationPanel live={live} />

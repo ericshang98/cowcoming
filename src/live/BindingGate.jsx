@@ -21,7 +21,7 @@ export default function BindingGate({ live, onOpenAtlas, formId, onSelectForm, c
     </aside>
     <aside className="work-list evolution-technology binding-panel" aria-label={t('绑定设备', 'Device binding')}>
       <div className="glass binding-card">
-        <GuestPreview formId={formId} onSelect={onSelectForm} ready={ready} controller={controller} />
+        <GuestPreview formId={formId} onSelect={onSelectForm} />
         <GevCloudPreview formId={formId} controller={controller} ready={ready} />
         <span className="eyebrow"><Link2 size={14} />{t('设备连接', 'DEVICE CONNECTION')}</span>
         <h1>{waiting ? t('已绑定，等待电脑上线', 'Bound. Waiting for your computer.') : reconnecting ? t('连接已中断，正在重连', 'Connection lost. Reconnecting.') : t('先绑定你的牛来', 'Bind your Niulai first')}</h1>

@@ -6,6 +6,7 @@ import { ancestry, evolutionEdges, forms } from "../evolution.mjs";
 import EvolutionModelPreview from "../components/EvolutionModelPreview";
 import MotionPreview from "../components/MotionPreview";
 import { browserTuningStorage, loadTuning } from "../live/motion-tuning.mjs";
+import { softwareVariantCount } from "../live/motion-variants.mjs";
 
 const connections = {
   normal: "M400 134V166",
@@ -194,6 +195,11 @@ export default function EvolutionTree({
                   </button>
                 ))}
               </div>
+              <p className="atlas-debug-note">
+                {zh
+                  ? `五个基础动作只用于调试；${softwareVariantCount(previewId)} 个软件表现变体会在正常对话中按形态和事件自动选择。`
+                  : `The five base actions are for debugging; normal conversation can choose from ${softwareVariantCount(previewId)} software accents for this form.`}
+              </p>
               <MotionPreview
                 controller={controller}
                 formId={previewId}

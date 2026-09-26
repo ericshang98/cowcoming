@@ -7,7 +7,7 @@ import {
   availableDeviceActions,
 } from "../shared/action-catalog.mjs";
 import { initialRoom, updateProfile } from "../shared/live-protocol.mjs";
-function fixture() {
+function fixture({ accent = false } = {}) {
   const root = new THREE.Group(),
     bone = new THREE.Bone();
   bone.name = "Head";
@@ -15,7 +15,7 @@ function fixture() {
   const mixer = new THREE.AnimationMixer(root),
     actions = {};
   for (const name of [
-    "idle",
+    "idle", "bow",
     ...Object.values(ACTION_CATALOG).map((a) => a.suffix),
   ])
     actions[name] = mixer.clipAction(
@@ -40,13 +40,16 @@ function fixture() {
     actions,
     manifest,
     bones: new Set(["Head"]),
+    getSoftwareVariant: accent
+      ? () => ({ id: "test-accent", clip: "bow", phase: "before", tuning: { speed: 1, amplitude: 1 } })
+      : undefined,
   });
   return {
     player,
     mixer,
     actions,
-    advance() {
-      for (let i = 0; i < 100; i++) {
+    advance(seconds = 1) {
+      for (let i = 0; i < Math.ceil(100 * seconds); i++) {
         player.update(0.01);
         mixer.update(0.01);
       }
@@ -65,6 +68,19 @@ test("all five actions play their distinct clip, complete after recovery and ded
     assert.equal((await result).status, "completed");
     assert.equal(f.player.busy, false);
   }
+  f.player.dispose();
+});
+test("software accents enrich a base action without changing its action identity", async () => {
+  const f = fixture({ accent: true });
+  const result = f.player.play({ eventId: "accent", formId: "calf", actionId: "NOD" });
+  assert.equal(f.player.busy, true);
+  assert.equal(f.player.clip, "bow");
+  f.advance(0.4);
+  assert.equal(f.player.busy, true);
+  assert.equal(f.player.clip, "nod_confirm");
+  f.advance();
+  assert.equal((await result).softwareVariant, "test-accent");
+  assert.equal(f.player.busy, false);
   f.player.dispose();
 });
 test("unavailable models never claim completion; stop interrupts actual playback", async () => {

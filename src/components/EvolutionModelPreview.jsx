@@ -13,6 +13,7 @@ import { AnimationMixer, Box3, Vector3 } from "three";
 import { evolutionAssets } from "../evolution-assets.mjs";
 import { createResponsePlayer } from "../live/response-player.mjs";
 import { DEFAULT_TUNING } from "../live/motion-tuning.mjs";
+import { selectSoftwareVariant } from "../live/motion-variants.mjs";
 import { useLanguage } from "../i18n/Language";
 
 class PreviewBoundary extends Component {
@@ -79,6 +80,7 @@ function PreviewRig({ asset, controller, onReady }) {
       actions,
       manifest: asset,
       bones: names,
+      getSoftwareVariant: (request, _variant, context) => selectSoftwareVariant(asset.formId, request.actionId, request.eventId, context),
       getTuning: (id) =>
         controller.motionTuning?.forms[asset.formId]?.actions[id] ||
         DEFAULT_TUNING,
