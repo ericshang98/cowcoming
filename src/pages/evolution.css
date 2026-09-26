@@ -175,6 +175,31 @@
 .guest-actions button { padding: 7px 9px; border: 1px solid #c9dbe1; border-radius: 14px; background: #fff; color: #3f626c; font-size: 11px; }
 .guest-actions button:disabled { opacity: .45; }
 .guest-preview small { display: block; min-height: 16px; margin-top: 8px; color: #6d868e; font-size: 11px; }
+.gev-preview { margin: 0 0 24px; padding: 18px 0 22px; border-bottom: 1px solid #d7e4e8; }
+.gev-preview-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.gev-preview-heading .eyebrow { display: flex; align-items: center; gap: 6px; color: #0b8994; font: 9px var(--mono); letter-spacing: .12em; }
+.gev-preview h2 { margin: 8px 0 6px; color: #25434b; font-size: 17px; font-weight: 500; }
+.gev-preview > p { margin: 0 0 14px; color: #657e87; font-size: 12px; line-height: 1.7; }
+.gev-endpoint-state { flex-shrink: 0; padding: 5px 8px; border: 1px solid #d9e3e6; border-radius: 12px; color: #9aa9ae; font: 8px var(--mono); letter-spacing: .08em; }
+.gev-endpoint-state.is-ready { color: #117f89; border-color: #add3d8; background: #eff9fa; }
+.gev-input-label, .gev-language-option > label { display: block; margin: 10px 0 6px; color: #4d6b75; font-size: 11px; }
+.gev-preview textarea, .gev-language-option input, .gev-language-option textarea { box-sizing: border-box; width: 100%; border: 1px solid #cbdde2; border-radius: 9px; background: #ffffffb5; color: #28454c; padding: 10px 11px; font: 12px/1.6 inherit; resize: vertical; }
+.gev-preview textarea:focus, .gev-language-option input:focus, .gev-language-option textarea:focus { outline: 2px solid #9bd0d5; outline-offset: 1px; }
+.gev-preview-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 9px; }
+.gev-preview-actions > span { color: #7c9299; font: 10px var(--mono); }
+.gev-preview button { border: 1px solid #c5dce1; border-radius: 17px; background: #fff; color: #3d6872; padding: 8px 12px; font-size: 11px; cursor: pointer; }
+.gev-preview button:hover:not(:disabled) { border-color: #73b7bf; color: #087b86; }
+.gev-preview button:disabled { opacity: .5; cursor: default; }
+.gev-preview .gev-primary { border-color: #a4d4d8; background: #e0f2f3; color: #087b86; }
+.gev-result { min-height: 34px; display: grid; gap: 3px; margin-top: 12px; color: #5c747c; font-size: 11px; line-height: 1.55; }
+.gev-result strong { color: #177f89; font-size: 12px; font-weight: 500; }
+.gev-result small { color: #778c93; }
+.gev-language-option { margin-top: 14px; padding-top: 12px; border-top: 1px dashed #cbdde1; }
+.gev-language-option summary { color: #4b707a; cursor: pointer; font-size: 11px; }
+.gev-language-option p { margin: 8px 0 12px; color: #809299; font-size: 10px; line-height: 1.6; }
+.gev-language-option button { margin-top: 10px; }
+.gev-language-option small { display: block; margin-top: 8px; color: #738b92; font-size: 10px; line-height: 1.5; }
+.gev-language-option blockquote { margin: 10px 0 0; padding: 10px 12px; border-left: 2px solid #9bcbd1; background: #f2f9fa; color: #47656d; font-size: 11px; line-height: 1.65; }
 .binding-card > .eyebrow { display: flex; align-items: center; gap: 8px; color: #098c97; font: 10px var(--mono); letter-spacing: .1em; }
 .binding-card h1 { font-size: clamp(22px, 2.1vw, 31px); font-weight: 500; line-height: 1.35; letter-spacing: -.03em; margin: 22px 0 12px; }
 .binding-card > p { font-size: 13px; color: #657e87; line-height: 1.85; margin: 0 0 22px; }

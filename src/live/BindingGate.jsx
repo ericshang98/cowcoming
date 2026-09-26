@@ -3,6 +3,7 @@ import { Localized, useLanguage } from '../i18n/Language';
 import { PageLead } from '../pages/Portfolio';
 import ConnectionBar from './ConnectionBar';
 import GuestPreview from './GuestPreview';
+import GevCloudPreview from './GevCloudPreview';
 
 export default function BindingGate({ live, onOpenAtlas, formId, onSelectForm, controller, ready }) {
   const { language } = useLanguage();
@@ -21,6 +22,7 @@ export default function BindingGate({ live, onOpenAtlas, formId, onSelectForm, c
     <aside className="work-list evolution-technology binding-panel" aria-label={t('绑定设备', 'Device binding')}>
       <div className="glass binding-card">
         <GuestPreview formId={formId} onSelect={onSelectForm} ready={ready} controller={controller} />
+        <GevCloudPreview formId={formId} controller={controller} ready={ready} />
         <span className="eyebrow"><Link2 size={14} />{t('设备连接', 'DEVICE CONNECTION')}</span>
         <h1>{waiting ? t('已绑定，等待电脑上线', 'Bound. Waiting for your computer.') : reconnecting ? t('连接已中断，正在重连', 'Connection lost. Reconnecting.') : t('先绑定你的牛来', 'Bind your Niulai first')}</h1>
         <p role="status">{waiting ? t('网页密钥已验证。请在连接机械臂的电脑上，用配套设备密钥启动程序。电脑上线后，这里会自动打开。', 'Your browser key is verified. Start the local program with the matching device key on the arm’s computer. This page opens automatically when it comes online.') : reconnecting ? t('进化和实时交互已暂停。请检查电脑程序与网络；恢复连接后继续，旧动作不会重放。', 'Evolution and live interactions are paused. Check the local program and network. Previous actions will not replay after reconnection.') : t('输入网页连接密钥，并让对应电脑上线，才能使用进化、摄像头和语言交互。', 'Enter your browser connection key and bring its computer online to use evolution, camera and language interactions.')}</p>

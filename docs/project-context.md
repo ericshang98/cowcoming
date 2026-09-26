@@ -2,6 +2,12 @@
 
 Current checks, release boundaries and on-site acceptance: [submission checklist](submission-checklist.md). JEV parallel scheduling is a local controller option; Worker protocol remains unchanged.
 
+## 2026-09-26：保留原站模型的 GEV 云端试玩
+
+网站继续使用原主站的六套牛来 GLB、`Evolution` 页面和五项动作合同。新增 `src/live/GevCloudPreview.jsx` 只在未绑定页提供云端试玩：浏览器把输入和当前 `formId` 发到公开 `VITE_GEV_PREVIEW_URL`（兼容 `VITE_GEP_PREVIEW_URL`），网关只返回一个既有动作 ID，网页通过现有 `responsePlayer` 播放。没有 endpoint 时显示待配置，不伪造在线模型；试玩不写进化历史、不计轮、不驱动硬件。
+
+可选的语言模型区域使用用户填写的 endpoint 和 API Key 直连第三方，密钥只留在当前页面内存，不经 Cowcoming 服务端，也不参与 GEV 动作决策。接口合同和部署边界见 [GEV 云端试玩](gev-cloud-preview.md)。本次修正撤回独立程序化牛作为默认展示的方向，独立 Harness 仍是开发者工具，不是原站视觉或模型资产的替代品。
+
 # 项目现状与交接
 
 ## 2026-09-24：六模型图鉴与可点击调试按钮

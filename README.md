@@ -7,6 +7,7 @@
 | 你想做什么 | 从这里开始 |
 | --- | --- |
 | 直接体验牛来 | 打开 [WORK 页面](https://cowcoming.world/?section=work)，无需克隆源码 |
+| 试玩云端 GEV | 配置公开 `VITE_GEV_PREVIEW_URL`，阅读 [GEV 云端试玩](docs/gev-cloud-preview.md) |
 | 了解形态切换、自动进化和重置 | 阅读 [使用指南](docs/getting-started.md) |
 | 接入自己的 JEV、语言模型或机械臂 | 先读 [硬件开发交接](docs/hardware-handoff.md)，再按 [设备 API 指南](docs/live-device.md) 联调 |
 | 在自己的电脑运行或修改网页 | 按下方本地运行步骤开始 |
