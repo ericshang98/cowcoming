@@ -1,12 +1,25 @@
 import { forms } from "../evolution.mjs";
 import { useLanguage } from "../i18n/Language";
+import { Settings } from "lucide-react";
 
-export default function GuestPreview({ formId, onSelect }) {
+export default function GuestPreview({ formId, onSelect, onOpenSettings, settingsNeedsSetup = false }) {
   const { language } = useLanguage();
   const zh = language === "zh";
   return (
     <div className="guest-preview">
-      <h2>{zh ? "预览进化" : "Preview evolution"}</h2>
+      <div className="guest-preview-heading">
+        <h2>{zh ? "预览进化" : "Preview evolution"}</h2>
+        {onOpenSettings && <button
+          type="button"
+          className="guest-preview-settings"
+          aria-label={zh ? "打开进化设置" : "Open evolution settings"}
+          title={zh ? "进化设置" : "Evolution settings"}
+          onClick={onOpenSettings}
+        >
+          <Settings size={16} strokeWidth={1.7} />
+          <i className={settingsNeedsSetup ? "needs-setup" : ""} />
+        </button>}
+      </div>
       <p>{zh
         ? "没绑定也能看六种真实形态。正常对话时由模型决定动作；基础动作和参数只在调试模式里手动试播。"
         : "Look through all six real forms without binding. During a normal conversation the model chooses the response; manual base-action playback belongs in Debug mode."}</p>

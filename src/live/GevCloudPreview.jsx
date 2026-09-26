@@ -17,9 +17,9 @@ export default function GevCloudPreview({ formId, controller, ready }) {
   const [status, setStatus] = useState('');
   const [decision, setDecision] = useState(null);
   const [llmOpen, setLlmOpen] = useState(false);
-  const [llmEndpoint, setLlmEndpoint] = useState('');
+  const [llmEndpoint, setLlmEndpoint] = useState(() => String(import.meta.env.VITE_LLM_PREVIEW_URL || '').trim());
   const [llmKey, setLlmKey] = useState('');
-  const [llmModel, setLlmModel] = useState('');
+  const [llmModel, setLlmModel] = useState(() => String(import.meta.env.VITE_LLM_PREVIEW_MODEL || '').trim());
   const [llmText, setLlmText] = useState('');
   const [llmBusy, setLlmBusy] = useState(false);
   const [llmStatus, setLlmStatus] = useState('');
@@ -27,6 +27,7 @@ export default function GevCloudPreview({ formId, controller, ready }) {
   const generation = useRef(0);
   const endpoint = resolveGevPreviewEndpoint();
   const form = forms[formId];
+  const localLlm = /^https?:\/\/(127\.0\.0\.1|localhost)(?::\d+)?\//.test(llmEndpoint.trim());
 
   useEffect(() => {
     generation.current += 1;
@@ -87,8 +88,8 @@ export default function GevCloudPreview({ formId, controller, ready }) {
 
   async function askOwnLanguageModel() {
     const prompt = llmText.trim() || text.trim();
-    if (!llmEndpoint.trim() || !llmKey.trim() || !prompt) {
-      setLlmStatus(zh ? '请填写 endpoint、API Key 和输入内容' : 'Add an endpoint, API key and input text');
+    if (!llmEndpoint.trim() || (!llmKey.trim() && !localLlm) || !prompt) {
+      setLlmStatus(zh ? (localLlm ? '请填写 endpoint 和输入内容' : '请填写 endpoint、API Key 和输入内容') : (localLlm ? 'Add an endpoint and input text' : 'Add an endpoint, API key and input text'));
       return;
     }
     setLlmBusy(true);
@@ -97,7 +98,7 @@ export default function GevCloudPreview({ formId, controller, ready }) {
     try {
       const response = await fetch(llmEndpoint.trim(), {
         method: 'POST',
-        headers: { 'content-type': 'application/json', accept: 'application/json', authorization: `Bearer ${llmKey.trim()}` },
+        headers: { 'content-type': 'application/json', accept: 'application/json', ...(llmKey.trim() ? { authorization: `Bearer ${llmKey.trim()}` } : {}) },
         body: JSON.stringify({
           model: llmModel.trim() || undefined,
           messages: [{ role: 'user', content: `你是${form?.name || '牛来'}的陪伴助手。请回应：${prompt}` }],
@@ -108,7 +109,7 @@ export default function GevCloudPreview({ formId, controller, ready }) {
       const output = value?.choices?.[0]?.message?.content || value?.output || value?.text;
       if (typeof output !== 'string' || !output.trim()) throw new Error('LLM returned no text');
       setLlmOutput(output.trim().slice(0, 1200));
-      setLlmStatus(zh ? '完成。密钥只存在当前浏览器内，没有发送给牛来服务。' : 'Done. The key stayed in this browser and was not sent to Cowcoming.');
+      setLlmStatus(zh ? (localLlm ? '完成。本地语言模型网关已返回文字。' : '完成。密钥只存在当前浏览器内，没有发送给牛来服务。') : (localLlm ? 'Done. The local language-model gateway returned text.' : 'Done. The key stayed in this browser and was not sent to Cowcoming.'));
     } catch (error) {
       setLlmStatus(error instanceof Error ? error.message : String(error));
     } finally {
@@ -124,9 +125,9 @@ export default function GevCloudPreview({ formId, controller, ready }) {
       </div>
       <span className={`gev-endpoint-state ${endpoint ? 'is-ready' : ''}`}>{endpoint ? (zh ? '已配置' : 'READY') : (zh ? '待配置' : 'NOT CONFIGURED')}</span>
     </div>
-    <p>{zh
-      ? '云端模型只选择一个已有动作；下面仍然播放仓库里的真实牛来模型，不接大语言模型，也不会触发机械臂。'
-      : 'The cloud model only selects an existing motion. The real Niulai model from this repository renders it in the browser; no LLM or hardware is involved.'}</p>
+      <p>{zh
+      ? 'GEV 只选择一个已有动作；下面播放仓库里的真实牛来模型。语言模型只生成文字，不参与动作决策，也不会触发机械臂。'
+      : 'GEV only selects an existing motion. The real Niulai model from this repository renders it in the browser; the language model only writes text and never controls motion or hardware.'}</p>
     <label className="gev-input-label" htmlFor="gev-preview-input">{zh ? '输入一句话' : 'Say something'}</label>
     <textarea id="gev-preview-input" value={text} onChange={(event) => setText(event.target.value)} rows={3} maxLength={500} placeholder={zh ? '例如：我今天有点累，陪我安静一会儿。' : 'For example: I am tired today. Stay with me quietly.'} />
     <div className="gev-preview-actions">
@@ -138,8 +139,8 @@ export default function GevCloudPreview({ formId, controller, ready }) {
       {status && <small>{status}</small>}
     </div>
     <details className="gev-language-option" open={llmOpen} onToggle={(event) => setLlmOpen(event.currentTarget.open)}>
-      <summary>{zh ? '可选：在浏览器直连你自己的语言模型' : 'Optional: call your own language model in this browser'}</summary>
-      <p>{zh ? '本站不会接收或保存下面的 API Key。请求直接从浏览器发到你填写的 endpoint，并且只生成文字，不参与 GEV 动作决策。' : 'Cowcoming does not receive or store this API key. The browser calls your endpoint directly; the result is text only and never controls GEV motions.'}</p>
+      <summary>{localLlm ? (zh ? '本地语言模型试玩' : 'Local language-model preview') : (zh ? '可选：在浏览器直连你自己的语言模型' : 'Optional: call your own language model in this browser')}</summary>
+      <p>{zh ? '本地测试 endpoint 不需要 Key；填写外部服务时，请只使用你自己的 Key。请求直接从浏览器发到 endpoint，只生成文字，不参与 GEV 动作决策。' : 'The local test endpoint needs no key. For an external service, use your own key; the browser calls it directly and the result never controls GEV motions.'}</p>
       <label htmlFor="gev-llm-endpoint">Endpoint</label>
       <input id="gev-llm-endpoint" value={llmEndpoint} onChange={(event) => setLlmEndpoint(event.target.value)} autoComplete="off" placeholder="https://your-provider.example/v1/chat/completions" />
       <label htmlFor="gev-llm-key">API Key / SDK</label>

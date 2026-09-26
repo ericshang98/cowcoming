@@ -29,6 +29,7 @@
     "predev": "node scripts/export-device-kit.mjs",
     "qa:work-models": "node scripts/work-models-qa.cjs",
     "motion:lab": "node scripts/motion-lab.mjs",
+    "models:dev": "node scripts/local-model-gateway.mjs",
     "qa:release": "node scripts/final-release-check.mjs",
     "qa:six-models": "node scripts/model-loading-qa.cjs"
   },

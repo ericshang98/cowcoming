@@ -45,3 +45,22 @@ GEV 服务可以由项目方在云端持有自己的模型凭据，浏览器只�
 页面另有一个默认折叠的“浏览器直连自己的语言模型”区域。用户可以临时填写 endpoint、API Key/SDK 和模型名，浏览器直接向该 endpoint 发兼容请求。这个 key 只保存在当前 React 内存，不写入 localStorage、服务端或 Cowcoming Worker；语言结果只作为文字显示，不进入 GEV 决策，也不驱动设备。提供商必须允许浏览器跨域请求，用户应只输入自己愿意直接交给该提供商的 key。
 
 这两个链路故意分开：GEV 负责从已有动作中做快速选择，语言模型（如果用户选择使用）只负责文字。原网站的真实模型资产、人格、动作合同和硬件接入边界都继续由现有文档定义。
+
+## 本地联调
+
+仓库提供一个仅监听 loopback 的本地模型网关，便于先验收页面交互，再接入真实模型：
+
+```sh
+npm run models:dev
+npm run dev -- --port 4197
+```
+
+开发环境的 `.env.local`（已被 Git 忽略）可以指向：
+
+```dotenv
+VITE_GEV_PREVIEW_URL=http://127.0.0.1:8768/gev/preview
+VITE_LLM_PREVIEW_URL=http://127.0.0.1:8768/v1/chat/completions
+VITE_LLM_PREVIEW_MODEL=local-llm-fixture-v1
+```
+
+没有配置真实模型 endpoint 时，网关使用明确标注的本地规则测试适配器；它只用于验证请求、动作播放和文字展示，不能当作 GEV 或 LLM 的真实推理结果。接入真实模型时，在网关进程的私有环境中设置 `GEV_MODEL_*`、`LLM_MODEL_*` 和可选的 `EVOLUTION_MODEL_*`，密钥不会进入浏览器。`/health` 会显示当前是 fixture 还是已配置模型。

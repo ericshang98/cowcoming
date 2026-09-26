@@ -5,7 +5,7 @@ import ConnectionBar from './ConnectionBar';
 import GuestPreview from './GuestPreview';
 import GevCloudPreview from './GevCloudPreview';
 
-export default function BindingGate({ live, onOpenAtlas, formId, onSelectForm, controller, ready }) {
+export default function BindingGate({ live, onOpenAtlas, onOpenSettings, settingsNeedsSetup, formId, onSelectForm, controller, ready }) {
   const { language } = useLanguage();
   const t = (zh, en) => language === 'zh' ? zh : en;
   const waiting = live.status === 'connected' && live.snapshot;
@@ -21,7 +21,7 @@ export default function BindingGate({ live, onOpenAtlas, formId, onSelectForm, c
     </aside>
     <aside className="work-list evolution-technology binding-panel" aria-label={t('绑定设备', 'Device binding')}>
       <div className="glass binding-card">
-        <GuestPreview formId={formId} onSelect={onSelectForm} />
+        <GuestPreview formId={formId} onSelect={onSelectForm} onOpenSettings={onOpenSettings} settingsNeedsSetup={settingsNeedsSetup} />
         <GevCloudPreview formId={formId} controller={controller} ready={ready} />
         <span className="eyebrow"><Link2 size={14} />{t('设备连接', 'DEVICE CONNECTION')}</span>
         <h1>{waiting ? t('已绑定，等待电脑上线', 'Bound. Waiting for your computer.') : reconnecting ? t('连接已中断，正在重连', 'Connection lost. Reconnecting.') : t('先绑定你的牛来', 'Bind your Niulai first')}</h1>
