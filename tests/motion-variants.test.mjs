@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import { ACTION_CATALOG } from '../shared/action-catalog.mjs';
 import { SOFTWARE_VARIANTS, selectSoftwareVariant, softwareVariantCount } from '../src/live/motion-variants.mjs';
 
-test('software variants stay within the five base actions and expose a richer form vocabulary', () => {
-  assert.ok(softwareVariantCount() >= 20);
+test('software variants cover the desktop-pet catalog across every form', () => {
+  assert.ok(Object.keys(ACTION_CATALOG).length > 20);
+  assert.ok(softwareVariantCount() >= Object.keys(ACTION_CATALOG).length * 6);
   for (const [formId, actions] of Object.entries(SOFTWARE_VARIANTS)) {
     for (const [actionId, variants] of Object.entries(actions)) {
       assert.ok(ACTION_CATALOG[actionId], `${formId} uses an unknown base action`);

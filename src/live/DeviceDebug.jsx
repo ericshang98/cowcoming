@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "../i18n/Language";
 import { LiveDialog } from "./ConnectionBar";
 import { forms } from "../evolution.mjs";
-import { ACTION_CATALOG, ACTION_CONTRACT_VERSION, availableDeviceActions } from "../../shared/action-catalog.mjs";
-import { ACTION_IDS } from "../../shared/live-protocol.mjs";
+import { ACTION_CATALOG, ACTION_CONTRACT_VERSION, actionsByGroup, availableDeviceActions } from "../../shared/action-catalog.mjs";
 export default function DeviceDebug({ live, onClose }) {
   const { language } = useLanguage(),
     t = (zh, en) => (language === "zh" ? zh : en);
@@ -46,7 +45,7 @@ export default function DeviceDebug({ live, onClose }) {
           "Set evolution cadence at the lower left. Edit forms, prompts and actions here; manually changing a form takes control of evolution.",
         )}
       </p>
-      {legacy && <div role="status"><p>{t('当前房间使用旧动作协议，需要升级后由设备重新确认。','This room uses the old action contract. Upgrade and wait for device acknowledgement.')}</p><button onClick={()=>live.updateProfile({migrateActions:true})}>{t('升级到五动作协议','Upgrade to five actions')}</button></div>}
+      {legacy && <div role="status"><p>{t('当前房间使用旧动作协议，需要升级后由设备重新确认。','This room uses the old action contract. Upgrade and wait for device acknowledgement.')}</p><button onClick={()=>live.updateProfile({migrateActions:true})}>{t('升级动作目录','Upgrade behavior catalog')}</button></div>}
       {!legacy && live.snapshot.device.actionContractVersion!==ACTION_CONTRACT_VERSION && <p role="status">{t('请让设备运行新版接入套件，并声明已验证的动作能力。','Update the device kit and report its verified action capabilities.')}</p>}
       <form onSubmit={save}>
       <fieldset disabled={legacy} style={{border:0,padding:0}}>
@@ -91,25 +90,21 @@ export default function DeviceDebug({ live, onClose }) {
         </label>
         {draft.personaVersion && <p>{t('语言人格按版本与本地配置同步，此处只预览；形态提示词供 JEV 使用。','Language persona is versioned with the local configuration; this field is a preview. The form prompt is for JEV.')}</p>}
         <fieldset>
-          <legend>{t("允许选择的动作", "Allowed actions")}</legend>
-          <div className="live-action-options">
-            {ACTION_IDS.map((action) => (
-              <label key={action} className="live-checkbox">
-                <input
-                  type="checkbox"
-                  checked={draft.allowedActions.includes(action)}
-                  onChange={(e) =>
-                    setDraft({
-                      ...draft,
-                      allowedActions: e.target.checked
-                        ? [...draft.allowedActions, action]
-                        : draft.allowedActions.filter((a) => a !== action),
-                    })
-                  }
-                />
-                {ACTION_CATALOG[action] ? t(ACTION_CATALOG[action].label,ACTION_CATALOG[action].en) : action}
-              </label>
-            ))}
+          <legend>{t("允许选择的动作", "Allowed behaviors")}</legend>
+          <p>{t("动作目录按身体部位组织；设备只会执行它在能力声明中支持的动作。", "The catalog is grouped by body region; hardware runs only actions it advertises as supported.")}</p>
+          <div className="live-action-groups">
+            {actionsByGroup().map((group) => <div key={group.id}>
+              <strong>{t(group.label, group.en)}</strong>
+              <div className="live-action-options">
+                {group.actions.map((action) => (
+                  <label key={action.id} className="live-checkbox">
+                    <input type="checkbox" checked={draft.allowedActions.includes(action.id)} onChange={(e) => setDraft({...draft, allowedActions: e.target.checked ? [...draft.allowedActions, action.id] : draft.allowedActions.filter((a) => a !== action.id)})} />
+                    {t(action.label, action.en)}
+                  </label>
+                ))}
+              </div>
+            </div>)}
+            <label className="live-checkbox"><input type="checkbox" checked={draft.allowedActions.includes("WAIT")} onChange={(e) => setDraft({...draft, allowedActions: e.target.checked ? [...draft.allowedActions, "WAIT"] : draft.allowedActions.filter((a) => a !== "WAIT")})} />{t("等待", "Wait")}</label>
           </div>
         </fieldset>
         <details>

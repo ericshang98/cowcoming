@@ -10,7 +10,7 @@ import {
 } from "../src/live/motion-tuning.mjs";
 import { tuneClip } from "../src/live/tuned-clip.mjs";
 import { createResponsePlayer } from "../src/live/response-player.mjs";
-test("tuning round trips all 30 actions; rejects incompatible sources and unsafe values atomically", () => {
+test("tuning round trips the full desktop-pet catalog; rejects incompatible sources and unsafe values atomically", () => {
   const doc = defaultTuningDocument();
   doc.forms.calf.actions.NOD = { speed: 0.5, amplitude: 1.25 };
   assert.deepEqual(parseTuningDocument(JSON.stringify(doc)), doc);

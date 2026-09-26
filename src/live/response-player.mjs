@@ -61,6 +61,32 @@ export function createResponsePlayer({
     state.action = action;
     state.clip = step.clip;
   }
+  function resolveVariant(actionId, spec) {
+    if (actionId === "WAIT") return null;
+    if (!spec) return null;
+    const exact = spec?.suffix
+      ? manifest.variants.find((v) => v.logicalId === spec.suffix)
+      : null;
+    if (exact && actions[exact.clip]) return exact;
+    const candidates = [
+      spec?.animation,
+      actionId,
+      ...(spec?.softwareClips || []),
+      ...(spec?.fallbackAction && ACTION_CATALOG[spec.fallbackAction]
+        ? [ACTION_CATALOG[spec.fallbackAction].suffix]
+        : []),
+      "bow",
+      "wave",
+    ].filter(Boolean);
+    const clip = candidates.find((name) => actions[name]);
+    if (!clip) return null;
+    return {
+      logicalId: actionId,
+      clip,
+      requiredBones: [],
+      fallback: !exact,
+    };
+  }
   function drain() {
     if (current || disposed) return;
     const job = queue.shift();
@@ -108,9 +134,7 @@ export function createResponsePlayer({
       if (seen.has(request.eventId))
         return Promise.resolve({ status: "duplicate" });
       const spec = ACTION_CATALOG[request.actionId];
-      const variant = manifest.variants.find(
-        (v) => v.logicalId === spec?.suffix,
-      );
+      const variant = resolveVariant(request.actionId, spec);
       if (
         request.actionId !== "WAIT" && (!variant ||
         !actions[variant.clip] ||

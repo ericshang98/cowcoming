@@ -2,7 +2,7 @@
 import { readFile, writeFile, mkdir, copyFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { resolve, join } from "node:path";
-import { ACTION_CATALOG } from "../shared/action-catalog.mjs";
+import { ACTION_CATALOG, HARDWARE_ACTION_IDS } from "../shared/action-catalog.mjs";
 const sourceRoot = resolve(process.env.NIULAI_PACKAGE || "tmp/evolution");
 const allForms = ["calf", "normal", "playful", "tough", "celestial", "dark"];
 const selectedForms = process.env.NIULAI_FORMS?.split(",") || allForms;
@@ -21,7 +21,8 @@ for (const form of selectedForms) {
   const bytes = await readFile(join(input, manifest.model));
   const sha = createHash("sha256").update(bytes).digest("hex");
   const name = `${form}-${sha.slice(0, 12)}.glb`;
-  const variants = Object.entries(ACTION_CATALOG).map(([actionId, a]) => {
+  const variants = HARDWARE_ACTION_IDS.filter((id) => id !== "WAIT").map((actionId) => {
+    const a = ACTION_CATALOG[actionId];
     const v = manifest.variants.find((v) => v.logicalId === a.suffix);
     if (!v) throw Error(`Missing ${form} ${actionId}`);
     return { ...v, actionId };
@@ -67,5 +68,5 @@ await writeFile(
     "\n",
 );
 console.log(
-  `Prepared ${Object.keys(orderedAssets).length} evolution models and ${Object.keys(orderedAssets).length * 5} semantic response clips.`,
+  `Prepared ${Object.keys(orderedAssets).length} evolution models and ${Object.keys(orderedAssets).length * (HARDWARE_ACTION_IDS.length - 1)} verified response clips; software-only behaviors are generated at runtime.`,
 );

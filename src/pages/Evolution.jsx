@@ -22,7 +22,7 @@ function growthStepLabel(state, status, t) {
 function growthStepDescription(state, status, t) {
   const completed = Math.max(0, state.turns.length - state.checkpoint);
   const interval = state.settings.interval;
-  if (status === 'manual') return t('正常对话仍由 JEV 选择基础动作；形态由你在图鉴中明确选择。', 'JEV still chooses the base action during normal conversation; you choose the form explicitly in the atlas.');
+  if (status === 'manual') return t('正常对话仍由 JEV 从桌面宠物动作目录中选择；形态由你在图鉴中明确选择。', 'JEV still chooses from the desktop-pet behavior catalog during normal conversation; you choose the form explicitly in the atlas.');
   if (status === 'terminal') return t('仙牛和暗黑牛没有自动后继；重置后才会从小牛重新开始。', 'Celestial and dark have no automatic successor; reset starts again from calf.');
   if (status === 'evaluating') return t(`已完成 ${completed} 次互动，评估器正在决定保持当前形态还是沿合法分支前进。`, `${completed} interactions are complete. The evaluator is deciding whether to stay or take one legal branch step.`);
   if (status === 'error') return t('对话记录保留，进入设置重试不会重复计轮，也不会伪造进化。', 'The conversation record is kept. Retry in Settings without recounting turns or faking an evolution.');

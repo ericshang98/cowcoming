@@ -20,7 +20,7 @@ VITE_GEV_PREVIEW_URL=https://your-preview-gateway.example/v1/gev/preview
   "model": "gev-preview-v1",
   "formId": "normal",
   "text": "我今天有点累，陪我安静一会儿。",
-  "allowedActions": ["NOD", "SHAKE", "NOD_DOUBLE", "TILT_LEFT", "TILT_RIGHT", "WAIT"]
+  "allowedActions": ["NOD", "PAW_WAVE", "BELLY_BREATHE", "TAIL_WAG", "WAIT"]
 }
 ```
 
@@ -29,7 +29,7 @@ VITE_GEV_PREVIEW_URL=https://your-preview-gateway.example/v1/gev/preview
 ```json
 {
   "requestId": "browser-generated-id",
-  "actionId": "NOD",
+  "actionId": "PAW_WAVE",
   "summary": "简短可读的动作理由",
   "modelVersion": "your-model-version",
   "latencyMs": 83

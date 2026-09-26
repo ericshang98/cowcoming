@@ -8,7 +8,7 @@ import {
   saveTuning,
   parseTuningDocument,
 } from "../live/motion-tuning.mjs";
-import { ACTION_CATALOG } from "../../shared/action-catalog.mjs";
+import { ACTION_CATALOG, actionsByGroup } from "../../shared/action-catalog.mjs";
 import { useLanguage } from "../i18n/Language";
 export default function MotionPreview({ controller, formId, ready, defaultOpen = false }) {
   const { language } = useLanguage(),
@@ -148,17 +148,30 @@ export default function MotionPreview({ controller, formId, ready, defaultOpen =
       <summary>
         {zh ? "动作调试 · 仅软件" : "Motion tuning · software only"}
       </summary>
-      <div className="motion-preview-actions">
-        {Object.entries(ACTION_CATALOG).map(([id, a]) => (
-          <button
-            key={id}
-            data-motion={id}
-            aria-pressed={selected === id}
-            disabled={!ready || busy}
-            onClick={() => play(id)}
-          >
-            {zh ? a.label : a.en}
-          </button>
+      <p className="motion-preview-note">
+        {zh
+          ? "这里是桌面宠物的动作能力库，按身体部位分组。软件可以先演示全部动作；实机只执行设备声明支持的能力。"
+          : "This is the desktop-pet behavior library, grouped by body region. Software can preview the full catalog; hardware runs only verified capabilities."}
+      </p>
+      <div className="motion-preview-groups">
+        {actionsByGroup().map((group) => (
+          <section key={group.id} className="motion-preview-group">
+            <h4>{zh ? group.label : group.en}</h4>
+            <div className="motion-preview-actions">
+              {group.actions.map((action) => (
+                <button
+                  key={action.id}
+                  data-motion={action.id}
+                  aria-pressed={selected === action.id}
+                  disabled={!ready || busy}
+                  onClick={() => play(action.id)}
+                  title={action.region}
+                >
+                  {zh ? action.label : action.en}
+                </button>
+              ))}
+            </div>
+          </section>
         ))}
       </div>
       <fieldset className="motion-tuning" disabled={!ready || busy}>

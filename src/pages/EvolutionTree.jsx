@@ -197,8 +197,8 @@ export default function EvolutionTree({
               </div>
               <p className="atlas-debug-note">
                 {zh
-                  ? `五个基础动作只用于调试；${softwareVariantCount(previewId)} 个软件表现变体会在正常对话中按形态和事件自动选择。`
-                  : `The five base actions are for debugging; normal conversation can choose from ${softwareVariantCount(previewId)} software accents for this form.`}
+                  ? `动作目录只用于调试试播；${softwareVariantCount(previewId)} 个软件表现变体会在正常对话中按身体部位、形态和事件自动选择。实机能力由设备声明。`
+                  : `The behavior catalog is for debug preview; normal conversation can choose from ${softwareVariantCount(previewId)} software accents for this form, while hardware declares its own capabilities.`}
               </p>
               <MotionPreview
                 controller={controller}

@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { createHash } from "node:crypto";
 import { evolutionAssets } from "../src/evolution-assets.mjs";
-import { ACTION_CATALOG } from "../shared/action-catalog.mjs";
-test("all six shipped rigs contain the exact five clips and their required bones", () => {
+import { ACTION_CATALOG, HARDWARE_ACTION_IDS } from "../shared/action-catalog.mjs";
+test("all six shipped rigs contain the verified hardware clips while the software catalog remains broader", () => {
   assert.equal(Object.keys(evolutionAssets).length, 6);
   for (const [form, m] of Object.entries(evolutionAssets)) {
     const bytes = fs.readFileSync(
@@ -17,10 +17,10 @@ test("all six shipped rigs contain the exact five clips and their required bones
     const bones = new Set(
       json.skins.flatMap((s) => s.joints.map((j) => json.nodes[j].name)),
     );
-    assert.equal(m.variants.length, 5);
+    assert.equal(m.variants.length, HARDWARE_ACTION_IDS.length - 1);
     assert.deepEqual(
       m.variants.map((v) => v.actionId).sort(),
-      Object.keys(ACTION_CATALOG).sort(),
+      HARDWARE_ACTION_IDS.filter((id) => id !== "WAIT").sort(),
     );
     for (const v of m.variants) {
       assert.ok(json.animations.some((a) => a.name === v.clip));
@@ -43,13 +43,7 @@ test("playful retains its original clips, mouth shapes and reclining presentatio
     bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString(),
   );
   assert.equal(json.animations.length, 14);
-  for (const name of [
-    "idle",
-    "wave",
-    "bow",
-    "leg_sway",
-    ...Object.keys(ACTION_CATALOG),
-  ])
+  for (const name of ["idle", "wave", "bow", "leg_sway", "NOD", "NOD_DOUBLE", "SHAKE", "TILT_LEFT", "TILT_RIGHT"])
     assert.ok(json.animations.some((a) => a.name === name));
   const morphNames = new Set(
     json.meshes.flatMap((m) => m.extras?.targetNames || []),

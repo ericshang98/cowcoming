@@ -4213,6 +4213,10 @@ kbd {
 /* Per-form response tuning: keep all controls inside the WORK timeline. */
 .motion-preview { margin-top: 20px; border-top: 1px solid #0002; padding-top: 14px; }
 .motion-preview summary { cursor: pointer; font-size: 13px; font-weight: 600; padding: 4px 0 10px; }
+.motion-preview-note { font-size: 10px; line-height: 1.7; color: #637f89; margin: 0 0 10px; }
+.motion-preview-groups { display: grid; gap: 9px; }
+.motion-preview-group { border: 1px solid #0002; border-radius: 8px; padding: 7px 8px 4px; }
+.motion-preview-group h4 { font-size: 10px; font-weight: 600; margin: 0; color: #54727a; }
 .motion-preview button { font: inherit; font-size: 11px; border: 1px solid #0003; border-radius: 6px; padding: 7px 9px; background: #fff9; cursor: pointer; }
 .motion-preview button:disabled { opacity: .4; cursor: default; }
 .motion-preview button[aria-pressed="true"] { background: #222; color: white; }

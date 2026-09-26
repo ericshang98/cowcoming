@@ -14,6 +14,7 @@ import { evolutionAssets } from "../evolution-assets.mjs";
 import { createResponsePlayer } from "../live/response-player.mjs";
 import { DEFAULT_TUNING } from "../live/motion-tuning.mjs";
 import { selectSoftwareVariant } from "../live/motion-variants.mjs";
+import { createDesktopPetClips } from "../scene/ip-motion.mjs";
 import { useLanguage } from "../i18n/Language";
 
 class PreviewBoundary extends Component {
@@ -66,7 +67,7 @@ function PreviewRig({ asset, controller, onReady }) {
   }, [bounds, camera, size.width, size.height]);
   useEffect(() => {
     const actions = Object.fromEntries(
-      gltf.animations.map((clip) => [clip.name, mixer.clipAction(clip)]),
+      [...createDesktopPetClips(model), ...gltf.animations].map((clip) => [clip.name, mixer.clipAction(clip)]),
     );
     const names = new Set();
     model.traverse((object) => {

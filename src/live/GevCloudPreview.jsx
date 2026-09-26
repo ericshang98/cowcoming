@@ -126,8 +126,8 @@ export default function GevCloudPreview({ formId, controller, ready }) {
       <span className={`gev-endpoint-state ${endpoint ? 'is-ready' : ''}`}>{endpoint ? (zh ? '已配置' : 'READY') : (zh ? '待配置' : 'NOT CONFIGURED')}</span>
     </div>
       <p>{zh
-      ? 'GEV 只选择一个已有动作；下面播放仓库里的真实牛来模型。语言模型只生成文字，不参与动作决策，也不会触发机械臂。'
-      : 'GEV only selects an existing motion. The real Niulai model from this repository renders it in the browser; the language model only writes text and never controls motion or hardware.'}</p>
+      ? 'GEV 从桌面宠物动作目录中选择一个语义动作；下面播放仓库里的真实牛来模型。语言模型只生成文字，不参与动作决策，也不会触发机械臂。'
+      : 'GEV selects one semantic behavior from the desktop-pet catalog. The real Niulai model from this repository renders it in the browser; the language model only writes text and never controls motion or hardware.'}</p>
     <label className="gev-input-label" htmlFor="gev-preview-input">{zh ? '输入一句话' : 'Say something'}</label>
     <textarea id="gev-preview-input" value={text} onChange={(event) => setText(event.target.value)} rows={3} maxLength={500} placeholder={zh ? '例如：我今天有点累，陪我安静一会儿。' : 'For example: I am tired today. Stay with me quietly.'} />
     <div className="gev-preview-actions">

@@ -11,7 +11,7 @@
 
 ## 给接入者的最新修正
 
-先读 [进化与五种动作交接](hardware-handoff.md)。Eric 最新确认的五种回应为确认点头、摇头、得意双点头、左侧好奇歪头、右侧好奇歪头；不含转头看向。本交付使用动作合同 `actionContractVersion: 2`，传输协议仍为 v1。旧房间需在设备调试中显式升级，并由新版设备套件重新确认。新增进化规则与已实现/待配置部分也在交接中区分。
+先读 [桌面宠物动作目录交接](hardware-handoff.md) 和 [动作目录](action-catalog.md)。本交付使用动作合同 `actionContractVersion: 2`，传输协议仍为 v1。BenBen 的五个已验证动作只是一个 `supportedActions` 子集；其他设备可以声明头部、躯干、前肢、腹部、尾巴和组合行为。旧房间需在设备调试中显式升级，并由新版设备套件重新确认。新增进化规则与已实现/待配置部分也在交接中区分。
 
 ## 体验与职责
 
@@ -25,7 +25,7 @@
 - 本机 JEV 在允许动作集合里选择，报告 `decision`。网页仅从这个动作的动画映射中随机选择表现；完成状态来自独立的 `action` 回执。
 - 右侧 **Vision / Action** 按需建立 WebRTC 连接，显示电脑端相机和本机 CV 检测框；**Large Language Model** 显示本机发送的输入与流式回复。
 - 输入框发出 `interact` 给本机进程，由接入者决定如何调用 JEV 与语言模型；网页没有内置模型 API Key。
-- 形态切换按来源记录 manual／automatic／reset；调试选择不伪称自动成长。小牛、普通牛来、骚牛、硬牛、仙牛、暗黑牛各有五段正式骨骼动作；骚牛保留侧躺姿态并禁用大幅头部跟随。
+- 形态切换按来源记录 manual／automatic／reset；调试选择不伪称自动成长。六种牛来形态各有已核验的动作资源；公共目录可通过软件变体覆盖更多身体区域，实际可执行集合仍由当前设备能力声明决定。
 
 ```mermaid
 flowchart LR
@@ -118,7 +118,7 @@ PYTHONPATH=/path/to/your/code python examples/device/run.py --adapter my_adapter
 | `async stop()` | 无 | `{confirmed: bool, detail: str}`；确认控制器停止才返回 True |
 | `async reply(user_input)` | 用户输入 | 异步生成器，逐次 yield 字符串；模型与模型密钥留在本机 |
 
-本机已有其他语言或完整工程也可以直接使用下节协议，无须依赖 Python 示例。JEV 输出只允许 NOD、SHAKE、NOD_DOUBLE、TILT_LEFT、TILT_RIGHT 和控制结果 WAIT；五种动作语义由 `shared/action-catalog.mjs` 定义。模型不能通过返回未知 ID 扩大能力。
+本机已有其他语言或完整工程也可以直接使用下节协议，无须依赖 Python 示例。JEV 输出只能使用 `shared/action-catalog.mjs` 中的公共行为 ID，或控制结果 `WAIT`；模型不能通过返回未知 ID 扩大能力。设备仍必须用 `supportedActions` 把目录收窄到自己已经验证的子集。
 
 ## HTTP API（协议版本 1）
 
@@ -155,7 +155,7 @@ PYTHONPATH=/path/to/your/code python examples/device/run.py --adapter my_adapter
 保存云端配置：
 
 ```json
-{"type":"profile.update","expectedRevision":1,"formId":"normal","prompt":"回应时优先选择轻轻点头。","allowedActions":["NOD","SHAKE","NOD_DOUBLE","TILT_LEFT","TILT_RIGHT","WAIT"],"animationMap":{"NOD":["nod-soft"],"SHAKE":["head-shake"],"NOD_DOUBLE":["nod-double"],"TILT_LEFT":["tilt-left"],"TILT_RIGHT":["tilt-right"],"WAIT":["idle"]}}
+{"type":"profile.update","expectedRevision":1,"formId":"normal","prompt":"回应时优先选择符合身体部位和情绪的动作。","allowedActions":["NOD","PAW_WAVE","BELLY_BREATHE","TAIL_WAG","WAIT"],"animationMap":{"NOD":["nod-soft"],"PAW_WAVE":["wave","leg_sway"],"BELLY_BREATHE":["reflect","leg_sway","bow"],"TAIL_WAG":["wave","leg_sway","look"],"WAIT":["idle"]}}
 ```
 
 新配置存储成功后，设备收到 `{type:"profile",profile:{revision:2,...}}`。设备应用后发送：
@@ -179,7 +179,7 @@ PYTHONPATH=/path/to/your/code python examples/device/run.py --adapter my_adapter
 所有设备事件必须有唯一 `eventId`（建议 UUID）。重复 eventId 不重复更新状态或播放动画；已有 completed/failed/interrupted 的动作不接受倒退状态。
 
 ```json
-{"type":"device.status","eventId":"status-1","name":"Desk computer","hardware":"ready","camera":"ready","jev":"ready","language":"ready","simulation":false,"actionContractVersion":2,"supportedActions":["NOD","SHAKE","NOD_DOUBLE","TILT_LEFT","TILT_RIGHT","WAIT"]}
+{"type":"device.status","eventId":"status-1","name":"Desk computer","hardware":"ready","camera":"ready","jev":"ready","language":"ready","simulation":false,"actionContractVersion":2,"supportedActions":["NOD","PAW_WAVE","BELLY_BREATHE","TAIL_WAG","WAIT"]}
 {"type":"observation","eventId":"obs-1","text":"检测到一位参与者"}
 {"type":"decision","eventId":"dec-1","decisionId":"decision-1","commandId":"command-1","profileRevision":2,"actionId":"NOD","summary":"对问候做点头回应"}
 {"type":"action","eventId":"act-1","decisionId":"decision-1","status":"started","detail":"控制器开始动作"}

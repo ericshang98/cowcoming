@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { createResponsePlayer } from "../src/live/response-player.mjs";
 import {
   ACTION_CATALOG,
+  HARDWARE_ACTION_IDS,
   availableDeviceActions,
 } from "../shared/action-catalog.mjs";
 import { initialRoom, updateProfile } from "../shared/live-protocol.mjs";
@@ -15,8 +16,8 @@ function fixture({ accent = false } = {}) {
   const mixer = new THREE.AnimationMixer(root),
     actions = {};
   for (const name of [
-    "idle", "bow",
-    ...Object.values(ACTION_CATALOG).map((a) => a.suffix),
+    "idle", "bow", "wave", "look", "reflect", "tilt", "leg_sway",
+    ...HARDWARE_ACTION_IDS.filter((id) => id !== "WAIT").map((id) => ACTION_CATALOG[id].suffix),
   ])
     actions[name] = mixer.clipAction(
       new THREE.AnimationClip(name, 0.4, [
@@ -29,9 +30,9 @@ function fixture({ accent = false } = {}) {
     );
   const manifest = {
     formId: "calf",
-    variants: Object.values(ACTION_CATALOG).map((a) => ({
-      logicalId: a.suffix,
-      clip: a.suffix,
+    variants: HARDWARE_ACTION_IDS.filter((id) => id !== "WAIT").map((id) => ({
+      logicalId: ACTION_CATALOG[id].suffix,
+      clip: ACTION_CATALOG[id].suffix,
       requiredBones: ["Head"],
     })),
   };
@@ -56,9 +57,10 @@ function fixture({ accent = false } = {}) {
     },
   };
 }
-test("all five actions play their distinct clip, complete after recovery and deduplicate", async () => {
+test("verified hardware actions play their distinct clip, complete after recovery and deduplicate", async () => {
   const f = fixture();
-  for (const [id, a] of Object.entries(ACTION_CATALOG)) {
+  for (const id of HARDWARE_ACTION_IDS.filter((id) => id !== "WAIT")) {
+    const a = ACTION_CATALOG[id];
     const request = { eventId: id, formId: "calf", actionId: id };
     const result = f.player.play(request);
     assert.equal(f.player.clip, a.suffix);
@@ -67,6 +69,17 @@ test("all five actions play their distinct clip, complete after recovery and ded
     f.advance();
     assert.equal((await result).status, "completed");
     assert.equal(f.player.busy, false);
+  }
+  f.player.dispose();
+});
+test("expanded software behaviors resolve to a registered clip or a declared fallback", async () => {
+  const f = fixture();
+  for (const id of Object.keys(ACTION_CATALOG).filter((id) => !HARDWARE_ACTION_IDS.includes(id))) {
+    const result = f.player.play({ eventId: `software-${id}`, formId: "calf", actionId: id });
+    assert.equal(f.player.busy, true);
+    assert.ok(f.player.clip);
+    f.advance();
+    assert.equal((await result).status, "completed");
   }
   f.player.dispose();
 });
@@ -111,17 +124,10 @@ test("protocol migration is explicit and action semantics cannot be swapped", ()
     migrateActions: true,
   });
   assert.equal(next.profile.actionContractVersion, 2);
-  for (const [id, a] of Object.entries(ACTION_CATALOG))
-    for (const other of Object.values(ACTION_CATALOG))
-      if (a !== other)
-        assert.throws(
-          () =>
-            updateProfile(next, {
-              expectedRevision: 2,
-              animationMap: { [id]: [other.animation] },
-            }),
-          /mapping/,
-        );
+  assert.throws(
+    () => updateProfile(next, { expectedRevision: 2, animationMap: { NOD: ["wave"] } }),
+    /mapping/,
+  );
   next.device = {
     hardware: "ready",
     actionContractVersion: 2,

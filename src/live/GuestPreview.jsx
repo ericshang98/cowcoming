@@ -21,8 +21,8 @@ export default function GuestPreview({ formId, onSelect, onOpenSettings, setting
         </button>}
       </div>
       <p>{zh
-        ? "没绑定也能看六种真实形态。正常对话时由模型决定动作；基础动作和参数只在调试模式里手动试播。"
-        : "Look through all six real forms without binding. During a normal conversation the model chooses the response; manual base-action playback belongs in Debug mode."}</p>
+        ? "没绑定也能看六种真实形态。正常对话时由模型从桌面宠物动作目录决定回应；动作目录和参数只在调试模式里手动试播。"
+        : "Look through all six real forms without binding. During a normal conversation the model chooses from the desktop-pet behavior catalog; manual catalog playback belongs in Debug mode."}</p>
       <div className="guest-forms" role="group" aria-label={zh ? "预览形态" : "Preview forms"}>
         {Object.values(forms).map((item) => (
           <button key={item.id} type="button" aria-pressed={item.id === formId} onClick={() => onSelect(item.id)}>

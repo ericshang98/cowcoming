@@ -28,14 +28,14 @@ python run.py --adapter my_adapter:Adapter --camera 0
 ```
 
 - `simulation = False` for a real adapter.
-- `status()` → `{name, hardware, jev, language, actionContractVersion: 2, supportedActions}`. Status values: ready/offline/error/unknown.
+- `status()` → `{name, hardware, jev, language, actionContractVersion: 2, supportedActions}`. Status values: ready/offline/error/unknown. `supportedActions` is a verified subset of the public desktop-pet behavior catalog; it is not required to contain every catalog action.
 - `apply_profile(profile)` receives `revision`, `actionContractVersion`, `formId`, `prompt`, `allowedActions`, `animationMap`. Return only after the JEV prompt/configuration is applied.
 - `decide(user_input, requested_action=None, *, allowed_actions=None)` → `{actionId, summary}`. Call your JEV with the profile prompt and the provided allowed_actions capability intersection. Never return arbitrary motor instructions.
 - `execute(action_id)` → `{status, detail}`. Report completed only with actual completion evidence; use sent for a write without completion evidence, unknown for uncertain results.
 - `stop()` → `{confirmed: bool, detail: str}`. Stop the physical controller, not just this Python task.
 - `reply(user_input)` is an async generator yielding text from your local LLM process.
 
-Action contract **2**: NOD / SHAKE / NOD_DOUBLE / TILT_LEFT / TILT_RIGHT. WAIT means no movement. Left/right are device-own directions. Advertise only verified supportedActions and set hardware=ready only after actual readiness checks. Old rooms require explicit migration in Device lab. See `hardware-handoff.md`. HTTP/WebSocket transport remains v1. Never turn a simulation into a real adapter just by changing its flag.
+Action contract **2** exposes a broad desktop-pet behavior catalog: head, torso, foreleg, belly, tail/posture and composed behaviors. `WAIT` means no movement. The five IDs NOD / SHAKE / NOD_DOUBLE / TILT_LEFT / TILT_RIGHT remain the legacy BenBen profile, not the catalog limit. Left/right are device-own directions. Advertise only verified `supportedActions` and set `hardware=ready` only after actual readiness checks. Old rooms require explicit migration in Device lab. See `hardware-handoff.md` and `action-catalog.md`. HTTP/WebSocket transport remains v1. Never turn a simulation into a real adapter just by changing its flag.
 
 Manual form selection, reset and configurable conversation-based evolution evaluation are implemented. Automatic evolution requires a configured evaluation model and gateway; see `evolution-runtime.md` in the kit or [the repository contract](https://github.com/ericshang98/cowcoming/blob/main/docs/evolution-runtime.md). Profiles remain editable per form. An update stops the current interaction, applies the new prompt, and acknowledges its revision. Reconnection receives a fresh profile and does not replay old commands.
 

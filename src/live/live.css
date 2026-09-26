@@ -161,6 +161,19 @@
   gap: 15px;
   flex-wrap: wrap;
 }
+.live-action-groups {
+  display: grid;
+  gap: 12px;
+}
+.live-action-groups strong {
+  display: block;
+  font-size: 10px;
+  color: #54727a;
+  margin-bottom: 4px;
+}
+.live-action-groups .live-action-options {
+  gap: 8px 14px;
+}
 .live-action-options label {
   margin: 0;
 }

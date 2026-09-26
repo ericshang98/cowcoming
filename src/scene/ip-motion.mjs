@@ -121,3 +121,70 @@ export function createIpClips(model, id) {
     return new THREE.AnimationClip(name, 1, tracks);
   });
 }
+// Authored normalized-time gestures for non-Niulai IPs are kept above. This
+// second layer creates software-only desktop-pet behaviors from whatever
+// compatible bones a supplied rig exposes. It never emits servo commands.
+const desktopFrames = (...values) => values;
+const desktopPose = {
+  'look-left': { Head: desktopFrames([0,0,0,0],[.2,0,18,0],[.62,0,18,0],[1,0,0,0]), Neck: desktopFrames([0,0,0,0],[.2,0,8,0],[.62,0,8,0],[1,0,0,0]) },
+  'look-right': { Head: desktopFrames([0,0,0,0],[.2,0,-18,0],[.62,0,-18,0],[1,0,0,0]), Neck: desktopFrames([0,0,0,0],[.2,0,-8,0],[.62,0,-8,0],[1,0,0,0]) },
+  'look-up': { Head: desktopFrames([0,0,0,0],[.2,-16,0,0],[.62,-16,0,0],[1,0,0,0]), Neck: desktopFrames([0,0,0,0],[.2,-7,0,0],[.62,-7,0,0],[1,0,0,0]) },
+  'look-down': { Head: desktopFrames([0,0,0,0],[.2,16,0,0],[.62,16,0,0],[1,0,0,0]), Neck: desktopFrames([0,0,0,0],[.2,7,0,0],[.62,7,0,0],[1,0,0,0]) },
+  bow: { Chest: desktopFrames([0,0,0,0],[.18,10,0,0],[.43,18,0,0],[.7,8,0,0],[1,0,0,0]), Spine: desktopFrames([0,0,0,0],[.18,8,0,0],[.43,14,0,0],[.7,6,0,0],[1,0,0,0]), Head: desktopFrames([0,0,0,0],[.2,-8,0,0],[.45,-13,0,0],[.7,-6,0,0],[1,0,0,0]) },
+  stretch: { Chest: desktopFrames([0,0,0,0],[.2,-8,0,0],[.5,-14,0,0],[.8,-5,0,0],[1,0,0,0]), 'UpperArm.L': desktopFrames([0,0,0,0],[.2,-16,0,22],[.5,-28,0,30],[.8,-12,0,16],[1,0,0,0]), 'UpperArm.R': desktopFrames([0,0,0,0],[.2,-16,0,-22],[.5,-28,0,-30],[.8,-12,0,-16],[1,0,0,0]) },
+  breathe: { Chest: desktopFrames([0,0,0,0],[.2,-5,0,0],[.42,5,0,0],[.64,-5,0,0],[.86,5,0,0],[1,0,0,0]), Spine: desktopFrames([0,0,0,0],[.2,-3,0,0],[.42,3,0,0],[.64,-3,0,0],[.86,3,0,0],[1,0,0,0]) },
+  shimmy: { Chest: desktopFrames([0,0,0,0],[.18,0,0,8],[.36,0,0,-8],[.54,0,0,8],[.72,0,0,-8],[1,0,0,0]), Hips: desktopFrames([0,0,0,0],[.18,0,0,-5],[.36,0,0,5],[.54,0,0,-5],[.72,0,0,5],[1,0,0,0]) },
+  'turn-left': { Chest: desktopFrames([0,0,0,0],[.2,0,15,0],[.65,0,18,0],[1,0,0,0]), Head: desktopFrames([0,0,0,0],[.2,0,-6,0],[.65,0,-8,0],[1,0,0,0]) },
+  'turn-right': { Chest: desktopFrames([0,0,0,0],[.2,0,-15,0],[.65,0,-18,0],[1,0,0,0]), Head: desktopFrames([0,0,0,0],[.2,0,6,0],[.65,0,8,0],[1,0,0,0]) },
+  'paw-tap-left': { 'UpperArm.L': desktopFrames([0,0,0,0],[.2,8,0,12],[.42,18,0,16],[.64,8,0,12],[1,0,0,0]), 'Forearm.L': desktopFrames([0,0,0,0],[.2,-12,0,0],[.42,-25,0,0],[.64,-12,0,0],[1,0,0,0]) },
+  'paw-tap-right': { 'UpperArm.R': desktopFrames([0,0,0,0],[.2,8,0,-12],[.42,18,0,-16],[.64,8,0,-12],[1,0,0,0]), 'Forearm.R': desktopFrames([0,0,0,0],[.2,-12,0,0],[.42,-25,0,0],[.64,-12,0,0],[1,0,0,0]) },
+  'paw-wave': { 'UpperArm.L': desktopFrames([0,0,0,0],[.15,-18,0,28],[.32,-14,0,36],[.5,-18,0,24],[.68,-14,0,36],[1,0,0,0]), 'Forearm.L': desktopFrames([0,0,0,0],[.2,-22,0,10],[.45,-10,0,-5],[.7,-22,0,10],[1,0,0,0]) },
+  'paw-reach': { 'UpperArm.L': desktopFrames([0,0,0,0],[.25,-24,0,14],[.58,-30,0,18],[.8,-10,0,8],[1,0,0,0]), 'Forearm.L': desktopFrames([0,0,0,0],[.25,-30,0,0],[.58,-40,0,0],[.8,-15,0,0],[1,0,0,0]) },
+  'paw-cross': { 'UpperArm.L': desktopFrames([0,0,0,0],[.28,-18,0,34],[.62,-10,0,22],[1,0,0,0]), 'UpperArm.R': desktopFrames([0,0,0,0],[.28,-18,0,-34],[.62,-10,0,-22],[1,0,0,0]) },
+  'belly-breathe': { Chest: desktopFrames([0,0,0,0],[.18,-6,0,0],[.4,6,0,0],[.62,-6,0,0],[.84,6,0,0],[1,0,0,0]), Hips: desktopFrames([0,0,0,0],[.2,0,0,2],[.5,0,0,-2],[.8,0,0,2],[1,0,0,0]) },
+  'belly-rub': { 'UpperArm.L': desktopFrames([0,0,0,0],[.25,-20,0,24],[.52,-12,0,18],[.78,-18,0,22],[1,0,0,0]), 'UpperArm.R': desktopFrames([0,0,0,0],[.25,-20,0,-24],[.52,-12,0,-18],[.78,-18,0,-22],[1,0,0,0]) },
+  'belly-laugh': { Chest: desktopFrames([0,0,0,0],[.2,-8,0,0],[.42,8,0,0],[.64,-8,0,0],[.86,5,0,0],[1,0,0,0]), 'UpperArm.L': desktopFrames([0,0,0,0],[.2,-18,0,24],[.42,-12,0,20],[.64,-18,0,24],[1,0,0,0]), 'UpperArm.R': desktopFrames([0,0,0,0],[.2,-18,0,-24],[.42,-12,0,-20],[.64,-18,0,-24],[1,0,0,0]) },
+  'tail-wag': { Tail: desktopFrames([0,0,0,0],[.18,0,22,0],[.36,0,-22,0],[.54,0,22,0],[.72,0,-18,0],[1,0,0,0]), 'Tail.01': desktopFrames([0,0,0,0],[.2,0,18,0],[.4,0,-18,0],[.6,0,18,0],[1,0,0,0]), Hips: desktopFrames([0,0,0,0],[.2,0,0,4],[.4,0,0,-4],[.6,0,0,4],[1,0,0,0]) },
+  sit: { Hips: desktopFrames([0,0,0,0],[.2,-10,0,0],[.55,-22,0,0],[.8,-8,0,0],[1,0,0,0]), 'UpLeg.L': desktopFrames([0,0,0,0],[.25,18,0,0],[.58,28,0,0],[.82,8,0,0],[1,0,0,0]), 'UpLeg.R': desktopFrames([0,0,0,0],[.25,18,0,0],[.58,28,0,0],[.82,8,0,0],[1,0,0,0]) },
+  stand: { Hips: desktopFrames([0,0,0,0],[.2,12,0,0],[.52,20,0,0],[.78,6,0,0],[1,0,0,0]), 'UpLeg.L': desktopFrames([0,0,0,0],[.25,-18,0,0],[.58,-26,0,0],[.82,-8,0,0],[1,0,0,0]), 'UpLeg.R': desktopFrames([0,0,0,0],[.25,-18,0,0],[.58,-26,0,0],[.82,-8,0,0],[1,0,0,0]) },
+  rest: { Head: desktopFrames([0,0,0,0],[.25,8,0,0],[.65,10,0,0],[1,0,0,0]), Chest: desktopFrames([0,0,0,0],[.25,4,0,0],[.65,6,0,0],[1,0,0,0]) },
+  wake: { Head: desktopFrames([0,0,0,0],[.2,10,0,0],[.45,-12,0,0],[.72,6,0,0],[1,0,0,0]), Chest: desktopFrames([0,0,0,0],[.2,8,0,0],[.45,-12,0,0],[.72,4,0,0],[1,0,0,0]) },
+  'play-bounce': { Hips: desktopFrames([0,0,0,0],[.2,-8,0,0],[.42,8,0,0],[.64,-8,0,0],[.86,5,0,0],[1,0,0,0]), Head: desktopFrames([0,0,0,0],[.2,-10,0,0],[.42,8,0,0],[.64,-10,0,0],[.86,5,0,0],[1,0,0,0]) },
+  celebrate: { Chest: desktopFrames([0,0,0,0],[.18,0,0,8],[.36,0,0,-8],[.54,0,0,8],[.72,0,0,-8],[1,0,0,0]), 'UpperArm.L': desktopFrames([0,0,0,0],[.2,-18,0,26],[.38,-12,0,34],[.56,-18,0,26],[.74,-12,0,34],[1,0,0,0]), 'UpperArm.R': desktopFrames([0,0,0,0],[.2,-18,0,-26],[.38,-12,0,-34],[.56,-18,0,-26],[.74,-12,0,-34],[1,0,0,0]) },
+  'shy-hide': { Head: desktopFrames([0,0,0,0],[.2,12,0,0],[.55,18,0,0],[.78,8,0,0],[1,0,0,0]), Chest: desktopFrames([0,0,0,0],[.2,4,0,8],[.55,10,0,12],[.78,4,0,8],[1,0,0,0]) },
+  comfort: { Head: desktopFrames([0,0,0,0],[.2,-6,0,0],[.55,-10,0,0],[.78,-4,0,0],[1,0,0,0]), Chest: desktopFrames([0,0,0,0],[.2,-3,0,0],[.55,3,0,0],[.78,-2,0,0],[1,0,0,0]) },
+};
+
+function createDesktopClip(model, name, sourcePose) {
+  const bones = [];
+  const byName = new Map();
+  model.traverse((object) => {
+    if (object.isBone) {
+      bones.push(object);
+      byName.set(object.name, object);
+      if (object.userData.name) byName.set(object.userData.name, object);
+    }
+  });
+  const keys = Object.entries(sourcePose).filter(([name]) => byName.has(name));
+  if (!keys.length) return null;
+  const times = Array.from({ length: 91 }, (_, i) => i / 90);
+  const tracks = [];
+  for (const [name, source] of keys) {
+    const bone = byName.get(name);
+    const parent = bone.parent.getWorldQuaternion(new THREE.Quaternion());
+    const inverse = parent.clone().invert();
+    const values = times.flatMap((t) => {
+      const angles = sampleFrames(source, t).map(THREE.MathUtils.degToRad);
+      const delta = new THREE.Quaternion().setFromEuler(new THREE.Euler(...angles, 'XYZ'));
+      return inverse.clone().multiply(delta).multiply(parent).multiply(bone.quaternion).toArray();
+    });
+    tracks.push(new THREE.QuaternionKeyframeTrack(bone.uuid + '.quaternion', times, values));
+  }
+  return new THREE.AnimationClip(name, 1, tracks);
+}
+
+export function createDesktopPetClips(model) {
+  return Object.entries(desktopPose)
+    .map(([name, pose]) => createDesktopClip(model, name, pose))
+    .filter(Boolean);
+}

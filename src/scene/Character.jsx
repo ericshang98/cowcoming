@@ -10,7 +10,7 @@ import { evolutionAssets } from '../evolution-assets.mjs';
 import { PROCEDURAL_CLIPS, proceduralPose } from "../live/animation.mjs";
 import { damp, gazeTargets, clamp } from "./motion.mjs";
 import { refineIpSkin } from "./ip-skin.mjs";
-import { createIpClips } from "./ip-motion.mjs";
+import { createIpClips, createDesktopPetClips } from "./ip-motion.mjs";
 import IpWeb from "./IpWeb";
 import { NIULAI_ASSET, prepareMouth, updateMouth } from "./niulai.mjs";
 const MASCOT = NIULAI_ASSET,
@@ -86,7 +86,7 @@ function Rig({ human, modelAsset = MASCOT, characterId, controller, placement, v
   const actions = useMemo(
     () =>
       Object.fromEntries(
-        [...gltf.animations, ...createIpClips(model, characterId)].map((c) => [c.name, mixer.clipAction(c)]),
+        [...createDesktopPetClips(model), ...gltf.animations, ...createIpClips(model, characterId)].map((c) => [c.name, mixer.clipAction(c)]),
       ),
     [gltf, mixer, model, characterId],
   );

@@ -2,6 +2,14 @@
 
 Current checks, release boundaries and on-site acceptance: [submission checklist](submission-checklist.md). JEV parallel scheduling is a local controller option; Worker protocol remains unchanged.
 
+## 2026-09-26：桌面宠物动作能力层扩展
+
+按 Eric 的最新要求，公共动作不再以机械臂的五个动作作为上限。`shared/action-catalog.mjs` 现在提供按头部与视线、躯干、脚与前肢、肚子与呼吸、尾巴/姿态、组合表达分组的桌面宠物行为目录（32 个语义动作 + `WAIT`）。GEV/JEV 和纯软件预览使用完整目录；设备仍通过 `supportedActions` 声明自己实际验证的子集，BenBen 的五个旧 ID 只是兼容 profile。
+
+六套牛来预览在保留已交付骨骼动作的基础上，加入按可用骨骼生成的程序化软件动作：转头、抬头低头、伸展、呼吸、抖动、身体转向、左右脚轻点、前肢动作、肚子动作、尾巴、坐/站/休息及组合表达。缺少相应骨骼或 clip 时播放器按登记的同语义回退并明确保持软件/硬件边界，不把网页完成写成实机完成。调试面板按身体区域分组；正常对话仍由 GEV 决定动作，不把动作按钮变成普通用户遥控器。
+
+新增 [桌面宠物动作目录](action-catalog.md)，并同步更新设备 Python 合同、动作调参迁移、接入文档和测试。真实机械动作、舵机标定和安全边界仍由每个硬件 adapter 独立验证，公共目录不包含关节角度。
+
 ## 2026-09-26：保留原站模型的 GEV 云端试玩
 
 网站继续使用原主站的六套牛来 GLB、`Evolution` 页面和五项动作合同。新增 `src/live/GevCloudPreview.jsx` 只在未绑定页提供云端试玩：浏览器把输入和当前 `formId` 发到公开 `VITE_GEV_PREVIEW_URL`（兼容 `VITE_GEP_PREVIEW_URL`），网关只返回一个既有动作 ID，网页通过现有 `responsePlayer` 播放。没有 endpoint 时显示待配置，不伪造在线模型；试玩不写进化历史、不计轮、不驱动硬件。

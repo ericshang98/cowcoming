@@ -47,8 +47,9 @@ export function parseTuningDocument(text) {
     .sort()
     .join();
   const currentIds = Object.keys(output.forms).sort().join();
-  // The one supported migration: existing five-form files gain default playful
-  // settings. Never reset a user's already-tuned five forms on asset addition.
+  // Migrate older files by retaining every known setting and filling newly
+  // added desktop-pet behaviors with defaults. Never reset a user's tuned
+  // values just because the public behavior catalog grew.
   const legacyIds = Object.keys(output.forms)
     .filter((id) => id !== "playful")
     .sort()
@@ -61,14 +62,11 @@ export function parseTuningDocument(text) {
     const source = input.forms[id];
     if (source?.modelSha256 !== form.modelSha256)
       throw Error("Model version differs");
-    if (
-      Object.keys(source.actions || {})
-        .sort()
-        .join() !== Object.keys(ACTION_CATALOG).sort().join()
-    )
+    if (Object.keys(source.actions || {}).some((action) => !ACTION_CATALOG[action]))
       throw Error("Incompatible actions");
-    for (const action of Object.keys(ACTION_CATALOG))
-      form.actions[action] = validateTuning(source.actions[action]);
+    for (const action of Object.keys(ACTION_CATALOG)) {
+      if (source.actions?.[action]) form.actions[action] = validateTuning(source.actions[action]);
+    }
   }
   return output;
 }
