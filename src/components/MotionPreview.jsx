@@ -62,6 +62,10 @@ export default function MotionPreview({ controller, formId, ready, defaultOpen =
     setFileStatus("");
     commit(next);
   }
+  function actionReady(actionId) {
+    const player = controller.responsePlayer;
+    return ready && (!player?.supports || player.supports(actionId));
+  }
   function exportFile() {
     const blob = new Blob([JSON.stringify(document, null, 2) + "\n"], {
       type: "application/json",
@@ -168,7 +172,7 @@ export default function MotionPreview({ controller, formId, ready, defaultOpen =
                   key={action.id}
                   data-motion={action.id}
                   aria-pressed={selected === action.id}
-                  disabled={!ready}
+                  disabled={!actionReady(action.id)}
                   onClick={() => play(action.id)}
                   title={action.region}
                 >

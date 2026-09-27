@@ -26,7 +26,7 @@ test('desktop-pet catalog is broader than the legacy device profile and covers e
 });
 
 test('procedural desktop actions use available body bones and return to neutral', () => {
-  const model = rig(['Hips', 'Spine', 'Chest', 'Neck', 'Head', 'UpperArm.L', 'Forearm.L', 'Tail']);
+  const model = rig(['Hips', 'Spine', 'Chest', 'Neck', 'Head', 'UpperArm.L', 'UpperArm.R', 'Forearm.L', 'Tail', 'Tail.01']);
   const clips = createDesktopPetClips(model);
   const names = new Set(clips.map((clip) => clip.name));
   for (const name of ['look-left', 'stretch', 'breathe', 'paw-wave', 'belly-rub', 'tail-wag', 'play-bounce']) {
@@ -55,4 +55,12 @@ test('bone aliases bind the underscore rigs and tilts contain no nod pitch', () 
   assert.ok(headTrack);
   const values = [...headTrack.values];
   assert.ok(values.some((value, index) => index % 4 === 2 && Math.abs(value) > 0.05));
+});
+
+test('desktop clips fail closed instead of partially retargeting missing bones', () => {
+  const model = rig(['Hips', 'Spine', 'Neck', 'Head', 'UpperArm_L', 'UpperArm_R']);
+  const names = new Set(createDesktopPetClips(model).map((clip) => clip.name));
+  assert.ok(names.has('stretch'));
+  assert.equal(names.has('paw-wave'), false);
+  assert.equal(names.has('tail-wag'), false);
 });

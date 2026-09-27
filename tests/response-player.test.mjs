@@ -8,7 +8,7 @@ import {
   availableDeviceActions,
 } from "../shared/action-catalog.mjs";
 import { initialRoom, updateProfile } from "../shared/live-protocol.mjs";
-function fixture({ accent = false } = {}) {
+function fixture({ accent = false, getSoftwareVariant = null } = {}) {
   const root = new THREE.Group(),
     bone = new THREE.Bone();
   bone.name = "Head";
@@ -41,9 +41,9 @@ function fixture({ accent = false } = {}) {
     actions,
     manifest,
     bones: new Set(["Head"]),
-    getSoftwareVariant: accent
+    getSoftwareVariant: getSoftwareVariant || (accent
       ? () => ({ id: "test-accent", clip: "bow", phase: "before", tuning: { speed: 1, amplitude: 1 } })
-      : undefined,
+      : undefined),
   });
   return {
     player,
@@ -72,6 +72,13 @@ test("verified hardware actions play their distinct clip, complete after recover
   }
   f.player.dispose();
 });
+test("supports reports only actions with a loaded clip and required bones", () => {
+  const f = fixture();
+  assert.equal(f.player.supports("NOD"), true);
+  assert.equal(f.player.supports("STRETCH"), false);
+  assert.equal(f.player.supports("WAIT"), true);
+  f.player.dispose();
+});
 test("software behaviors never masquerade as another action when no matching clip is loaded", async () => {
   const f = fixture();
   for (const id of Object.keys(ACTION_CATALOG).filter((id) => !HARDWARE_ACTION_IDS.includes(id))) {
@@ -95,6 +102,20 @@ test("software accents enrich a base action without changing its action identity
   assert.equal((await result).softwareVariant, "test-accent");
   assert.equal(f.player.busy, false);
   f.player.dispose();
+});
+
+test("a software accent identical to the base clip is ignored", async () => {
+  const f = fixture({ getSoftwareVariant: (_request, _variant, context) => ({
+    id: "same-as-base",
+    clip: "nod_confirm",
+    phase: "before",
+    tuning: { speed: 1, amplitude: 1 },
+    ...context,
+  }) });
+  const resultPromise = f.player.play({ eventId: "same-base", formId: "calf", actionId: "NOD" });
+  f.advance();
+  const result = await resultPromise;
+  assert.equal(result.softwareVariant, null);
 });
 test("unavailable models never claim completion; stop interrupts actual playback", async () => {
   const f = fixture();

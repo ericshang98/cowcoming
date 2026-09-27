@@ -116,6 +116,16 @@ export function createResponsePlayer({
     get busy() {
       return Boolean(current);
     },
+    supports(actionId) {
+      if (disposed) return false;
+      if (actionId === "WAIT") return true;
+      const spec = ACTION_CATALOG[actionId];
+      const variant = resolveVariant(actionId, spec);
+      return Boolean(
+        variant && actions[variant.clip] &&
+        variant.requiredBones.every((bone) => bones.has(bone)),
+      );
+    },
     get clip() {
       return current?.clip || null;
     },
@@ -150,7 +160,8 @@ export function createResponsePlayer({
       if (seen.size > 1000) seen.delete(seen.keys().next().value);
       return new Promise(resolve => {
         let softwareVariant = null;
-        try { softwareVariant = getSoftwareVariant(request, variant, { actions, bones }); } catch { /* Optional software accents fail closed. */ }
+        try { softwareVariant = getSoftwareVariant(request, variant, { actions, bones, baseClip: variant?.clip || null }); } catch { /* Optional software accents fail closed. */ }
+        if (softwareVariant?.clip === variant?.clip) softwareVariant = null;
         if (softwareVariant && (!actions[softwareVariant.clip] || !softwareVariant.tuning)) softwareVariant = null;
         queue.push({request, variant, tuning, softwareVariant, resolve});
         drain();

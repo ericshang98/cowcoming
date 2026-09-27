@@ -136,7 +136,7 @@ const desktopPose = {
   'look-down': { Head: desktopFrames([0,0,0,0],[.2,16,0,0],[.62,16,0,0],[1,0,0,0]), Neck: desktopFrames([0,0,0,0],[.2,7,0,0],[.62,7,0,0],[1,0,0,0]) },
   bow: { Chest: desktopFrames([0,0,0,0],[.18,10,0,0],[.43,18,0,0],[.7,8,0,0],[1,0,0,0]), Spine: desktopFrames([0,0,0,0],[.18,8,0,0],[.43,14,0,0],[.7,6,0,0],[1,0,0,0]), Head: desktopFrames([0,0,0,0],[.2,-8,0,0],[.45,-13,0,0],[.7,-6,0,0],[1,0,0,0]) },
   stretch: { Chest: desktopFrames([0,0,0,0],[.2,-8,0,0],[.5,-14,0,0],[.8,-5,0,0],[1,0,0,0]), 'UpperArm.L': desktopFrames([0,0,0,0],[.2,-16,0,22],[.5,-28,0,30],[.8,-12,0,16],[1,0,0,0]), 'UpperArm.R': desktopFrames([0,0,0,0],[.2,-16,0,-22],[.5,-28,0,-30],[.8,-12,0,-16],[1,0,0,0]) },
-  breathe: { Chest: desktopFrames([0,0,0,0],[.2,-5,0,0],[.42,5,0,0],[.64,-5,0,0],[.86,5,0,0],[1,0,0,0]), Spine: desktopFrames([0,0,0,0],[.2,-3,0,0],[.42,3,0,0],[.64,-3,0,0],[.86,3,0,0],[1,0,0,0]) },
+  breathe: { Chest: desktopFrames([0,0,0,0],[.2,-6,0,0],[.42,6,0,0],[.64,-6,0,0],[.86,6,0,0],[1,0,0,0]) },
   shimmy: { Chest: desktopFrames([0,0,0,0],[.18,0,0,8],[.36,0,0,-8],[.54,0,0,8],[.72,0,0,-8],[1,0,0,0]), Hips: desktopFrames([0,0,0,0],[.18,0,0,-5],[.36,0,0,5],[.54,0,0,-5],[.72,0,0,5],[1,0,0,0]) },
   'turn-left': { Chest: desktopFrames([0,0,0,0],[.2,0,15,0],[.65,0,18,0],[1,0,0,0]), Head: desktopFrames([0,0,0,0],[.2,0,-6,0],[.65,0,-8,0],[1,0,0,0]) },
   'turn-right': { Chest: desktopFrames([0,0,0,0],[.2,0,-15,0],[.65,0,-18,0],[1,0,0,0]), Head: desktopFrames([0,0,0,0],[.2,0,6,0],[.65,0,8,0],[1,0,0,0]) },
@@ -148,7 +148,9 @@ const desktopPose = {
   'belly-breathe': { Chest: desktopFrames([0,0,0,0],[.18,-6,0,0],[.4,6,0,0],[.62,-6,0,0],[.84,6,0,0],[1,0,0,0]), Hips: desktopFrames([0,0,0,0],[.2,0,0,2],[.5,0,0,-2],[.8,0,0,2],[1,0,0,0]) },
   'belly-rub': { 'UpperArm.L': desktopFrames([0,0,0,0],[.25,-20,0,24],[.52,-12,0,18],[.78,-18,0,22],[1,0,0,0]), 'UpperArm.R': desktopFrames([0,0,0,0],[.25,-20,0,-24],[.52,-12,0,-18],[.78,-18,0,-22],[1,0,0,0]) },
   'belly-laugh': { Chest: desktopFrames([0,0,0,0],[.2,-8,0,0],[.42,8,0,0],[.64,-8,0,0],[.86,5,0,0],[1,0,0,0]), 'UpperArm.L': desktopFrames([0,0,0,0],[.2,-18,0,24],[.42,-12,0,20],[.64,-18,0,24],[1,0,0,0]), 'UpperArm.R': desktopFrames([0,0,0,0],[.2,-18,0,-24],[.42,-12,0,-20],[.64,-18,0,-24],[1,0,0,0]) },
-  'tail-wag': { Tail: desktopFrames([0,0,0,0],[.18,0,22,0],[.36,0,-22,0],[.54,0,22,0],[.72,0,-18,0],[1,0,0,0]), 'Tail.01': desktopFrames([0,0,0,0],[.2,0,18,0],[.4,0,-18,0],[.6,0,18,0],[1,0,0,0]), Hips: desktopFrames([0,0,0,0],[.2,0,0,4],[.4,0,0,-4],[.6,0,0,4],[1,0,0,0]) },
+  // Use the first available tail segment as the semantic anchor. A second
+  // segment is optional in a rig, but must never be guessed as the hips.
+  'tail-wag': { Tail: desktopFrames([0,0,0,0],[.18,0,22,0],[.36,0,-22,0],[.54,0,22,0],[.72,0,-18,0],[1,0,0,0]), Hips: desktopFrames([0,0,0,0],[.2,0,0,4],[.4,0,0,-4],[.6,0,0,4],[1,0,0,0]) },
   sit: { Hips: desktopFrames([0,0,0,0],[.2,-10,0,0],[.55,-22,0,0],[.8,-8,0,0],[1,0,0,0]), 'UpLeg.L': desktopFrames([0,0,0,0],[.25,18,0,0],[.58,28,0,0],[.82,8,0,0],[1,0,0,0]), 'UpLeg.R': desktopFrames([0,0,0,0],[.25,18,0,0],[.58,28,0,0],[.82,8,0,0],[1,0,0,0]) },
   stand: { Hips: desktopFrames([0,0,0,0],[.2,12,0,0],[.52,20,0,0],[.78,6,0,0],[1,0,0,0]), 'UpLeg.L': desktopFrames([0,0,0,0],[.25,-18,0,0],[.58,-26,0,0],[.82,-8,0,0],[1,0,0,0]), 'UpLeg.R': desktopFrames([0,0,0,0],[.25,-18,0,0],[.58,-26,0,0],[.82,-8,0,0],[1,0,0,0]) },
   rest: { Head: desktopFrames([0,0,0,0],[.25,8,0,0],[.65,10,0,0],[1,0,0,0]), Chest: desktopFrames([0,0,0,0],[.25,4,0,0],[.65,6,0,0],[1,0,0,0]) },
@@ -177,9 +179,9 @@ const BONE_ALIASES = Object.freeze({
   Chest: ['Chest', 'Spine'],
 });
 
-function resolveBoneName(byName, name) {
+function resolveBoneName(byName, name, usedBones) {
   const candidates = BONE_ALIASES[name] || [name, name.replace(/\./g, '_'), name.replace(/_/g, '.')];
-  return candidates.find((candidate) => byName.has(candidate)) || null;
+  return candidates.find((candidate) => byName.has(candidate) && !usedBones.has(candidate)) || null;
 }
 
 function createDesktopClip(model, name, sourcePose) {
@@ -195,8 +197,11 @@ function createDesktopClip(model, name, sourcePose) {
   const keys = [];
   const usedBones = new Set();
   for (const [sourceName, source] of Object.entries(sourcePose)) {
-    const name = resolveBoneName(byName, sourceName);
-    if (!name || usedBones.has(name)) continue;
+    const name = resolveBoneName(byName, sourceName, usedBones);
+    // A semantic motion is only valid when every authored target exists. A
+    // partial clip silently moving a nearby bone is worse than an unavailable
+    // clip because it makes the action appear to be incorrectly rigged.
+    if (!name) return null;
     usedBones.add(name);
     keys.push([name, source]);
   }

@@ -10,6 +10,10 @@ Current checks, release boundaries and on-site acceptance: [submission checklist
 
 新增 [桌面宠物动作目录](action-catalog.md)，并同步更新设备 Python 合同、动作调参迁移、接入文档和测试。真实机械动作、舵机标定和安全边界仍由每个硬件 adapter 独立验证，公共目录不包含关节角度。播放器不再以通用点头/鞠躬/挥手作为跨语义回退；缺少对应骨骼或 clip 时明确返回不可用。
 
+## 2026-09-27：动作播放与骨骼能力闸门
+
+软件变体只有在使用不同于语义基础动作的 clip 时才会加入；同一 clip 不再前后重复播放。程序化动作会按当前模型实际存在的骨骼生成，缺少任一目标骨骼时整段动作不可用，不把尾巴、前臂等语义动作静默映射到髋部或上臂。调试面板根据播放器的 `supports()` 能力结果禁用当前形态无法安全执行的动作。小牛原有五段 Blender 导出动作保持原资源和绑定不变。
+
 ## 2026-09-26：保留原站模型的 GEV 云端试玩
 
 网站继续使用原主站的六套牛来 GLB、`Evolution` 页面和五项动作合同。新增 `src/live/GevCloudPreview.jsx` 只在未绑定页提供云端试玩：浏览器把输入和当前 `formId` 发到公开 `VITE_GEV_PREVIEW_URL`（兼容 `VITE_GEP_PREVIEW_URL`），网关只返回一个既有动作 ID，网页通过现有 `responsePlayer` 播放。没有 endpoint 时显示待配置，不伪造在线模型；试玩不写进化历史、不计轮、不驱动硬件。

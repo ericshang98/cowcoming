@@ -43,14 +43,14 @@ export const SOFTWARE_VARIANTS = Object.freeze(
   Object.fromEntries(Object.keys(FORM_STYLE).map((formId) => [formId, generatedVariants(formId)])),
 );
 
-export function selectSoftwareVariant(formId, actionId, eventId, { actions = {} } = {}) {
+export function selectSoftwareVariant(formId, actionId, eventId, { actions = {}, baseClip = null } = {}) {
   // Verified semantic clips are the complete action. Do not prepend or append
   // a generic software accent (for example a wave before a curious tilt),
   // because that changes the meaning and makes the motion look like two
   // unrelated actions.
   if (ACTION_CATALOG[actionId]?.suffix) return null;
   const candidates = SOFTWARE_VARIANTS[formId]?.[actionId] || [];
-  const available = candidates.filter((variant) => actions[variant.clip]);
+  const available = candidates.filter((variant) => actions[variant.clip] && variant.clip !== baseClip);
   if (!available.length) return null;
   const variant = available[hash(formId + ':' + actionId + ':' + eventId) % available.length];
   return {
