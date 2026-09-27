@@ -1,4 +1,4 @@
-import { ACTION_CATALOG, ACTION_IDS } from '../../shared/action-catalog.mjs';
+import { ACTION_CATALOG, PUBLIC_ACTION_IDS } from '../../shared/action-catalog.mjs';
 
 // Software accents are independent from device capability. They enrich a
 // semantic behavior with a form-specific sequence while a device, when
@@ -10,49 +10,6 @@ const FORM_STYLE = Object.freeze({
   tough: { primary: 'bow', secondary: 'wave', speed: .9, amplitude: .74 },
   celestial: { primary: 'reflect', secondary: 'tilt', speed: .84, amplitude: .76 },
   dark: { primary: 'reflect', secondary: 'look', speed: .82, amplitude: .8 },
-});
-
-const OLD_VARIANTS = Object.freeze({
-  calf: {
-    NOD: [{ id: 'attentive-bow', clip: 'bow', phase: 'before', speed: .84, amplitude: .78 }],
-    SHAKE: [{ id: 'small-wave', clip: 'wave', phase: 'after', speed: .9, amplitude: .72 }],
-    TILT_LEFT: [{ id: 'curious-bow', clip: 'bow', phase: 'before', speed: .92, amplitude: .66 }],
-    TILT_RIGHT: [{ id: 'curious-wave', clip: 'wave', phase: 'after', speed: .92, amplitude: .66 }],
-  },
-  normal: {
-    NOD: [{ id: 'formal-bow', clip: 'bow', phase: 'before', speed: .82, amplitude: .8 }],
-    NOD_DOUBLE: [{ id: 'showcase-wave', clip: 'wave', phase: 'after', speed: .88, amplitude: .8 }],
-    TILT_LEFT: [{ id: 'formal-left-bow', clip: 'bow', phase: 'before', speed: .9, amplitude: .64 }],
-    TILT_RIGHT: [{ id: 'formal-right-bow', clip: 'bow', phase: 'before', speed: .9, amplitude: .64 }],
-  },
-  playful: {
-    NOD: [{ id: 'spotlight-bow', clip: 'bow', phase: 'before', speed: .9, amplitude: .78 }],
-    SHAKE: [{ id: 'teasing-wave', clip: 'wave', phase: 'after', speed: .82, amplitude: .9 }],
-    NOD_DOUBLE: [{ id: 'proud-leg-sway', clip: 'leg_sway', phase: 'after', speed: .86, amplitude: .86 }],
-    TILT_LEFT: [{ id: 'left-spotlight-wave', clip: 'wave', phase: 'after', speed: .86, amplitude: .82 }],
-    TILT_RIGHT: [{ id: 'right-spotlight-wave', clip: 'wave', phase: 'after', speed: .86, amplitude: .82 }],
-  },
-  tough: {
-    NOD: [{ id: 'reluctant-bow', clip: 'bow', phase: 'before', speed: .88, amplitude: .72 }],
-    SHAKE: [{ id: 'stubborn-wave', clip: 'wave', phase: 'after', speed: .86, amplitude: .76 }],
-    NOD_DOUBLE: [{ id: 'tough-showcase-wave', clip: 'wave', phase: 'after', speed: .92, amplitude: .74 }],
-    TILT_LEFT: [{ id: 'guarded-left-bow', clip: 'bow', phase: 'before', speed: .94, amplitude: .58 }],
-    TILT_RIGHT: [{ id: 'guarded-right-bow', clip: 'bow', phase: 'before', speed: .94, amplitude: .58 }],
-  },
-  celestial: {
-    NOD: [{ id: 'reflective-nod', clip: 'reflect', phase: 'before', speed: .82, amplitude: .78 }],
-    SHAKE: [{ id: 'oracle-look', clip: 'look', phase: 'before', speed: .86, amplitude: .72 }],
-    NOD_DOUBLE: [{ id: 'ceremonial-bow', clip: 'bow', phase: 'before', speed: .78, amplitude: .76 }],
-    TILT_LEFT: [{ id: 'left-meditative-tilt', clip: 'tilt', phase: 'after', speed: .84, amplitude: .72 }],
-    TILT_RIGHT: [{ id: 'right-meditative-tilt', clip: 'tilt', phase: 'after', speed: .84, amplitude: .72 }],
-  },
-  dark: {
-    NOD: [{ id: 'command-reflect', clip: 'reflect', phase: 'before', speed: .8, amplitude: .82 }],
-    SHAKE: [{ id: 'threatening-look', clip: 'look', phase: 'before', speed: .84, amplitude: .76 }],
-    NOD_DOUBLE: [{ id: 'imperial-bow', clip: 'bow', phase: 'before', speed: .8, amplitude: .8 }],
-    TILT_LEFT: [{ id: 'left-final-boss-tilt', clip: 'tilt', phase: 'after', speed: .84, amplitude: .74 }],
-    TILT_RIGHT: [{ id: 'right-final-boss-tilt', clip: 'tilt', phase: 'after', speed: .84, amplitude: .74 }],
-  },
 });
 
 function hash(value) {
@@ -68,7 +25,6 @@ function generatedVariants(formId) {
   const style = FORM_STYLE[formId] || FORM_STYLE.normal;
   return Object.fromEntries(
     Object.entries(ACTION_CATALOG).map(([actionId, spec]) => {
-      if (OLD_VARIANTS[formId]?.[actionId]) return [actionId, OLD_VARIANTS[formId][actionId]];
       const clip = spec.softwareClips.includes(style.primary) ? style.primary
         : spec.softwareClips.includes(style.secondary) ? style.secondary
         : spec.softwareClips[0];
@@ -88,6 +44,11 @@ export const SOFTWARE_VARIANTS = Object.freeze(
 );
 
 export function selectSoftwareVariant(formId, actionId, eventId, { actions = {} } = {}) {
+  // Verified semantic clips are the complete action. Do not prepend or append
+  // a generic software accent (for example a wave before a curious tilt),
+  // because that changes the meaning and makes the motion look like two
+  // unrelated actions.
+  if (ACTION_CATALOG[actionId]?.suffix) return null;
   const candidates = SOFTWARE_VARIANTS[formId]?.[actionId] || [];
   const available = candidates.filter((variant) => actions[variant.clip]);
   if (!available.length) return null;
@@ -104,7 +65,7 @@ export function softwareVariantCount(formId = null) {
 }
 
 export function softwareActionSummary() {
-  return ACTION_IDS.filter((id) => id !== 'WAIT').map((id) => ({
+  return PUBLIC_ACTION_IDS.map((id) => ({
     id,
     label: ACTION_CATALOG[id].label,
     group: ACTION_CATALOG[id].group,

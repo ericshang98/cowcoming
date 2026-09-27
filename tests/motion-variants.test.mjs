@@ -25,3 +25,10 @@ test('variant selection is deterministic for an interaction and fails closed whe
   assert.deepEqual(first, second);
   assert.equal(selectSoftwareVariant('calf', 'NOD', 'event-1', { actions: {} }), null);
 });
+
+test('verified head gestures do not receive unrelated software accents', () => {
+  const actions = { bow: {}, wave: {}, 'tilt-right': {}, 'tilt-left': {} };
+  assert.equal(selectSoftwareVariant('calf', 'TILT_RIGHT', 'event-tilt', { actions }), null);
+  assert.equal(selectSoftwareVariant('calf', 'TILT_LEFT', 'event-tilt', { actions }), null);
+  assert.equal(selectSoftwareVariant('calf', 'NOD', 'event-nod', { actions }), null);
+});

@@ -8,8 +8,9 @@ export const FORM_IDS = [
   "celestial",
   "dark",
 ];
-import { ACTION_CONTRACT_VERSION, ACTION_IDS, ANIMATIONS, DEFAULT_MAP, animationMatches, availableDeviceActions } from './action-catalog.mjs';
+import { ACTION_CONTRACT_VERSION, ACTION_IDS, PUBLIC_ACTION_IDS, ANIMATIONS, DEFAULT_MAP, animationMatches, availableDeviceActions } from './action-catalog.mjs';
 export { ACTION_CONTRACT_VERSION, ACTION_IDS, ANIMATIONS, DEFAULT_MAP, availableDeviceActions };
+const DEFAULT_ALLOWED_ACTIONS = Object.freeze([...PUBLIC_ACTION_IDS, "WAIT"]);
 export function check(ok, message) {
   if (!ok) throw new Error(message);
 }
@@ -48,7 +49,7 @@ export function initialRoom(roomId, label) {
       revision: 1,
       actionContractVersion: ACTION_CONTRACT_VERSION,
       ...personaProfile('calf'),
-      allowedActions: [...ACTION_IDS],
+      allowedActions: [...DEFAULT_ALLOWED_ACTIONS],
       animationMap: structuredClone(DEFAULT_MAP),
     },
     appliedRevision: null,
@@ -92,7 +93,7 @@ export function updateProfile(state, patch) {
   );
   if (patch.migrateActions === true || p.actionContractVersion !== ACTION_CONTRACT_VERSION) {
     p.actionContractVersion = ACTION_CONTRACT_VERSION;
-    p.allowedActions = [...ACTION_IDS];
+    p.allowedActions = [...DEFAULT_ALLOWED_ACTIONS];
     p.animationMap = structuredClone(DEFAULT_MAP);
   }
   if (patch.formId !== undefined) {

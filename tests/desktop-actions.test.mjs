@@ -44,3 +44,15 @@ test('procedural desktop actions use available body bones and return to neutral'
     }
   }
 });
+
+test('bone aliases bind the underscore rigs and tilts contain no nod pitch', () => {
+  const model = rig(['Hips', 'Spine', 'Neck', 'Head', 'UpperArm_L', 'ForeArm_L', 'UpperArm_R', 'ForeArm_R', 'Tail']);
+  const clips = createDesktopPetClips(model);
+  const names = new Set(clips.map((clip) => clip.name));
+  for (const name of ['tilt-left', 'tilt-right', 'paw-wave', 'stretch']) assert.ok(names.has(name), name);
+  const tilt = clips.find((clip) => clip.name === 'tilt-right');
+  const headTrack = tilt.tracks.find((track) => track.name.endsWith('.quaternion'));
+  assert.ok(headTrack);
+  const values = [...headTrack.values];
+  assert.ok(values.some((value, index) => index % 4 === 2 && Math.abs(value) > 0.05));
+});

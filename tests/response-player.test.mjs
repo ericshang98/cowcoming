@@ -72,14 +72,14 @@ test("verified hardware actions play their distinct clip, complete after recover
   }
   f.player.dispose();
 });
-test("expanded software behaviors resolve to a registered clip or a declared fallback", async () => {
+test("software behaviors never masquerade as another action when no matching clip is loaded", async () => {
   const f = fixture();
   for (const id of Object.keys(ACTION_CATALOG).filter((id) => !HARDWARE_ACTION_IDS.includes(id))) {
     const result = f.player.play({ eventId: `software-${id}`, formId: "calf", actionId: id });
-    assert.equal(f.player.busy, true);
-    assert.ok(f.player.clip);
+    const hasSemanticClip = Boolean(f.actions[ACTION_CATALOG[id].animation]);
+    assert.equal(f.player.busy, hasSemanticClip, id);
     f.advance();
-    assert.equal((await result).status, "completed");
+    assert.equal((await result).status, hasSemanticClip ? "completed" : "unavailable", id);
   }
   f.player.dispose();
 });

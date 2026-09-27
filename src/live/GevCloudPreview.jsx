@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Sparkles } from 'lucide-react';
-import { ACTION_CATALOG } from '../../shared/action-catalog.mjs';
+import { ACTION_CATALOG, PUBLIC_ACTION_IDS } from '../../shared/action-catalog.mjs';
 import { forms } from '../evolution.mjs';
 import { useLanguage } from '../i18n/Language';
 import { GEV_PREVIEW_MODEL, requestGevDecision, resolveGevPreviewEndpoint } from '../gev-preview.mjs';
@@ -61,7 +61,7 @@ export default function GevCloudPreview({ formId, controller, ready }) {
         model: GEV_PREVIEW_MODEL,
         formId,
         text: prompt,
-        allowedActions: Object.keys(ACTION_CATALOG).concat('WAIT'),
+        allowedActions: PUBLIC_ACTION_IDS.concat('WAIT'),
       });
       if (generation.current !== gen) return;
       setDecision(result);

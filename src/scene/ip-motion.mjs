@@ -126,6 +126,10 @@ export function createIpClips(model, id) {
 // compatible bones a supplied rig exposes. It never emits servo commands.
 const desktopFrames = (...values) => values;
 const desktopPose = {
+  // A tilt is a roll around the head's forward axis. It intentionally has no
+  // pitch component, so it cannot look like a nod before the head leans.
+  'tilt-left': { Head: desktopFrames([0,0,0,0],[.2,0,0,-12],[.62,0,0,-12],[1,0,0,0]), Neck: desktopFrames([0,0,0,0],[.2,0,0,-4],[.62,0,0,-4],[1,0,0,0]) },
+  'tilt-right': { Head: desktopFrames([0,0,0,0],[.2,0,0,12],[.62,0,0,12],[1,0,0,0]), Neck: desktopFrames([0,0,0,0],[.2,0,0,4],[.62,0,0,4],[1,0,0,0]) },
   'look-left': { Head: desktopFrames([0,0,0,0],[.2,0,18,0],[.62,0,18,0],[1,0,0,0]), Neck: desktopFrames([0,0,0,0],[.2,0,8,0],[.62,0,8,0],[1,0,0,0]) },
   'look-right': { Head: desktopFrames([0,0,0,0],[.2,0,-18,0],[.62,0,-18,0],[1,0,0,0]), Neck: desktopFrames([0,0,0,0],[.2,0,-8,0],[.62,0,-8,0],[1,0,0,0]) },
   'look-up': { Head: desktopFrames([0,0,0,0],[.2,-16,0,0],[.62,-16,0,0],[1,0,0,0]), Neck: desktopFrames([0,0,0,0],[.2,-7,0,0],[.62,-7,0,0],[1,0,0,0]) },
@@ -155,6 +159,29 @@ const desktopPose = {
   comfort: { Head: desktopFrames([0,0,0,0],[.2,-6,0,0],[.55,-10,0,0],[.78,-4,0,0],[1,0,0,0]), Chest: desktopFrames([0,0,0,0],[.2,-3,0,0],[.55,3,0,0],[.78,-2,0,0],[1,0,0,0]) },
 };
 
+const BONE_ALIASES = Object.freeze({
+  'UpperArm.L': ['UpperArm.L', 'UpperArm_L'],
+  'UpperArm.R': ['UpperArm.R', 'UpperArm_R'],
+  'Forearm.L': ['Forearm.L', 'ForeArm.L', 'Forearm_L', 'ForeArm_L'],
+  'Forearm.R': ['Forearm.R', 'ForeArm.R', 'Forearm_R', 'ForeArm_R'],
+  'Hand.L': ['Hand.L', 'Hand_L'],
+  'Hand.R': ['Hand.R', 'Hand_R'],
+  'Thigh.L': ['Thigh.L', 'Thigh_L', 'UpLeg.L', 'UpLeg_L'],
+  'Thigh.R': ['Thigh.R', 'Thigh_R', 'UpLeg.R', 'UpLeg_R'],
+  'UpLeg.L': ['UpLeg.L', 'UpLeg_L', 'Thigh.L', 'Thigh_L', 'Leg_L'],
+  'UpLeg.R': ['UpLeg.R', 'UpLeg_R', 'Thigh.R', 'Thigh_R', 'Leg_R'],
+  'Shin.L': ['Shin.L', 'Shin_L', 'Leg.L', 'Leg_L'],
+  'Shin.R': ['Shin.R', 'Shin_R', 'Leg.R', 'Leg_R'],
+  Tail: ['Tail', 'Tail.01'],
+  'Tail.01': ['Tail.01', 'Tail'],
+  Chest: ['Chest', 'Spine'],
+});
+
+function resolveBoneName(byName, name) {
+  const candidates = BONE_ALIASES[name] || [name, name.replace(/\./g, '_'), name.replace(/_/g, '.')];
+  return candidates.find((candidate) => byName.has(candidate)) || null;
+}
+
 function createDesktopClip(model, name, sourcePose) {
   const bones = [];
   const byName = new Map();
@@ -165,7 +192,14 @@ function createDesktopClip(model, name, sourcePose) {
       if (object.userData.name) byName.set(object.userData.name, object);
     }
   });
-  const keys = Object.entries(sourcePose).filter(([name]) => byName.has(name));
+  const keys = [];
+  const usedBones = new Set();
+  for (const [sourceName, source] of Object.entries(sourcePose)) {
+    const name = resolveBoneName(byName, sourceName);
+    if (!name || usedBones.has(name)) continue;
+    usedBones.add(name);
+    keys.push([name, source]);
+  }
   if (!keys.length) return null;
   const times = Array.from({ length: 91 }, (_, i) => i / 90);
   const tracks = [];

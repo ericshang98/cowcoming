@@ -72,11 +72,6 @@ export function createResponsePlayer({
       spec?.animation,
       actionId,
       ...(spec?.softwareClips || []),
-      ...(spec?.fallbackAction && ACTION_CATALOG[spec.fallbackAction]
-        ? [ACTION_CATALOG[spec.fallbackAction].suffix]
-        : []),
-      "bow",
-      "wave",
     ].filter(Boolean);
     const clip = candidates.find((name) => actions[name]);
     if (!clip) return null;
