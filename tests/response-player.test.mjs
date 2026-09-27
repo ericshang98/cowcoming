@@ -112,6 +112,19 @@ test("unavailable models never claim completion; stop interrupts actual playback
   assert.equal(f.player.busy, false);
   f.player.dispose();
 });
+test("stopping a motion allows the next motion to start immediately", async () => {
+  const f = fixture();
+  const first = f.player.play({ eventId: "switch-one", formId: "calf", actionId: "NOD" });
+  assert.equal(f.player.busy, true);
+  f.player.stop();
+  assert.equal((await first).status, "interrupted");
+  const second = f.player.play({ eventId: "switch-two", formId: "calf", actionId: "SHAKE" });
+  assert.equal(f.player.busy, true);
+  assert.equal(f.player.clip, ACTION_CATALOG.SHAKE.suffix);
+  f.advance();
+  assert.equal((await second).status, "completed");
+  f.player.dispose();
+});
 test("protocol migration is explicit and action semantics cannot be swapped", () => {
   const state = initialRoom("test", "test");
   delete state.profile.actionContractVersion;

@@ -25,6 +25,7 @@ export default function MotionPreview({ controller, formId, ready, defaultOpen =
   const importInput = useRef(null);
   const tuning = document.forms[formId]?.actions[selected] || DEFAULT_TUNING;
   const generation = useRef(0);
+  const playbackGeneration = useRef(0);
   useEffect(() => {
     if (
       Object.keys(document.forms).length !== Object.keys(evolutionAssets).length
@@ -96,17 +97,21 @@ export default function MotionPreview({ controller, formId, ready, defaultOpen =
   }
   useEffect(() => {
     generation.current++;
+    playbackGeneration.current++;
     setStatus("");
     setBusy(false);
     return () => {
       generation.current++;
+      playbackGeneration.current++;
       controller.responsePlayer?.stop();
     };
   }, [formId, controller]);
   async function play(actionId) {
     setSelected(actionId);
-    const gen = generation.current,
-      player = controller.responsePlayer;
+    const gen = generation.current;
+    const playback = ++playbackGeneration.current;
+    const player = controller.responsePlayer;
+    if (player?.busy) player.stop();
     if (!player || controller.responseForm !== formId) {
       setStatus(
         zh ? "当前形态动画未就绪" : "This form’s animation is unavailable.",
@@ -120,7 +125,7 @@ export default function MotionPreview({ controller, formId, ready, defaultOpen =
       actionId,
       eventId: crypto.randomUUID(),
     });
-    if (generation.current !== gen) return;
+    if (generation.current !== gen || playbackGeneration.current !== playback) return;
     setBusy(false);
     setStatus(
       result.status === "completed"
@@ -163,7 +168,7 @@ export default function MotionPreview({ controller, formId, ready, defaultOpen =
                   key={action.id}
                   data-motion={action.id}
                   aria-pressed={selected === action.id}
-                  disabled={!ready || busy}
+                  disabled={!ready}
                   onClick={() => play(action.id)}
                   title={action.region}
                 >
@@ -182,8 +187,8 @@ export default function MotionPreview({ controller, formId, ready, defaultOpen =
         </legend>
         <p>
           {zh
-            ? "点上面的动作试播；修改参数后点同一动作重播。"
-            : "Select an action to play; select it again after adjusting."}
+            ? "点击任何动作都可以立即切换；播放中修改参数会在下一次播放生效。"
+            : "Click any action to switch immediately; tuning changes apply on the next playback."}
         </p>
         {Object.entries(TUNING_LIMITS).map(([key, [min, max]]) => (
           <label key={key}>
@@ -230,7 +235,12 @@ export default function MotionPreview({ controller, formId, ready, defaultOpen =
       <button
         data-motion-stop
         disabled={!busy}
-        onClick={() => controller.responsePlayer?.stop()}
+        onClick={() => {
+          playbackGeneration.current++;
+          controller.responsePlayer?.stop();
+          setBusy(false);
+          setStatus(zh ? "已停止" : "Stopped");
+        }}
       >
         {zh ? "停止预览" : "Stop preview"}
       </button>
